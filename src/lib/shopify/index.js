@@ -31,13 +31,17 @@ const endpoint = domain
  * @param {Object} params
  * @param {string} params.query   GraphQL query/mutation string.
  * @param {Object} [params.variables]  GraphQL variables.
- * @param {RequestCache} [params.cache]  fetch cache mode (default 'force-cache').
+ * @param {RequestCache} [params.cache]  fetch cache mode. Defaults to 'no-store'
+ *   so the storefront always reflects the latest Shopify data (in dev AND
+ *   production) without a rebuild. This makes routes dynamically rendered. For a
+ *   specific call that can be cached, pass `cache: 'force-cache'` (optionally
+ *   with `next: { revalidate }` upstream) to opt back into caching/ISR.
  * @returns {Promise<{ status: number, body: any }>}
  */
 export async function shopifyFetch({
   query,
   variables,
-  cache = 'force-cache',
+  cache = 'no-store',
 }) {
   if (!endpoint || !accessToken) {
     throw new Error(
