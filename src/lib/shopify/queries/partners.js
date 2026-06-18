@@ -1,16 +1,16 @@
-import { partnerFragment } from '@/components/sections/PartnersSection/PartnersSection';
+import { partnersSectionFragment } from '@/components/sections/PartnersSection/PartnersSection';
 
-// Partners are a collection of `partners` metaobjects (each an individual
-// partner with a logo). Fetched as a set rather than via a page's `sections`.
+// The partners section is a single `partners` metaobject holding a `title` and
+// a `partner_item` list of partner entries. Fetched as one section metaobject.
 export const getPartnersQuery = /* GraphQL */ `
   query GetPartners($first: Int!) {
     metaobjects(type: "partners", first: $first) {
       edges {
         node {
-          ...PartnerFields
+          ...PartnersSectionFields
         }
       }
     }
   }
-  ${partnerFragment}
+  ${partnersSectionFragment}
 `;

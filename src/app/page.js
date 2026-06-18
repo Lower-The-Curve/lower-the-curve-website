@@ -6,7 +6,10 @@ import PartnersSection from '@/components/sections/PartnersSection/PartnersSecti
 import styles from './page.module.css';
 
 export default async function HomePage() {
-  const [home, partners] = await Promise.all([getHomePage(), getPartners()]);
+  const [home, partnersSection] = await Promise.all([
+    getHomePage(),
+    getPartners(),
+  ]);
 
   // `sections` may be a single reference or a list of references. Normalize.
   const sections =
@@ -24,7 +27,7 @@ export default async function HomePage() {
         }
       })}
 
-      <PartnersSection partners={partners} />
+      <PartnersSection section={partnersSection} />
     </main>
   );
 }
