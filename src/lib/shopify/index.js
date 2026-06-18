@@ -287,18 +287,18 @@ export async function getHomePage() {
 }
 
 /**
- * Fetch all `partners` metaobjects (individual partners with logos).
+ * Fetch the `partners` section metaobject (holds a title + a list of partner
+ * items). There is a single partners section, so we return the first node.
  *
- * @param {number} [first=50]
- * @returns {Promise<Array<object>>} Partner metaobject nodes (empty if none).
+ * @returns {Promise<object|null>} The partners section node, or null if none.
  */
-export async function getPartners(first = 50) {
+export async function getPartners() {
   const { body } = await shopifyFetch({
     query: getPartnersQuery,
-    variables: { first },
+    variables: { first: 1 },
   });
 
-  return (body?.data?.metaobjects?.edges ?? []).map((edge) => edge.node);
+  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
 }
 
 /**
