@@ -4,7 +4,11 @@
 // Storefront access token never reaches the browser. As the storefront grows,
 // add more query/helper functions alongside `getShopMetafields` below.
 
-import { getHomePageQuery, getServicesPageQuery } from './queries';
+import {
+  getHomePageQuery,
+  getServicesPageQuery,
+  getPartnersQuery,
+} from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
@@ -27,13 +31,17 @@ const endpoint = domain
  * @param {Object} params
  * @param {string} params.query   GraphQL query/mutation string.
  * @param {Object} [params.variables]  GraphQL variables.
- * @param {RequestCache} [params.cache]  fetch cache mode (default 'force-cache').
+ * @param {RequestCache} [params.cache]  fetch cache mode. Defaults to 'no-store'
+ *   so the storefront always reflects the latest Shopify data (in dev AND
+ *   production) without a rebuild. This makes routes dynamically rendered. For a
+ *   specific call that can be cached, pass `cache: 'force-cache'` (optionally
+ *   with `next: { revalidate }` upstream) to opt back into caching/ISR.
  * @returns {Promise<{ status: number, body: any }>}
  */
 export async function shopifyFetch({
   query,
   variables,
-  cache = 'force-cache',
+  cache = 'no-store',
 }) {
   if (!endpoint || !accessToken) {
     throw new Error(
@@ -276,6 +284,21 @@ export async function getHomePage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch all `partners` metaobjects (individual partners with logos).
+ *
+ * @param {number} [first=50]
+ * @returns {Promise<Array<object>>} Partner metaobject nodes (empty if none).
+ */
+export async function getPartners(first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnersQuery,
+    variables: { first },
+  });
+
+  return (body?.data?.metaobjects?.edges ?? []).map((edge) => edge.node);
 }
 
 /**
