@@ -4,7 +4,11 @@
 // Storefront access token never reaches the browser. As the storefront grows,
 // add more query/helper functions alongside `getShopMetafields` below.
 
-import { getHomePageQuery, getServicesPageQuery } from './queries';
+import {
+  getHomePageQuery,
+  getServicesPageQuery,
+  getPartnersQuery,
+} from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
@@ -276,6 +280,21 @@ export async function getHomePage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch all `partners` metaobjects (individual partners with logos).
+ *
+ * @param {number} [first=50]
+ * @returns {Promise<Array<object>>} Partner metaobject nodes (empty if none).
+ */
+export async function getPartners(first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnersQuery,
+    variables: { first },
+  });
+
+  return (body?.data?.metaobjects?.edges ?? []).map((edge) => edge.node);
 }
 
 /**

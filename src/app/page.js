@@ -1,14 +1,14 @@
-import { getHomePage } from '@/lib/shopify';
+import { getHomePage, getPartners } from '@/lib/shopify';
 import HeroSection, {
   HERO_SECTION_TYPE,
 } from '@/components/sections/HeroSection/HeroSection';
+import PartnersSection from '@/components/sections/PartnersSection/PartnersSection';
 import styles from './page.module.css';
 
 export default async function HomePage() {
-  const home = await getHomePage();
+  const [home, partners] = await Promise.all([getHomePage(), getPartners()]);
 
-  // `sections` may be a single reference or a list of references depending on
-  // how the metaobject field is defined. Normalize to an array either way.
+  // `sections` may be a single reference or a list of references. Normalize.
   const sections =
     home?.sections?.references?.nodes ??
     (home?.sections?.reference ? [home.sections.reference] : []);
@@ -23,6 +23,8 @@ export default async function HomePage() {
             return null;
         }
       })}
+
+      <PartnersSection partners={partners} />
     </main>
   );
 }
