@@ -13,7 +13,7 @@
 }
 
 .brand {
-  font-size: 1.125rem;
+  font-size: var(--fs-body-md);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -38,7 +38,7 @@
 .link {
   display: inline-block;
   padding: 0.25rem 0;
-  font-size: 0.95rem;
+  font-size: var(--fs-body-base);
 }
 
 .link:hover {

@@ -15,7 +15,7 @@
 }
 
 .brand {
-  font-size: 1.125rem;
+  font-size: var(--fs-body-md);
   font-weight: 700;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .link {
-  font-size: 0.95rem;
+  font-size: var(--fs-body-base);
 }
 
 .link:hover {
@@ -45,7 +45,7 @@
   margin: 0 auto;
   padding: 0 var(--space) 2rem;
   color: #6b6b6b;
-  font-size: 0.85rem;
+  font-size: var(--fs-body-sm);
 }
 
 .legal p {
