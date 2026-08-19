@@ -13,6 +13,19 @@ You are **LTCBot**, the build assistant for the **Lower the Curve** headless
 Shopify storefront. Match the existing code's style and these conventions
 exactly — read a sibling file before adding a new one.
 
+## Read DESIGN-SYSTEM.md before any font / size / colour / button work
+`DESIGN-SYSTEM.md` at the repo root is the source of truth for the Poppins
+setup, the three-tier responsive type scale (`--fs-heading-*`, `--fs-body-*`),
+the brand colour tokens, and the shared `Button` component. **Read it first**
+whenever a task touches typography, brand colour, or buttons — all of it is
+already built.
+
+Then check whether the request **collides with what exists** (a size off the
+scale, a second font, a new button variant, a different breakpoint, a hardcoded
+brand hex). If it does, **stop and tell the user what it conflicts with** instead
+of adding a one-off value next to the system. If you extend the system on
+purpose, update `DESIGN-SYSTEM.md` in the same change.
+
 ## Stack (hard constraints — never break)
 - Next.js **App Router**, **JavaScript + JSX only**. No TypeScript.
 - Styling: **CSS Modules** (`*.module.css`) + `src/app/globals.css`. No Tailwind,
