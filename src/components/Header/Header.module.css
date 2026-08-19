@@ -1,31 +1,116 @@
+/* Site header. Sizes come from the type scale in src/app/typography.css and
+   colours from the tokens in src/app/globals.css — no raw values here.
+
+   Desktop (>= 1025px): logo left, nav + CTA right, 50px between nav items.
+   <= 1024px:           nav collapses into a dropdown behind the toggle. Those
+                        are the design system's existing tiers — no new
+                        breakpoint is introduced. */
 .header {
-  border-bottom: 1px solid #e5e5e5;
+  position: relative;
+  /* High, because .header is a stacking context: the mobile drawer and its scrim
+     are descendants, so they can never paint above this value no matter what
+     z-index they carry. Page sections must stay below it. */
+  z-index: 100;
+  /* Transparent on purpose: the page's own background (e.g. the hero's
+     gradient) shows through behind the header, as in the design. */
+  background: transparent;
+  padding: 0.75rem 0;
 }
 
+/* Sized to hold a 1200px capsule plus the gutters, so the capsule can actually
+   reach its max-width. NOTE: this is deliberately wider than --max-width
+   (1152px), which every page section still uses. */
 .inner {
-  max-width: var(--max-width);
+  max-width: calc(1200px + var(--space) * 2);
   margin: 0 auto;
-  padding: 1rem var(--space);
+  padding: 0 var(--space);
+  display: flex;
+  /* stretch, not center: the capsule takes its height from the row, which the
+     logo's 15px vertical padding sets (50 + 15 + 15 = 80px). */
+  align-items: stretch;
+}
+
+/* The rounded wrapper. Holds the logo, the nav and the CTA. */
+.capsule {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 1200px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1.5rem;
+  /* Desktop: equal 23px inset on both sides — the logo sits 23px from the left
+     edge, the CTA 23px from the right. The logo supplies no horizontal padding
+     of its own, or the left side would double up to 46px. Narrower tiers keep a
+     tighter inset (see the <= 1024px block). */
+  padding: 0 23px;
+  border-radius: 20px;
 }
 
+/* The fill, blur and shadow live on a pseudo-element rather than on .capsule
+   itself — deliberately. `backdrop-filter` on an element makes that element the
+   containing block for its position:fixed descendants, which would trap the
+   mobile drawer and its scrim inside this 80px-tall box instead of letting them
+   cover the viewport. On a pseudo-element the blur still samples the page
+   behind it, with no effect on descendant positioning.
+
+   Translucent rather than a baked gradient: the page's own background tints the
+   capsule, which is where the green-to-blue wash in the design comes from. The
+   faint shadow keeps it defined on plain white pages. */
+.capsule::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* --- LOGO --------------------------------------------------------------- */
+/* Vertical padding only — the horizontal inset comes from .capsule. This is what
+   sets the wrapper's height (50 + 15 + 15 = 80px). */
 .brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 15px 0;
+}
+
+/* Fixed 123x50 render box per the design. `contain` rather than a stretch, so
+   the source asset (Shopify reports 124x50) keeps its aspect ratio inside the
+   box, and a future logo upload with a different ratio letterboxes instead of
+   distorting. */
+.logo {
+  display: block;
+  width: 123px;
+  height: 50px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* Only rendered if the metaobject has no logo. */
+.brandText {
   font-size: var(--fs-body-md);
   font-weight: 700;
+  color: var(--color-ink);
   white-space: nowrap;
 }
 
+/* --- NAV ---------------------------------------------------------------- */
 .nav {
   display: flex;
+  align-items: center;
+  gap: 50px;
 }
 
 .menu {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 50px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -37,34 +122,212 @@
 
 .link {
   display: inline-block;
-  padding: 0.25rem 0;
-  font-size: var(--fs-body-base);
+  font-size: var(--fs-body-xl); /* 24px desktop */
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-ink);
+  white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
-.link:hover {
-  text-decoration: underline;
+.link:hover,
+.link:focus-visible {
+  color: var(--color-brand);
 }
 
-/* Submenu: hidden until its parent item is hovered/focused. */
+.cta {
+  flex-shrink: 0;
+}
+
+/* --- SUBMENU: hidden until its parent item is hovered/focused ----------- */
 .submenu {
   position: absolute;
   top: 100%;
   left: 0;
-  min-width: 12rem;
+  min-width: 14rem;
   display: none;
   flex-direction: column;
   gap: 0.25rem;
   list-style: none;
   margin: 0;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
   background: var(--color-bg);
-  border: 1px solid #e5e5e5;
-  border-radius: 0.375rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
 .item:hover .submenu,
 .item:focus-within .submenu {
   display: flex;
+}
+
+.sublink {
+  display: block;
+  padding: 0.25rem 0;
+  font-size: var(--fs-body-base);
+  color: var(--color-ink);
+  transition: color 0.2s ease;
+}
+
+.sublink:hover,
+.sublink:focus-visible {
+  color: var(--color-brand);
+}
+
+/* --- TOGGLE (hidden on desktop) ---------------------------------------- */
+.toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.bar {
+  display: block;
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-ink);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Drawer close control. Hidden on desktop, where the nav is an inline row. */
+.close {
+  display: none;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Tap-outside scrim behind the drawer. Never shown on desktop. */
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.35);
+  transition: opacity 0.28s ease;
+}
+
+/* --- TABLET + MOBILE (<= 1024px) ---------------------------------------
+   Closed state keeps the capsule, with the hamburger on the left and the logo
+   on the right. Opening slides a full-height drawer in from the left.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  /* The 23px inset is a desktop figure; keep the tighter one on narrow screens. */
+  .capsule {
+    padding: 0 0.75rem;
+  }
+
+  /* order:-1 puts the hamburger ahead of the logo, so space-between reads
+     toggle-left / logo-right. */
+  .toggle {
+    display: flex;
+    order: -1;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(75%, 320px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3rem;
+    padding: 1.5rem 1.5rem 2rem;
+    border-radius: 0 20px 20px 0;
+    /* Light neutral drawer fill from the design. */
+    background: #e6e6e6;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
+    overflow-y: auto;
+    /* visibility (not display) so the panel can transition, and so a closed
+       drawer stays out of the tab order. */
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.28s ease, visibility 0.28s ease;
+  }
+
+  .navOpen {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .close {
+    display: inline-flex;
+  }
+
+  /* Gap scaled with the label size to keep the drawer's approved rhythm
+     (~3.4x the label height between items). */
+  .menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3.25rem;
+  }
+
+  /* 24px on mobile, per spec. --fs-heading-md is the only token that lands on
+     24px at the mobile tier; note it resolves to 32px on tablet (576-1024px).
+     See DESIGN-SYSTEM.md "Open decisions". */
+  .link {
+    font-size: var(--fs-heading-md);
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  /* Nested items sit inline in the drawer — there is no hover on touch. */
+  .submenu {
+    position: static;
+    display: flex;
+    min-width: 0;
+    margin: 1rem 0 0 1rem;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* The reference mobile design shows no CTA in the drawer. */
+  .cta {
+    display: none;
+  }
+
+  .scrim {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scrimOpen {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }

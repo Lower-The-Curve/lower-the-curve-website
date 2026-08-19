@@ -14,7 +14,7 @@
   cursor: pointer;
   text-decoration: none;
   transition: background-color 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease, transform 0.2s ease;
+    color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
 }
 
 .button:focus-visible {
@@ -60,6 +60,19 @@
     var(--color-brand-darker),
     var(--color-brand-dark)
   );
+}
+
+/* Flat fill, no gradient. Both colours are overridable per instance through the
+   --btn-bg / --btn-fg custom properties, so a CMS-authored colour can drive the
+   button without a bespoke class. Hover darkens whatever fill it was given. */
+.solid {
+  background-color: var(--btn-bg, var(--color-brand));
+  color: var(--btn-fg, #ffffff);
+  border-color: transparent;
+}
+
+.solid:hover {
+  filter: brightness(0.9);
 }
 
 .secondary {

@@ -124,6 +124,7 @@ Defined in [src/app/globals.css](src/app/globals.css):
 |---|---|---|
 | `--color-bg` | `#ffffff` | page background |
 | `--color-text` | `#1a1a1a` | default text |
+| `--color-ink` | `#010101` | near-black UI labels — header nav, hamburger bars |
 | `--color-brand` | `#106cfd` | brand blue — primary actions, links, focus rings |
 | `--color-brand-dark` | `#004bc9` | gradient start, hover states |
 | `--color-brand-darker` | `#003a9e` | primary button hover gradient |
@@ -158,7 +159,7 @@ import Button from '@/components/ui/Button/Button';
 
 | Prop | Values | Default | Notes |
 |---|---|---|---|
-| `variant` | `primary` \| `secondary` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border. |
+| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
 | `size` | `md` \| `sm` | `md` | `md` = 16px label (`--fs-body-base`), `sm` = 14px (`--fs-body-sm`). |
 | `arrow` | `right` \| `diagonal` \| `none` | `right` | `right` = →, `diagonal` = ↗ (same SVG rotated -45°). |
 | `href` | string | — | Present → renders a link. Absent → renders `<button>`. |
@@ -182,6 +183,11 @@ import Button from '@/components/ui/Button/Button';
   Client Component just to call `useId`.
 - Both variants carry a 2px border (transparent on `primary`) so the two are the
   same height side by side. Don't remove it.
+- **`solid` exists for CMS-authored colours.** It's the one variant whose fill
+  isn't a token: pass `style={{ '--btn-bg': hex, '--btn-fg': hex }}` and it uses
+  them, falling back to `--color-brand` on white. Hover darkens via
+  `filter: brightness()` rather than a second gradient, because the fill isn't
+  known at author time. Use `primary` for any button whose colour is ours.
 
 ### Rules
 - New visual treatment → **new `variant` in `Button.module.css`**, documented in
@@ -210,3 +216,38 @@ before relying on them as final:
   token, so it now steps rather than scaling continuously.
 - The light ring around the blue buttons in the design was read as background
   separation, not a border. If it's real, `primary` needs a visible border colour.
+
+### Header (added with the header build)
+- **`--color-ink` (#010101) was added** rather than reusing `--color-text`
+  (#1a1a1a). The design specified #010101 for nav labels. If the two were meant
+  to be the same colour, delete `--color-ink` and point the header at
+  `--color-text`.
+- **Nav labels use `--fs-body-xl`** (24px desktop, per the design) — they drop to
+  20px on tablet and 16px on mobile with the rest of the scale.
+- **The CTA uses `Button variant="solid" size="md"`** — 16px per the design on
+  desktop, 14px on mobile because `--fs-body-base` shrinks. If the design needs
+  it locked at 16px everywhere, that's a conflict to resolve deliberately.
+- **The nav collapses behind a hamburger at <= 1024px**, the existing tablet
+  tier — no new breakpoint. Only desktop was specified, so the mobile panel's
+  styling is a judgement call.
+- **The header capsule is capped at 1200px, not `--max-width` (1152px).**
+  Requested explicitly. `--max-width` was deliberately left alone, because every
+  page section (hero, partners, footer, page `main`) uses it — changing the token
+  would move all of them. Consequence: the capsule is 48px wider than the content
+  below it, so its edges do not line up with the page. Resolve by either bumping
+  `--max-width` to 1200px (moves every section) or accepting the header as
+  intentionally wider.
+- **Between 1025px and ~1168px the desktop row can overflow.** The 50px gap is
+  fixed and the row's natural width (~1136px with the design's five labels) is
+  close to the capsule's width, so viewports in that band are narrower than the
+  row. Fixing it means either a smaller desktop gap or moving the collapse
+  breakpoint — a 4th tier. Unresolved.
+- **The mobile drawer's labels use `--fs-heading-md`** (24px mobile), overriding
+  the inline nav's `--fs-body-xl` inside the `<= 1024px` block. 24px was specified
+  directly. **Unresolved:** no token is 24px at *both* narrow tiers, so this
+  renders 24px on mobile but **32px on tablet** (576-1024px). If 24px is meant to
+  be flat across every width, that needs a new token declared at 24px in all
+  three tier blocks — a deliberate scale addition, not a component one-off. The
+  desktop nav is untouched at 24px via `--fs-body-xl`.
+- **The CTA is hidden in the mobile drawer** (`display: none`), matching the
+  reference, which shows no button. Deleting that rule restores it.
