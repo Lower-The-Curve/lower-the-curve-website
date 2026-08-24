@@ -1,11 +1,6 @@
+/* Same as the home page: sections own their measure and spacing, so `main` is a
+   plain full-width flow container and a full-bleed section (the hero) can reach
+   the viewport edges. */
 .main {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 4rem var(--space);
-}
-
-.title {
-  font-size: var(--fs-heading-md);
-  font-weight: 700;
-  margin: 0;
+  display: block;
 }

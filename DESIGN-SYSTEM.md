@@ -32,7 +32,7 @@ Run through this before touching typography, colour, or buttons:
 |---|---|---|
 | Font loading | [src/app/layout.js](src/app/layout.js) | Poppins via `next/font/google` |
 | Type scale tokens | [src/app/typography.css](src/app/typography.css) | **single source of truth** for every font-size |
-| Colour + layout tokens | [src/app/globals.css](src/app/globals.css) | brand blues, `--font-sans`, `--max-width`, `--space` |
+| Colour + layout tokens | [src/app/globals.css](src/app/globals.css) | brand blues, `--color-accent-green`, `--font-sans`, `--max-width`, `--space`, `--header-height` |
 | Button | [src/components/ui/Button/](src/components/ui/Button/) | `Button.js`, `Button.module.css`, `ArrowIcon.js` |
 
 Import order in `layout.js` matters: `typography.css` **before** `globals.css`.
@@ -149,14 +149,45 @@ Defined in [src/app/globals.css](src/app/globals.css):
 | `--color-brand-dark` | `#004bc9` | gradient start, hover states |
 | `--color-brand-darker` | `#003a9e` | primary button hover gradient |
 | `--color-brand-tint` | `#eef4ff` | light blue wash (secondary button hover) |
+| `--color-accent-green` | `#3ba952` | secondary accent — the green half of the brand pair |
+| `--color-accent-green-dark` | `#2a773a` | dark end of the green gradient |
 
 The brand gradient used across the design is
-`linear-gradient(135deg, var(--color-brand-dark), var(--color-brand))`.
+`linear-gradient(135deg, var(--color-brand-dark), var(--color-brand))`, and the
+green accent mirrors it:
+`linear-gradient(135deg, var(--color-accent-green-dark), var(--color-accent-green))`.
+
+**At 135deg the first stop is the top-left end**, so that stop order puts the
+dark blue on the *left*. The hero headline's blue accent deliberately reverses
+the stops to put the darker blue on the **right** — see the Hero notes in §6.
+Everything else (buttons, arrows) keeps the dark-on-left order above.
 
 ### Rules
 - **No brand-blue hex codes in components.** Use the tokens.
 - Neutral one-offs (e.g. a single muted body grey) are tolerated but should be
   promoted to a token the second time they're used.
+- **`--color-accent-green` is display-text only.** It clears 3:1 on white (the
+  WCAG large-text floor), not 4.5:1. `--color-brand` sits at 4.58:1, so the two
+  accents are *not* interchangeable — don't put the green on body copy, labels or
+  small UI text. If green is ever needed at body size, that's a second token
+  (a darker `--color-accent-green-dark`), not a reuse of this one.
+
+### Where the green came from (confirm before relying on it)
+The design has no specified green hex — it was **derived**, and the value is a
+judgement call. The hero's background artwork
+(`Landing_page_sector.png`) contains a green gradient running from `#298c6d`
+through `#5cc371` to a near-white `#e0fbdd`. None of those work as text on
+white: the light end is ~2.2:1 and even the deep end only reaches 4.15:1 while
+reading teal rather than the grass green in the reference. So
+`--color-accent-green` takes the artwork's **hue** (132°) at a raised saturation
+and darkens it to land exactly on 3:1 — mirroring how `--color-brand` (#106cfd)
+is the same artwork's saturated blue at 4.58:1.
+`--color-accent-green-dark` is the same hue and saturation taken down to 5.5:1,
+so the gradient between them is visibly a gradient while its *lightest* pixel
+still clears the 3:1 floor.
+
+**If design has a real green swatch, replace both values** — every consumer
+reads the variables, so it's a two-line change in `globals.css`.
 
 ---
 
@@ -218,7 +249,48 @@ import Button from '@/components/ui/Button/Button';
 
 ---
 
-## 5. Open decisions
+## 5. Layout tokens
+
+Also in [src/app/globals.css](src/app/globals.css):
+
+| Token | Value | Use for |
+|---|---|---|
+| `--max-width` | `72rem` (1152px) | the content measure every section applies itself |
+| `--space` | `1rem` | the standard gutter |
+| `--header-height` | `104px` / `93px` ≤575px | the header's rendered height |
+
+### `--max-width` lives on the section, not on `main`
+**Every section owns its own measure** — `max-width: var(--max-width); margin: 0
+auto` plus `--space` gutters — and a page's `main` adds neither a max-width nor
+padding. That's deliberate: it's the only way a **full-bleed** section (the
+hero's background artwork) can reach the viewport edges, and it keeps one
+section's spacing from being decided in the page's CSS.
+
+So: a new section is responsible for its own width and vertical rhythm. Don't
+"fix" a too-wide section by constraining `main`; that caps every sibling,
+full-bleed ones included.
+
+### `--header-height`
+The header is **transparent and in normal flow**, so a section that wants
+artwork behind the nav offsets its own background layer upward by this token
+rather than the page pulling the header out of flow:
+
+```css
+.backdrop { position: absolute; top: calc(-1 * var(--header-height)); inset: 0 0 0 0; z-index: -1; }
+```
+
+The token is **authoritative, not documentary**: `Header.module.css` sets
+`.capsule`'s `min-height` from it, so the header can't silently drift away from
+the number sections are offsetting by. It resolves to the header's two real
+heights — 104px, and 93px at ≤575px where the logo box shrinks.
+
+Prefer this over a negative `margin-top` on the section: offsetting only the
+background layer leaves the section's own box in flow, so nothing above or below
+it moves.
+
+---
+
+## 6. Open decisions
 
 These were judgement calls made during the initial build. Confirm with the user
 before relying on them as final:
@@ -306,3 +378,75 @@ before relying on them as final:
   had a single `<= 1024px` block, so tablet keeps the desktop logo figures. If
   "mobile" was meant to cover the whole collapsed range, move these two rules up
   into the `<= 1024px` block instead.
+
+### Hero (added with the hero build)
+- **`--color-accent-green` (#3ba952) was added** — the design's green headline
+  word had no token and no specified hex. See "Where the green came from" in
+  §3; **confirm the value with design**, and note it's a 3:1 (large-text-only)
+  colour, unlike every other accent here.
+- **The headline's accent runs are authored, not hardcoded.** The `title` field
+  carries HTML spans, and the class name selects the accent:
+  `Let’s Launch a <span class="green-gradient">Shopify Store</span> with
+  <span class="blue-gradient">us</span>`. The alternative (matching the words
+  "Shopify" and "us" in code) would have hidden editorial copy in the component
+  — as it happens the live copy greens *both* words, which a hardcoded match
+  would have got wrong.
+  - **The title is parsed, never injected.** No `dangerouslySetInnerHTML`: only
+    `<span>` with a class in `ACCENT_CLASSES` becomes an element, so pasted
+    markup can't execute. Adding a third accent means adding a class to that map
+    — a `<span>` whose class isn't in it keeps its words and loses the styling.
+  - A title with no spans renders as plain text, so an un-marked title is not an
+    error — it just renders all in `--color-text`.
+- **The headline is regular weight (400); only the accent runs are bold (700).**
+  Requested explicitly, and it's the one heading on the site that isn't bold —
+  `PartnersSection`, the footer brand and the header all use 700. The weight sits
+  on `.accent`, not on `.green`/`.blue`, so "the accented words are the bold
+  ones" is stated once. Note this makes the headline **lighter than the
+  reference screenshot**, where the whole line reads bold.
+- **The accents are gradient-filled, not flat**, because the authored class names
+  say `-gradient`: the brand gradient is painted as a background and clipped to
+  the glyphs. It's wrapped in an `@supports` test for `background-clip: text`
+  **and** `-webkit-text-fill-color`, because with only the first the
+  `color: transparent` would render invisible words. Flat colours are declared
+  outside the guard, so **deleting the whole `@supports` block reverts to flat
+  colour** with nothing else to change.
+- **The blue accent's stops are reversed relative to the brand gradient**, so its
+  darker blue lands on the **right** of the word (requested). Same two colours,
+  same 135deg diagonal — only the stop order differs, because at 135deg the first
+  stop is the top-left end. **The green accent was left dark-on-left**, so the two
+  accents currently run in opposite directions; flip green's stops to match if
+  that was meant to apply to both.
+- **`--header-height` was added** and `main` stopped applying `--max-width` /
+  padding, so the hero's artwork can be full-bleed and start at the top of the
+  page. See §5 — this changed **every** page's `main`, so sections now own all
+  the spacing that `main`'s `padding: 4rem var(--space)` used to supply. The home
+  page's partners section and the services page therefore sit tighter to their
+  neighbours than before; add the rhythm back **on the section** if that reads
+  too tight.
+- **The three-line headline break comes from `max-width: 13ch`** on `.title`,
+  not from authored line breaks (`title` is a `single_line_text_field`, so it
+  can't hold any). `ch` scales with `--fs-heading-xl`, which is what keeps the
+  same break at 64/52/40px. A materially longer headline will break elsewhere —
+  that's a measure, not a guarantee. Same technique on `.scrollText` (`14ch`).
+- **`--fs-body-xl` for the description** (24px desktop), per the token's stated
+  "lede under a headline" role. The live entry has **no description authored**
+  (the field is null, so nothing renders), which matches the reference design —
+  meaning this size is inferred and has never been seen against real copy.
+- **The scroll cue is not interactive.** The metaobject gives it text but no link
+  or target, and making it scroll would force the section to a Client Component.
+  If it should jump to the next section, that's a deliberate change.
+- **The cue's double chevron is drawn in `ChevronsDownIcon.js`**, not authored in
+  Shopify — there's no icon field. Two chevrons was read off the reference; if
+  it's meant to be three, that file is the only place to change.
+- **`content_align` defaults to centre** when the field is empty (the services
+  hero leaves it unset). It's free text in the admin — the live value is
+  `"Center "`, with a trailing space — so it's trimmed and lowercased before
+  lookup, and an unrecognised value falls back to centre rather than breaking.
+- **`margin_top` / `margin_bottom` apply as plain `px` margins** on the section
+  via custom properties. Both are `0` on the live entry, so this is untested
+  against a non-zero value; note a positive `margin_top` will open a white band
+  above the artwork, since only the artwork layer is offset up under the header.
+- **The artwork is `cover`, anchored `center top`.** On a portrait phone a 16:9
+  wash gets cropped hard — only its top-left corner shows. Acceptable for a soft
+  gradient with no detail to protect; a separate mobile crop would need a second
+  image field.
