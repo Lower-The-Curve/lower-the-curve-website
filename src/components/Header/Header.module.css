@@ -36,6 +36,13 @@
   flex: 1;
   min-width: 0;
   max-width: 1200px;
+  /* The row's height already comes out at this figure from the logo box below
+     (50 + 15 + 15 = 80px; 33 + 18 + 18 = 69px on phones). Stating it against
+     --header-height makes the token authoritative instead of documentary, so a
+     full-bleed section that offsets its artwork by --header-height can't drift
+     out of sync with the header it's sliding under. Subtracts .header's
+     0.75rem top and bottom padding. */
+  min-height: calc(var(--header-height) - 1.5rem);
   display: flex;
   align-items: center;
   justify-content: space-between;

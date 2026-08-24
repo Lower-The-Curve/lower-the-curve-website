@@ -1,20 +1,202 @@
+/* Hero section. Full-bleed artwork filling the first screen, a centred headline
+   with two accented words, and the scroll cue sitting low in the section.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   FULL-BLEED: the section is a direct child of the page's `main`, which adds no
+   max-width of its own (sections own their measure), so .hero spans the viewport
+   and .content re-applies --max-width for the text. */
 .hero {
-  padding: 4rem var(--space);
-  max-width: var(--max-width);
-  margin: 0 auto;
+  position: relative;
+  /* Own stacking context, so .backdrop's z-index: -1 stays inside the section
+     and can never slide behind the page background. .hero itself keeps z-index
+     auto, which is what lets the header (z-index: 100) paint over the artwork. */
+  isolation: isolate;
+  /* CMS-authored spacing (margin_top / margin_bottom, in px). Defaults cover a
+     section rendered without the fields set at all. */
+  margin-top: var(--hero-margin-top, 0px);
+  margin-bottom: var(--hero-margin-bottom, 0px);
+  /* The artwork reaches up under the header, so the section only needs the rest
+     of the first screen. svh keeps mobile browser chrome from adding a scroll. */
+  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100svh - var(--header-height));
+  display: grid;
+  /* Two rows: the headline block takes the slack and centres in it, the scroll
+     cue sits at the bottom. This is what puts the cue low in the section without
+     taking it out of flow, so it can never overlap the headline on a short
+     viewport. */
+  grid-template-rows: 1fr auto;
+  padding: 0 var(--space) 3rem;
 }
 
+/* --- BACKDROP -----------------------------------------------------------
+   Pulled up by exactly the header's height so the artwork's top edge lands at
+   the very top of the page. The header's fill is translucent, so the blobs read
+   through it as they do in the design. Only this layer is offset — the section's
+   own box stays in flow, so no negative margins leak into the page layout.
+   ---------------------------------------------------------------------- */
+.backdrop {
+  position: absolute;
+  top: calc(-1 * var(--header-height));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* `cover` rather than `contain`: the artwork is a soft gradient wash with no
+   detail to protect, so filling the screen matters more than showing all of it.
+   Anchored to the top, which is where the blobs that frame the header live. */
+.backdropImage {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* --- CONTENT ------------------------------------------------------------ */
+.content {
+  grid-row: 1;
+  align-self: center;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Regular weight, unlike the other headings on the site — the emphasis in this
+   headline comes from the accented words below, which are the only bold part. */
 .title {
   font-size: var(--fs-heading-xl);
-  font-weight: 700;
+  font-weight: 400;
+  line-height: 1.2;
   margin: 0;
-  line-height: 1.1;
+  /* A measure, not a fixed width. `ch` scales with the heading token, so the
+     design's three-line break ("Let’s Launch a / Shopify Store / with us")
+     holds at 64px, 52px and 40px without a media query. */
+  max-width: 13ch;
 }
 
+/* The accented runs in the headline. The weight lives on .accent rather than on
+   each colour, so "the accented words are the bold ones" is stated once and a
+   third colour can't be added without it. */
+.accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradient below only
+   replaces them where clipping a background to the glyphs actually works. */
+.green {
+  color: var(--color-accent-green);
+}
+
+.blue {
+  color: var(--color-brand);
+}
+
+/* The metafield names these classes `green-gradient` / `blue-gradient`, so the
+   accents are gradient-filled rather than flat: paint the brand gradient as a
+   background and clip it to the letterforms.
+
+   Guarded, because the trick needs BOTH background-clip: text and
+   text-fill-color — without the second one, `color: transparent` would render
+   invisible words. -webkit- prefixes stay: background-clip is unprefixed now,
+   but text-fill-color never was.
+
+   To go back to flat colour, delete this whole block — the rules above already
+   carry the right colours. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .green,
+  .blue {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+
+  /* The brand gradient's two blues on the design's 135deg diagonal, but with the
+     stops in the reverse order to the buttons: bright at the top-left, dark at
+     the bottom-right, so the darker blue lands on the right of the word. At
+     135deg the FIRST stop is the top-left end, which is the only reason the
+     order differs from the `--color-brand-dark, --color-brand` written in
+     DESIGN-SYSTEM.md — same colours, same angle, mirrored. */
+  .blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+}
+
+/* The `p` element itself carries the size — a font-size on .content would never
+   reach it, because the global `p` rule matches directly. See DESIGN-SYSTEM.md. */
 .description {
-  margin: 1rem 0 0;
-  font-size: var(--fs-body-base);
+  margin: 0;
+  font-size: var(--fs-body-xl);
   color: #4a4a4a;
   max-width: 48ch;
+  /* multi_line_text_field: authored line breaks are meaningful. */
   white-space: pre-line;
+}
+
+/* --- SCROLL CUE --------------------------------------------------------- */
+.scroll {
+  grid-row: 2;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  /* The icon strokes with currentColor, so this colours label and mark at once. */
+  color: var(--color-brand);
+}
+
+.scrollText {
+  font-size: var(--fs-body-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  /* Breaks "Scroll down to Explore more" onto the design's two lines. Same
+     reasoning as .title's measure — in `ch`, so it survives the tier changes. */
+  max-width: 14ch;
+}
+
+.scrollIcon {
+  display: block;
+}
+
+/* --- CONTENT ALIGNMENT --------------------------------------------------
+   Driven by the metaobject's `content_align` field. The measure wrappers stay
+   centred on the page either way; only the text inside them moves.
+   ---------------------------------------------------------------------- */
+.alignCenter .content,
+.alignCenter .scroll {
+  align-items: center;
+  text-align: center;
+}
+
+.alignLeft .content,
+.alignLeft .scroll {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.alignRight .content,
+.alignRight .scroll {
+  align-items: flex-end;
+  text-align: right;
 }
