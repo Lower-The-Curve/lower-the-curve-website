@@ -15,7 +15,7 @@
 }
 
 .brand {
-  font-size: var(--fs-body-md);
+  font-size: var(--fs-body-base);
   font-weight: 700;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .link {
-  font-size: var(--fs-body-base);
+  font-size: var(--fs-body-sm);
 }
 
 .link:hover {
@@ -45,9 +45,14 @@
   margin: 0 auto;
   padding: 0 var(--space) 2rem;
   color: #6b6b6b;
-  font-size: var(--fs-body-sm);
+  font-size: var(--fs-body-xs);
 }
 
+/* The font-size is repeated here on purpose. The global `p` rule in
+   typography.css matches this element directly, and a direct rule always beats
+   an inherited one — so .legal's font-size above never reaches the paragraph.
+   It stays there for any non-paragraph text added to .legal later. */
 .legal p {
   margin: 0;
+  font-size: var(--fs-body-xs);
 }

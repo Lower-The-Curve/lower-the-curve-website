@@ -34,12 +34,12 @@
    Padding is in `em`, so it scales with the label size automatically.
    ---------------------------------------------------------------------- */
 .md {
-  font-size: var(--fs-body-base); /* 16px desktop */
+  font-size: var(--fs-body-sm); /* 16px desktop */
   padding: 0.875em 1.75em;
 }
 
 .sm {
-  font-size: var(--fs-body-sm); /* 14px desktop */
+  font-size: var(--fs-body-xs); /* 14px desktop */
   padding: 0.8em 1.5em;
 }
 

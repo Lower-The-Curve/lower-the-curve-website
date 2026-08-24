@@ -72,7 +72,8 @@
 
 /* --- LOGO --------------------------------------------------------------- */
 /* Vertical padding only — the horizontal inset comes from .capsule. This is what
-   sets the wrapper's height (50 + 15 + 15 = 80px). */
+   sets the wrapper's height (50 + 15 + 15 = 80px on desktop and tablet; the
+   <= 575px block at the end of this file makes it 69px). */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -94,7 +95,7 @@
 
 /* Only rendered if the metaobject has no logo. */
 .brandText {
-  font-size: var(--fs-body-md);
+  font-size: var(--fs-body-base);
   font-weight: 700;
   color: var(--color-ink);
   white-space: nowrap;
@@ -122,7 +123,9 @@
 
 .link {
   display: inline-block;
-  font-size: var(--fs-body-xl); /* 24px desktop */
+  /* Desktop only — the <= 1024px block below overrides this with --fs-heading-md
+     for the drawer. */
+  font-size: var(--fs-body-base); /* 18px desktop */
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-ink);
@@ -165,7 +168,7 @@
 .sublink {
   display: block;
   padding: 0.25rem 0;
-  font-size: var(--fs-body-base);
+  font-size: var(--fs-body-sm);
   color: var(--color-ink);
   transition: color 0.2s ease;
 }
@@ -329,5 +332,26 @@
   .scrimOpen {
     opacity: 1;
     pointer-events: auto;
+  }
+}
+
+/* --- MOBILE (<= 575px) ---------------------------------------------------
+   The design system's mobile tier (see src/app/typography.css). Placed after the
+   <= 1024px block and also max-width, so it overrides it — same ordering rule
+   the type scale uses. Tablet (576-1024px) keeps the 123x50 / 15px figures.
+   ---------------------------------------------------------------------- */
+@media (max-width: 575px) {
+  /* 18px top and bottom, so the row is 33 + 18 + 18 = 69px tall here — shorter
+     than the 80px desktop and tablet row, not taller. */
+  .brand {
+    padding: 18px 0;
+  }
+
+  /* 81px wide, with the height derived so the box keeps the desktop 123x50
+     ratio (81 / 2.46 = 32.9 -> 33). Matching the ratio is what lets
+     `object-fit: contain` fill the box instead of letterboxing. */
+  .logo {
+    width: 81px;
+    height: 33px;
   }
 }
