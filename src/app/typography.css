@@ -67,6 +67,24 @@
   --fs-body-base: 18px;
   --fs-body-sm: 16px;
   --fs-body-xs: 14px;
+
+  /* --- THE FOOTER PAIR: THE ONE PLACE THE SCALE RUNS BACKWARDS -----------
+     Every token above shrinks (or holds) as the viewport narrows. These two do
+     the opposite — they get BIGGER on narrow screens, because the footer turns
+     from a compact three-column strip into the primary stacked navigation, and
+     the design sizes it for thumbs rather than for density.
+
+     That is why they are their own tokens and not points on the scale above: no
+     scale token can express an inverted pair, and forcing one would have meant a
+     font-size media query inside Footer.module.css. Sizes were specified for
+     desktop (18/14) and mobile (24/18); tablet takes the mobile values because
+     that is where the stacked layout starts (<= 1024px, the header's existing
+     collapse point).
+
+     Do not reach for these outside the footer. If another component needs type
+     that grows on mobile, that is a second inverted pair and its own decision. */
+  --fs-footer-heading: 18px;
+  --fs-footer-link: 14px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -82,6 +100,11 @@
     --fs-body-base: 16px;
     --fs-body-sm: 16px;
     --fs-body-xs: 14px;
+
+    /* Up, not down — see the note in the :root block. The footer stacks at this
+       tier, so it takes the mobile sizes here rather than an interpolated pair. */
+    --fs-footer-heading: 24px;
+    --fs-footer-link: 18px;
   }
 }
 
@@ -109,6 +132,12 @@
     --fs-body-base: 16px;
     --fs-body-sm: 14px;
     --fs-body-xs: 12px;
+
+    /* The specified mobile pair. Note the footer heading (24px) is now LARGER
+       than any body token here, and the footer link (18px) larger than the
+       default paragraph — intentional, and the reason these live apart. */
+    --fs-footer-heading: 24px;
+    --fs-footer-link: 18px;
   }
 }
 

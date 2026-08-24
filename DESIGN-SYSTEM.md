@@ -121,6 +121,32 @@ paragraph itself: `.legal p { font-size: var(--fs-body-xs); }`. This bit
 `Footer.module.css` — its copyright line silently rendered at the `p` default
 instead of its intended 14px.
 
+### The footer pair — the one place the scale runs backwards
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-footer-heading` | 18px | 24px | 24px | footer column headings |
+| `--fs-footer-link` | 14px | 18px | 18px | footer links |
+
+These **get bigger as the viewport narrows** — the opposite of every token
+above. The footer stops being a compact three-column strip and becomes the
+primary stacked navigation on a phone, and the design sizes it for thumbs.
+
+They are separate tokens rather than points on the scale because **no scale
+token can express an inverted pair**: 18px desktop is `--fs-body-base`, but that
+is 16px on mobile, not 24px; 14px desktop is `--fs-body-xs`, but that is 12px on
+mobile, not 18px. Forcing it would have meant a font-size media query inside
+`Footer.module.css`, which rule 2 below forbids.
+
+Only desktop and mobile were specified. **Tablet takes the mobile values**,
+because that is where the stacked layout begins (≤ 1024px, reusing the header's
+existing collapse point rather than inventing a breakpoint). If the footer should
+keep three columns on a tablet, that tier needs its own pair — and a fourth
+breakpoint.
+
+Don't reach for these outside the footer. Another component needing type that
+grows on mobile is a second inverted pair and its own decision.
+
 ### Rules
 - **No raw `px`/`rem` font-size in a component CSS Module. Ever.** Use a token.
 - **No font-size media queries in components.** The tokens already respond.
@@ -255,7 +281,7 @@ Also in [src/app/globals.css](src/app/globals.css):
 
 | Token | Value | Use for |
 |---|---|---|
-| `--max-width` | `72rem` (1152px) | the content measure every section applies itself |
+| `--max-width` | `78rem` (1248px) | the content measure every section applies itself |
 | `--space` | `1rem` | the standard gutter |
 | `--header-height` | `104px` / `93px` ≤575px | the header's rendered height |
 
@@ -347,13 +373,12 @@ before relying on them as final:
 - **The nav collapses behind a hamburger at <= 1024px**, the existing tablet
   tier — no new breakpoint. Only desktop was specified, so the mobile panel's
   styling is a judgement call.
-- **The header capsule is capped at 1200px, not `--max-width` (1152px).**
-  Requested explicitly. `--max-width` was deliberately left alone, because every
-  page section (hero, partners, footer, page `main`) uses it — changing the token
-  would move all of them. Consequence: the capsule is 48px wider than the content
-  below it, so its edges do not line up with the page. Resolve by either bumping
-  `--max-width` to 1200px (moves every section) or accepting the header as
-  intentionally wider.
+- ~~**The header capsule is capped at 1200px, not `--max-width` (1152px).**~~
+  **RESOLVED.** `--max-width` is now `78rem` (1248px) site-wide and the header
+  capsule reads that token instead of a hardcoded 1200px, so the header, every
+  section and the footer share one edge. This moved every section 96px wider —
+  intended, and the reason the change was made in one place rather than per
+  component.
 - **The 1025–~1168px desktop overflow is largely relieved** by the nav dropping
   to 18px. The 50px gaps are still fixed, but the label text is ~25% narrower, so
   the row's natural width fell well below the capsule's. Worth re-measuring in a
@@ -451,43 +476,44 @@ before relying on them as final:
   image field.
 
 
-### Partners (added with the partners build)
-- **`--fs-heading-sm`'s mobile value went 18px -> 24px.** Requested. It is the
-  token's only consumer and nothing renders an `<h4>`, so the blast radius today
-  is zero — but it IS a scale change: `--fs-heading-md` and `--fs-heading-sm` are
-  now **both 24px on mobile**, so the two smallest heading steps are
-  indistinguishable there. A future card title that must read smaller than a
-  sub-section heading on a phone needs a new step, not a nudge to this one.
-- **The heading's bold run is authored, not hardcoded.** The `title` field takes
-  plain semantic HTML — `The <strong>ones</strong> we work with` — parsed the way
-  the hero's accent spans are (no `dangerouslySetInnerHTML`; only `<strong>` and
-  `<b>` become elements). Chose `<strong>` over inventing a class name because
-  "make this word bold" already has an HTML element. The live title uses `<b>`,
-  which is why both tags are accepted.
-- **The heading is gradient-filled `#ffffff` -> `#bdbdbd`** at 135deg, not the
-  brand gradient — the type sits ON brand blue, where a blue gradient would be
-  invisible. Both stops are **specified**, and both are neutrals rather than
-  brand colours, so they stay raw here; promote `#bdbdbd` to a token if a second
-  component ever needs the same grey. Same `@supports` guard as the hero: flat
-  white is the fallback, so deleting the block reverts to solid white.
-- **No CSS tinting is applied to the logos.** The uploaded PNGs are *entirely
-  semi-transparent white* (every pixel has alpha < 250), so the pale blue-gradient
-  look in the design comes from the assets letting the background through. Adding
-  a mask or opacity here would double the effect. A future logo uploaded as solid
-  full-colour artwork will look wrong next to these — the assets carry the
-  treatment, not the CSS.
-- **`max-width: 200px` on the logo is the assets' native width**, so none of them
-  upscale, and `height: auto` keeps each one's own proportions rather than forcing
-  a uniform height — which is how the design reads (a tall wordmark beside a short
-  one). 150px at tablet, 110px on mobile, both measured off the references.
-- **Column counts: 5 desktop / 3 tablet / 2 mobile.** Only 5 and 2 were
-  specified; 3 is a judgement call for the tier between.
-- **The section is full-bleed**, which works only because a page's `main` adds no
-  max-width (see §5). Its gradient is `--color-brand -> --color-brand-dark`,
-  brighter than the footer's `--color-brand-dark -> --color-brand-darker`,
-  matching the references — but both sets of stops are estimated from screenshots.
-- **All 10 partner items are authored** (kwik, blackroll, misi, doc,
-  thinker-toys, voicedrop, vush, prizecart, bonlabo, cili). The grid takes any
-  count, so adding or removing one needs no code change — but note the 5/3/2
-  column counts assume a multiple that fills rows evenly; an 11th item would sit
-  alone on a fourth row.
+### Footer (added with the footer build)
+- **`--max-width` went 72rem -> 78rem (1152px -> 1248px)** and the header capsule
+  now reads the token instead of its own 1200px. One page measure for the whole
+  site; see §5. Every section got 96px wider as a result.
+- **Two new tokens invert the scale** (`--fs-footer-heading`,
+  `--fs-footer-link`). This is the system's only inverted pair — see §2. The
+  tablet values are a judgement call: only desktop and mobile were specified.
+- **The footer collapses at <= 1024px**, the header's existing breakpoint, rather
+  than a new one. That means a 900px tablet gets the stacked layout and the
+  larger mobile type, which is early for a device with room for three columns —
+  deliberate, but revisit if tablets matter.
+- **Columns are content-sized, not equal thirds.** `repeat(4, auto)` with
+  `justify-content: space-between`, because in the reference the About Us column
+  is visibly wider than Pages — they are sized by their longest label. Equal
+  `1fr` columns put About Us ~5% too far right; content sizing lands every
+  column within ~2% of the design.
+- **The link list carries the font-size, not just the link.** The `li` would
+  otherwise keep the inherited body metrics (18px/1.5) and, because `.link` is an
+  inline-flex child, the row height comes from the li's line box — which made
+  every link gap ~8px too large at both tiers. Sizing `.menu` fixes desktop and
+  mobile at once.
+- **The envelope icon is inferred, not authored.** The contact column is an
+  ordinary Shopify menu with no icon field, so `Footer.js` shows `MailIcon` when
+  an item's link is a `mailto:` **or** its label parses as an email address. In
+  the second case the href is rewritten to `mailto:<label>` — an email label
+  pointing at a page is never what's meant.
+- **`toRelativePath` now leaves non-web schemes alone.** It used to run every
+  menu URL through `new URL().pathname`, which turns
+  `mailto:info@lowerthecurve.com` into the relative path `info@lowerthecurve.com`
+  — a broken link. Only `http:`/`https:` get relativized now. This was a
+  pre-existing bug; it just had no `mailto:` in a menu to expose it.
+- **The copyright line was removed.** The previous footer had one; neither
+  reference image shows it. Add it back as a row inside `.inner` if it's needed
+  for legal reasons.
+- **White is hardcoded as `#ffffff`**, matching `Button.module.css`, rather than
+  a new `--color-on-brand` token. If a third white-on-brand surface appears,
+  promote it.
+- **The gradient stops are `--color-brand-dark` -> `--color-brand-darker` at
+  135deg** — both existing tokens, no new colour. The exact stops are estimated
+  from the reference screenshot; if the design's navy is deeper than
+  `--color-brand-darker` (#003a9e), that's a new token and a deliberate addition.

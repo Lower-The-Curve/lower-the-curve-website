@@ -25,7 +25,10 @@
   --color-accent-green-dark: #2a773a;
 
   --font-sans: var(--font-poppins), sans-serif;
-  --max-width: 72rem;
+  /* The page measure, site-wide: 78rem = 1248px. Every section, the header
+     capsule and the footer all read this one value, so the page has a single
+     edge that everything lines up to. */
+  --max-width: 78rem;
   --space: 1rem;
 
   /* Rendered height of the site header: 0.75rem padding top and bottom around
