@@ -1,58 +1,171 @@
+/* Site footer. A full-bleed brand-blue block with the logo on the left and three
+   link columns to the right, separated by hairline rules.
+
+   Sizes come from the type scale in src/app/typography.css — note the footer is
+   the one place the scale runs BACKWARDS (--fs-footer-heading / --fs-footer-link
+   get larger on narrow screens, because the footer becomes the primary stacked
+   navigation there). See the note in typography.css before touching them.
+
+   Desktop (>= 1025px): logo | Pages | About Us | Contact Us, vertical rules
+                        between the columns.
+   <= 1024px:           one centred column, the rules turn horizontal, and the
+                        logo moves to the bottom. That's the header's existing
+                        collapse point — no new breakpoint. */
 .footer {
-  margin-top: 4rem;
-  border-top: 1px solid #e5e5e5;
+  /* Full-bleed: the gradient spans the viewport, .inner holds the measure. */
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-dark),
+    var(--color-brand-darker)
+  );
+  color: #ffffff;
 }
 
 .inner {
   max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 2rem var(--space);
-  display: flex;
-  align-items: center;
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: grid;
+  /* Content-sized columns spread across the measure, NOT equal thirds. In the
+     design the About Us column is visibly wider than Pages — the columns are
+     sized by their longest label, and the leftover space is shared between them.
+     `auto` tracks take max-content but can still shrink to min-content if a
+     label ever gets long enough to need it. The column-gap is the floor;
+     space-between distributes what's left on top of it. */
+  grid-template-columns: repeat(4, auto);
   justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
+  column-gap: 2rem;
+  row-gap: 3.5rem;
+  /* Default `stretch` is what gives the column rules their full height — they
+     run the height of the tallest column, as in the design. */
+  align-items: stretch;
 }
 
+/* --- LOGO --------------------------------------------------------------- */
 .brand {
-  font-size: var(--fs-body-base);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  /* Centred against the columns rather than stretched with them. */
+  align-self: center;
 }
 
-.nav {
+.logo {
+  display: block;
+  width: 190px;
+  height: auto;
+}
+
+/* --- COLUMNS ------------------------------------------------------------ */
+.column {
   display: flex;
+  flex-direction: column;
 }
 
+/* The hairline between columns. On the 2nd and 3rd only, so the row has rules
+   between its columns and none on its outer edges. */
+.column + .column {
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+  padding-left: 3.5rem;
+}
+
+.heading {
+  /* Overrides the h2 default (--fs-heading-lg): this is a column label, not a
+     section heading, and the design sizes it well below the scale's h2. */
+  font-size: var(--fs-footer-heading);
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 1.5rem;
+}
+
+/* The size and line-height belong HERE, not only on .link. The `li` would
+   otherwise keep the inherited body metrics (18px / 1.5), and since the link is
+   an inline-flex child its row height comes from the li's line box — which made
+   the gap between links ~8px larger than the design at every tier. Setting them
+   on the list makes the li box match the text it holds; .link inherits both. */
 .menu {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
   list-style: none;
   margin: 0;
   padding: 0;
+  font-size: var(--fs-footer-link);
+  line-height: 1.4;
 }
 
 .link {
-  font-size: var(--fs-body-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 400;
+  color: #ffffff;
+  transition: opacity 0.2s ease;
 }
 
-.link:hover {
-  text-decoration: underline;
+.link:hover,
+.link:focus-visible {
+  opacity: 0.75;
 }
 
-.legal {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 var(--space) 2rem;
-  color: #6b6b6b;
-  font-size: var(--fs-body-xs);
+/* Sized against the label so the envelope tracks the link's own size, which
+   changes between tiers along with --fs-footer-link. */
+.mailIcon {
+  flex-shrink: 0;
+  width: 1.2em;
+  height: auto;
 }
 
-/* The font-size is repeated here on purpose. The global `p` rule in
-   typography.css matches this element directly, and a direct rule always beats
-   an inherited one — so .legal's font-size above never reaches the paragraph.
-   It stays there for any non-paragraph text added to .legal later. */
-.legal p {
-  margin: 0;
-  font-size: var(--fs-body-xs);
+/* --- TABLET + MOBILE (<= 1024px) ----------------------------------------
+   One centred column, logo last. The type also grows here — see typography.css.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .inner {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+    justify-items: center;
+    text-align: center;
+    gap: 2.5rem;
+    padding: 3rem var(--space);
+  }
+
+  /* Visually last, per the design. The logo is a link to the home page rather
+     than navigation, so moving it past the menus doesn't reorder anything a
+     keyboard user needs in sequence. */
+  .brand {
+    order: 1;
+  }
+
+  .column {
+    align-items: center;
+    width: 100%;
+  }
+
+  /* The vertical rule becomes a short horizontal one, centred above each
+     following group. Drawn as a pseudo-element rather than a border so it can
+     be narrower than the column, as in the design. */
+  .column + .column {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .column + .column::before {
+    content: '';
+    display: block;
+    width: min(140px, 50%);
+    height: 1px;
+    margin: 0 auto 2.5rem;
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  .heading {
+    margin-bottom: 1.75rem;
+  }
+
+  .menu {
+    gap: 1.25rem;
+  }
+
+  .logo {
+    width: 140px;
+  }
 }

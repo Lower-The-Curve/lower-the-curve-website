@@ -17,11 +17,12 @@
   padding: 0.75rem 0;
 }
 
-/* Sized to hold a 1200px capsule plus the gutters, so the capsule can actually
-   reach its max-width. NOTE: this is deliberately wider than --max-width
-   (1152px), which every page section still uses. */
+/* Sized to hold the capsule plus the gutters, so the capsule can actually reach
+   --max-width. The capsule used to be pinned at 1200px against a 1152px
+   --max-width, which left the header 48px wider than the content below it; both
+   now read the same token, so the header's edges line up with every section. */
 .inner {
-  max-width: calc(1200px + var(--space) * 2);
+  max-width: calc(var(--max-width) + var(--space) * 2);
   margin: 0 auto;
   padding: 0 var(--space);
   display: flex;
@@ -35,7 +36,7 @@
   position: relative;
   flex: 1;
   min-width: 0;
-  max-width: 1200px;
+  max-width: var(--max-width);
   /* The row's height already comes out at this figure from the logo box below
      (50 + 15 + 15 = 80px; 33 + 18 + 18 = 69px on phones). Stating it against
      --header-height makes the token authoritative instead of documentary, so a
