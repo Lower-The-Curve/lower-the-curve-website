@@ -86,7 +86,7 @@ block overrides the wider one. **Keep that order.**
 | `--fs-heading-xl` | 64px | 52px | 40px | Hero / large page headline (one per page) |
 | `--fs-heading-lg` | 48px | 40px | 32px | Major section headings |
 | `--fs-heading-md` | 40px | 32px | 24px | Sub-section headings |
-| `--fs-heading-sm` | 32px | 24px | 18px | Card titles, smallest heading |
+| `--fs-heading-sm` | 32px | 24px | **24px** | Card titles, smallest heading |
 
 ### Paragraph / body
 
@@ -325,9 +325,8 @@ before relying on them as final:
   there, **a lede and default body copy are indistinguishable by size on
   mobile** — separate them with weight or colour, or give `--fs-body-xl` its
   own mobile value (a deliberate scale change).
-- **`PartnersSection` heading was snapped 24px → `--fs-heading-sm`** (32px
-  desktop) because 24px isn't on the heading scale. Swap to `--fs-body-xl` if the
-  original size was intended.
+- ~~**`PartnersSection` heading was snapped 24px → `--fs-heading-sm`**~~
+  **CONFIRMED.** `--fs-heading-sm` is the intended desktop size (32px).
 - **`HeroSection` title lost its fluid `clamp()`** in favour of the three-tier
   token, so it now steps rather than scaling continuously.
 - The light ring around the blue buttons in the design was read as background
@@ -450,3 +449,41 @@ before relying on them as final:
   wash gets cropped hard — only its top-left corner shows. Acceptable for a soft
   gradient with no detail to protect; a separate mobile crop would need a second
   image field.
+
+
+### Partners (added with the partners build)
+- **`--fs-heading-sm`'s mobile value went 18px -> 24px.** Requested. It is the
+  token's only consumer and nothing renders an `<h4>`, so the blast radius today
+  is zero — but it IS a scale change: `--fs-heading-md` and `--fs-heading-sm` are
+  now **both 24px on mobile**, so the two smallest heading steps are
+  indistinguishable there. A future card title that must read smaller than a
+  sub-section heading on a phone needs a new step, not a nudge to this one.
+- **The heading's bold run is authored, not hardcoded.** The `title` field takes
+  plain semantic HTML — `The <strong>ones</strong> we work with` — parsed the way
+  the hero's accent spans are (no `dangerouslySetInnerHTML`; only `<strong>` and
+  `<b>` become elements). Chose `<strong>` over inventing a class name because
+  "make this word bold" already has an HTML element. **The live title has no
+  markup yet**, so the heading renders at a single weight until it's added.
+- **The heading is gradient-filled white -> `--color-brand-tint`**, not the brand
+  gradient — the type sits ON brand blue, where a blue gradient would be
+  invisible. Same `@supports` guard as the hero: flat white is the fallback, so
+  deleting the block reverts to solid white. The exact stops are estimated from
+  the reference.
+- **No CSS tinting is applied to the logos.** The uploaded PNGs are *entirely
+  semi-transparent white* (every pixel has alpha < 250), so the pale blue-gradient
+  look in the design comes from the assets letting the background through. Adding
+  a mask or opacity here would double the effect. A future logo uploaded as solid
+  full-colour artwork will look wrong next to these — the assets carry the
+  treatment, not the CSS.
+- **`max-width: 200px` on the logo is the assets' native width**, so none of them
+  upscale, and `height: auto` keeps each one's own proportions rather than forcing
+  a uniform height — which is how the design reads (a tall wordmark beside a short
+  one). 150px at tablet, 110px on mobile, both measured off the references.
+- **Column counts: 5 desktop / 3 tablet / 2 mobile.** Only 5 and 2 were
+  specified; 3 is a judgement call for the tier between.
+- **The section is full-bleed**, which works only because a page's `main` adds no
+  max-width (see §5). Its gradient is `--color-brand -> --color-brand-dark`,
+  brighter than the footer's `--color-brand-dark -> --color-brand-darker`,
+  matching the references — but both sets of stops are estimated from screenshots.
+- **Only 3 partner items exist in Shopify; the design shows 10.** The grid takes
+  any count, so adding the remaining 7 in the admin needs no code change.
