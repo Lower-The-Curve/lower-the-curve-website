@@ -462,13 +462,14 @@ before relying on them as final:
   plain semantic HTML — `The <strong>ones</strong> we work with` — parsed the way
   the hero's accent spans are (no `dangerouslySetInnerHTML`; only `<strong>` and
   `<b>` become elements). Chose `<strong>` over inventing a class name because
-  "make this word bold" already has an HTML element. **The live title has no
-  markup yet**, so the heading renders at a single weight until it's added.
-- **The heading is gradient-filled white -> `--color-brand-tint`**, not the brand
-  gradient — the type sits ON brand blue, where a blue gradient would be
-  invisible. Same `@supports` guard as the hero: flat white is the fallback, so
-  deleting the block reverts to solid white. The exact stops are estimated from
-  the reference.
+  "make this word bold" already has an HTML element. The live title uses `<b>`,
+  which is why both tags are accepted.
+- **The heading is gradient-filled `#ffffff` -> `#bdbdbd`** at 135deg, not the
+  brand gradient — the type sits ON brand blue, where a blue gradient would be
+  invisible. Both stops are **specified**, and both are neutrals rather than
+  brand colours, so they stay raw here; promote `#bdbdbd` to a token if a second
+  component ever needs the same grey. Same `@supports` guard as the hero: flat
+  white is the fallback, so deleting the block reverts to solid white.
 - **No CSS tinting is applied to the logos.** The uploaded PNGs are *entirely
   semi-transparent white* (every pixel has alpha < 250), so the pale blue-gradient
   look in the design comes from the assets letting the background through. Adding
@@ -485,5 +486,8 @@ before relying on them as final:
   max-width (see §5). Its gradient is `--color-brand -> --color-brand-dark`,
   brighter than the footer's `--color-brand-dark -> --color-brand-darker`,
   matching the references — but both sets of stops are estimated from screenshots.
-- **Only 3 partner items exist in Shopify; the design shows 10.** The grid takes
-  any count, so adding the remaining 7 in the admin needs no code change.
+- **All 10 partner items are authored** (kwik, blackroll, misi, doc,
+  thinker-toys, voicedrop, vush, prizecart, bonlabo, cili). The grid takes any
+  count, so adding or removing one needs no code change — but note the 5/3/2
+  column counts assume a multiple that fills rows evenly; an 11th item would sit
+  alone on a fourth row.

@@ -25,8 +25,8 @@
 
 /* --- HEADING ------------------------------------------------------------ */
 /* Gradient-filled rather than flat, per the design — painted as a background and
-   clipped to the glyphs. White into the light-blue tint, because the type sits
-   ON the brand blue: the usual brand gradient would be invisible here.
+   clipped to the glyphs. White into a neutral grey: the type sits ON the brand
+   blue, where the usual brand gradient would be invisible.
 
    Guarded, because the technique needs BOTH background-clip: text and
    text-fill-color — with only the first, `color: transparent` renders nothing.
@@ -51,11 +51,10 @@
 @supports ((background-clip: text) or (-webkit-background-clip: text)) and
   (-webkit-text-fill-color: transparent) {
   .title {
-    background-image: linear-gradient(
-      135deg,
-      #ffffff,
-      var(--color-brand-tint)
-    );
+    /* Specified stops. Both are neutrals, not brand colours, so they stay raw
+       here rather than becoming tokens — promote #bdbdbd if a second component
+       ever needs the same grey. */
+    background-image: linear-gradient(135deg, #ffffff, #bdbdbd);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
