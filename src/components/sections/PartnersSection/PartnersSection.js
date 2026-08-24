@@ -75,6 +75,35 @@ function logoFrom(item) {
   return item?.fields?.find((f) => f.reference?.image)?.reference.image ?? null;
 }
 
+// The design sets one word of the heading in bold against the rest ("The **ones**
+// we work with"). Which word that is is editorial, so it's authored in the
+// metafield with plain semantic HTML rather than matched by word here:
+//
+//   The <strong>ones</strong> we work with
+//
+// Parsed, never injected — there is no dangerouslySetInnerHTML. Only <strong>
+// and <b> produce an element, so a stray tag can't become markup. A title with
+// no emphasis renders at a single weight, which is not an error.
+const EMPHASIS = /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+
+function emphasizedTitle(title) {
+  const parts = [];
+  let cursor = 0;
+
+  for (const match of title.matchAll(EMPHASIS)) {
+    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+    parts.push(
+      <strong key={match.index} className={styles.emphasis}>
+        {match[2]}
+      </strong>
+    );
+    cursor = match.index + match[0].length;
+  }
+
+  if (cursor < title.length) parts.push(title.slice(cursor));
+  return parts;
+}
+
 export default function PartnersSection({ section }) {
   if (!section) return null;
 
@@ -84,40 +113,48 @@ export default function PartnersSection({ section }) {
 
   return (
     <section className={styles.partners}>
-      {title && <h2 className={styles.title}>{title}</h2>}
+      <div className={styles.inner}>
+        {title && <h2 className={styles.title}>{emphasizedTitle(title)}</h2>}
 
-      <ul className={styles.grid}>
-        {items.map((item) => {
-          const name =
-            fieldValue(item, 'name', 'title', 'button_text') ?? item.handle;
-          const url = fieldValue(item, 'link', 'button_url', 'url');
-          const logo = logoFrom(item);
+        <ul className={styles.grid}>
+          {items.map((item) => {
+            const name =
+              fieldValue(item, 'name', 'title', 'button_text') ?? item.handle;
+            const url = fieldValue(item, 'link', 'button_url', 'url');
+            const logo = logoFrom(item);
 
-          const content = logo ? (
-            <Image
-              src={logo.url}
-              alt={logo.altText ?? name ?? ''}
-              width={logo.width ?? 200}
-              height={logo.height ?? 100}
-              className={styles.logo}
-            />
-          ) : (
-            <span>{name}</span>
-          );
+            const content = logo ? (
+              <Image
+                src={logo.url}
+                alt={logo.altText ?? name ?? ''}
+                width={logo.width ?? 200}
+                height={logo.height ?? 100}
+                className={styles.logo}
+                unoptimized={/\.svg(\?|$)/i.test(logo.url)}
+              />
+            ) : (
+              <span className={styles.name}>{name}</span>
+            );
 
-          return (
-            <li key={item.id} className={styles.item}>
-              {url ? (
-                <a href={url} className={styles.link}>
-                  {content}
-                </a>
-              ) : (
-                content
-              )}
-            </li>
-          );
-        })}
-      </ul>
+            return (
+              <li key={item.id} className={styles.item}>
+                {url ? (
+                  <a
+                    href={url}
+                    className={styles.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  content
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

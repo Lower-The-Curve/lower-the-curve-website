@@ -86,7 +86,7 @@ block overrides the wider one. **Keep that order.**
 | `--fs-heading-xl` | 64px | 52px | 40px | Hero / large page headline (one per page) |
 | `--fs-heading-lg` | 48px | 40px | 32px | Major section headings |
 | `--fs-heading-md` | 40px | 32px | 24px | Sub-section headings |
-| `--fs-heading-sm` | 32px | 24px | 18px | Card titles, smallest heading |
+| `--fs-heading-sm` | 32px | 24px | **24px** | Card titles, smallest heading |
 
 ### Paragraph / body
 
@@ -351,9 +351,8 @@ before relying on them as final:
   there, **a lede and default body copy are indistinguishable by size on
   mobile** — separate them with weight or colour, or give `--fs-body-xl` its
   own mobile value (a deliberate scale change).
-- **`PartnersSection` heading was snapped 24px → `--fs-heading-sm`** (32px
-  desktop) because 24px isn't on the heading scale. Swap to `--fs-body-xl` if the
-  original size was intended.
+- ~~**`PartnersSection` heading was snapped 24px → `--fs-heading-sm`**~~
+  **CONFIRMED.** `--fs-heading-sm` is the intended desktop size (32px).
 - **`HeroSection` title lost its fluid `clamp()`** in favour of the three-tier
   token, so it now steps rather than scaling continuously.
 - The light ring around the blue buttons in the design was read as background
