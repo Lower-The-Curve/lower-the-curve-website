@@ -8,6 +8,7 @@ import {
   getHomePageQuery,
   getServicesPageQuery,
   getPartnersQuery,
+  getHeaderQuery,
 } from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
@@ -190,6 +191,25 @@ export async function getMenu(handle = 'main-menu') {
       path: toRelativePath(sub.url),
     })),
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Site chrome — header
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch the `header` metaobject (logo, menu handle, CTA link + colours).
+ * There is a single header entry, so we return the first node.
+ *
+ * @returns {Promise<object|null>} The header node, or null if none exists.
+ */
+export async function getHeader() {
+  const { body } = await shopifyFetch({
+    query: getHeaderQuery,
+    variables: { first: 1 },
+  });
+
+  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
 }
 
 // ---------------------------------------------------------------------------

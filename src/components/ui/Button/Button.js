@@ -8,6 +8,9 @@ import ArrowIcon from './ArrowIcon';
 // PROPS
 //   variant  'primary'   filled brand-blue gradient, white label   (default)
 //            'secondary' white fill, blue label, blue border
+//            'solid'     flat fill, white label. Override either colour per
+//                        instance with the --btn-bg / --btn-fg custom
+//                        properties (used for CMS-authored button colours).
 //   size     'md'        16px label  (default)
 //            'sm'        14px label
 //   arrow    'right'     → straight arrow  (default)
@@ -21,6 +24,7 @@ import ArrowIcon from './ArrowIcon';
 //   <Button href="/services">Learn More</Button>
 //   <Button href="/contact" arrow="diagonal">Book a Call</Button>
 //   <Button variant="secondary" size="sm" onClick={...}>Explore More</Button>
+//   <Button href={url} variant="solid" arrow="none" style={{ '--btn-bg': hex }}>…</Button>
 export default function Button({
   children,
   variant = 'primary',

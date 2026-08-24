@@ -36,20 +36,24 @@
 
    PARAGRAPH / BODY
      Token              Desktop  Tablet  Mobile   Use for
-     --fs-body-xl       24px     20px    16px     Lede / intro paragraph under a headline
-     --fs-body-lg       22px     18px    16px     Emphasised body copy
-     --fs-body-md       18px     16px    14px     Long-form body copy
-     --fs-body-base     16px     16px    14px     DEFAULT body text, nav, buttons
-     --fs-body-sm       14px     14px    12px     Captions, labels, legal, meta text
+     --fs-body-xl     24px     20px    16px     Lede / intro paragraph under a headline
+     --fs-body-lg     22px     18px    16px     Emphasised body copy
+     --fs-body-base   18px     16px    16px     DEFAULT — `p` and `body`, long-form copy
+     --fs-body-sm     16px     16px    14px     UI text: nav labels, button labels
+     --fs-body-xs     14px     14px    12px     Captions, legal, meta text
 
    Notes on the collapsing steps:
    - Headings shrink at every tier; large display type is what actually breaks
      on narrow screens, so it gets the most reduction (xl loses 24px total).
-   - --fs-body-base and --fs-body-sm are unchanged on tablet. 16px body copy
+   - --fs-body-sm and --fs-body-xs are unchanged on tablet. 16px body copy
      reads fine on a tablet; shrinking it only hurts legibility.
-   - Mobile has 3 body sizes against desktop's 5, so steps merge: xl+lg both
-     land on 16px, md+base both land on 14px, sm lands on 12px. Intentional —
-     mobile does not need five distinct body sizes.
+   - Mobile has 3 body sizes against desktop's 5, so steps merge: xl+lg+base
+     all land on 16px, sm lands on 14px, xs lands on 12px. Intentional — mobile
+     does not need five distinct body sizes.
+   - Consequence worth knowing: because xl, lg and base are all 16px on mobile,
+     a lede paragraph and default body copy are the SAME size there. If a mobile
+     design needs the lede to stand out, it has to do it with weight or colour,
+     not size — or --fs-body-xl needs its own mobile value.
    ------------------------------------------------------------------------ */
 :root {
   --fs-heading-xl: 64px;
@@ -59,9 +63,9 @@
 
   --fs-body-xl: 24px;
   --fs-body-lg: 22px;
-  --fs-body-md: 18px;
-  --fs-body-base: 16px;
-  --fs-body-sm: 14px;
+  --fs-body-base: 18px;
+  --fs-body-sm: 16px;
+  --fs-body-xs: 14px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -74,9 +78,9 @@
 
     --fs-body-xl: 20px;
     --fs-body-lg: 18px;
-    --fs-body-md: 16px;
     --fs-body-base: 16px;
-    --fs-body-sm: 14px;
+    --fs-body-sm: 16px;
+    --fs-body-xs: 14px;
   }
 }
 
@@ -94,9 +98,9 @@
 
     --fs-body-xl: 16px;
     --fs-body-lg: 16px;
-    --fs-body-md: 14px;
-    --fs-body-base: 14px;
-    --fs-body-sm: 12px;
+    --fs-body-base: 16px;
+    --fs-body-sm: 14px;
+    --fs-body-xs: 12px;
   }
 }
 
@@ -121,6 +125,13 @@ h2 { font-size: var(--fs-heading-lg); }
 h3 { font-size: var(--fs-heading-md); }
 h4 { font-size: var(--fs-heading-sm); }
 
+/* `p` and `body` both resolve to --fs-body-base (18px desktop), so prose is the
+   right size in or out of a paragraph. Still an explicit rule, because `p` also
+   needs margin: 0 and its own line-height.
+
+   Careful: a directly-matching rule always beats an inherited one, so this
+   font-size overrides any font-size set on an ancestor. A wrapper that sizes its
+   own prose (e.g. Footer's .legal) must target the `p`, not the wrapper. */
 p {
   margin: 0;
   font-size: var(--fs-body-base);

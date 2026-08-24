@@ -1,6 +1,9 @@
 :root {
   --color-bg: #ffffff;
   --color-text: #1a1a1a;
+  /* Near-black used for navigation / high-contrast UI labels in the design.
+     Deliberately darker than --color-text. */
+  --color-ink: #010101;
 
   /* Brand blues, taken from the button/arrow gradient in the design. */
   --color-brand: #106cfd;

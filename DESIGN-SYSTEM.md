@@ -94,21 +94,41 @@ block overrides the wider one. **Keep that order.**
 |---|---|---|---|---|
 | `--fs-body-xl` | 24px | 20px | 16px | Lede / intro paragraph under a headline |
 | `--fs-body-lg` | 22px | 18px | 16px | Emphasised body copy |
-| `--fs-body-md` | 18px | 16px | 14px | Long-form body copy |
-| `--fs-body-base` | 16px | 16px | 14px | **Default** body text, nav, buttons |
-| `--fs-body-sm` | 14px | 14px | 12px | Captions, labels, legal, meta text |
+| `--fs-body-base` | 18px | 16px | 16px | **Default** — `p` and `body`, long-form copy |
+| `--fs-body-sm` | 16px | 16px | 14px | UI text: nav labels, button labels |
+| `--fs-body-xs` | 14px | 14px | 12px | Captions, legal, meta text |
 
 ### Element defaults
 `h1`–`h4` and `p` already map to their token (`h1 → --fs-heading-xl`, …, `p →
 --fs-body-base`). **Semantic markup needs no font-size CSS at all.** Only
 override when the design genuinely differs from the element's default.
 
+`body` resolves to `--fs-body-base` too, so prose is 18px on desktop whether or
+not it sits in a `<p>`.
+
+**Inheritance trap — read this before sizing a text block from its wrapper.**
+The global `p` rule matches paragraphs *directly*, and a directly-matching
+declaration always beats an inherited one, regardless of the ancestor selector's
+specificity. So this does **not** work:
+
+```css
+.legal   { font-size: var(--fs-body-xs); }  /* never reaches the <p> */
+.legal p { margin: 0; }                     /* p keeps --fs-body-base = 18px */
+```
+
+To size prose smaller (or larger) than the default, put the token on the
+paragraph itself: `.legal p { font-size: var(--fs-body-xs); }`. This bit
+`Footer.module.css` — its copyright line silently rendered at the `p` default
+instead of its intended 14px.
+
 ### Rules
 - **No raw `px`/`rem` font-size in a component CSS Module. Ever.** Use a token.
 - **No font-size media queries in components.** The tokens already respond.
 - Naming asymmetry to be aware of: headings run `xl → lg → md → sm` (4 steps),
-  body runs `xl → lg → md → base → sm` (5 steps). `--fs-heading-md` is the 3rd
-  of 4; `--fs-body-md` is the 3rd of 5. Same suffix ≠ same position.
+  body runs `xl → lg → base → sm → xs` (5 steps). **There is no `--fs-body-md`
+  and no `--fs-heading-base`/`--fs-heading-xs`** — the two scales share only
+  `xl`, `lg` and `sm`, and `--fs-heading-sm` (3rd of 4) sits at a different
+  position than `--fs-body-sm` (4th of 5). Same suffix ≠ same position.
 - Adding a token means adding it to **all three tier blocks**. A token defined
   in only one block silently breaks at the other two.
 - A design asking for a size that isn't on the scale (e.g. 20px body on desktop)
@@ -124,6 +144,7 @@ Defined in [src/app/globals.css](src/app/globals.css):
 |---|---|---|
 | `--color-bg` | `#ffffff` | page background |
 | `--color-text` | `#1a1a1a` | default text |
+| `--color-ink` | `#010101` | near-black UI labels — header nav, hamburger bars |
 | `--color-brand` | `#106cfd` | brand blue — primary actions, links, focus rings |
 | `--color-brand-dark` | `#004bc9` | gradient start, hover states |
 | `--color-brand-darker` | `#003a9e` | primary button hover gradient |
@@ -158,8 +179,8 @@ import Button from '@/components/ui/Button/Button';
 
 | Prop | Values | Default | Notes |
 |---|---|---|---|
-| `variant` | `primary` \| `secondary` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border. |
-| `size` | `md` \| `sm` | `md` | `md` = 16px label (`--fs-body-base`), `sm` = 14px (`--fs-body-sm`). |
+| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
+| `size` | `md` \| `sm` | `md` | `md` = 16px label (`--fs-body-sm`), `sm` = 14px (`--fs-body-xs`). |
 | `arrow` | `right` \| `diagonal` \| `none` | `right` | `right` = →, `diagonal` = ↗ (same SVG rotated -45°). |
 | `href` | string | — | Present → renders a link. Absent → renders `<button>`. |
 | `type` | button/submit/reset | `button` | Only used when rendering a `<button>`. |
@@ -182,6 +203,11 @@ import Button from '@/components/ui/Button/Button';
   Client Component just to call `useId`.
 - Both variants carry a 2px border (transparent on `primary`) so the two are the
   same height side by side. Don't remove it.
+- **`solid` exists for CMS-authored colours.** It's the one variant whose fill
+  isn't a token: pass `style={{ '--btn-bg': hex, '--btn-fg': hex }}` and it uses
+  them, falling back to `--color-brand` on white. Hover darkens via
+  `filter: brightness()` rather than a second gradient, because the fill isn't
+  known at author time. Use `primary` for any button whose colour is ours.
 
 ### Rules
 - New visual treatment → **new `variant` in `Button.module.css`**, documented in
@@ -199,10 +225,34 @@ before relying on them as final:
 
 - **Tablet sizes were interpolated**, not specified by design. Only desktop and
   mobile values came from the design.
-- **`--fs-body-base` / `--fs-body-sm` don't shrink on tablet** (16px/14px body
+- **`--fs-body-sm` / `--fs-body-xs` don't shrink on tablet** (16px/14px body
   reads fine there); every other token does.
-- **Mobile collapses the body scale from 5 steps to 3**: `xl`+`lg` → 16px,
-  `md`+`base` → 14px, `sm` → 12px.
+- **The body scale was renamed so `base` means the default paragraph size.**
+  `md`(18px) → `base`, old `base`(16px) → `sm`, old `sm`(14px) → `xs`. Values
+  were **not** touched by the rename itself — it was behaviour-preserving, and
+  every consumer was updated in the same change. Net visual effect of the whole
+  18px request: paragraphs went **16px → 18px on desktop and 14px → 16px on
+  mobile**; tablet stayed at 16px.
+- **`--fs-body-base` was raised to 16px on mobile** (from the 14px it inherited
+  as the old `md`). Requested explicitly. It's the only token whose mobile value
+  was changed, so `sm` (14px) and `xs` (12px) still sit below it and the scale
+  stays monotonic at every tier — but see the 5-steps-to-3 note above for the
+  lede/body collision this creates on mobile.
+- **`body` was repointed from the 16px token to `--fs-body-base` (18px)** so it
+  agrees with `p`. Only one thing in the codebase actually inherits its size from
+  `body` — the `<span>{name}</span>` logo-less fallback in `PartnersSection` — so
+  this moved that span 16px → 18px and nothing else. Every other text node is
+  either explicitly sized or an `h1`–`h4`/`p`.
+- **`Button`'s `size` prop names no longer match the token names.** `size="md"`
+  reads `--fs-body-sm` and `size="sm"` reads `--fs-body-xs`. The sizes rendered
+  are unchanged (16px / 14px) and the prop is a public-ish API, so it was left
+  alone. Renaming the props to `sm`/`xs` would realign them — a deliberate API
+  change, not a token one.
+- **Mobile collapses the body scale from 5 steps to 3**: `xl`+`lg`+`base` →
+  16px, `sm` → 14px, `xs` → 12px. Because `xl`, `lg` and `base` are all 16px
+  there, **a lede and default body copy are indistinguishable by size on
+  mobile** — separate them with weight or colour, or give `--fs-body-xl` its
+  own mobile value (a deliberate scale change).
 - **`PartnersSection` heading was snapped 24px → `--fs-heading-sm`** (32px
   desktop) because 24px isn't on the heading scale. Swap to `--fs-body-xl` if the
   original size was intended.
@@ -210,3 +260,49 @@ before relying on them as final:
   token, so it now steps rather than scaling continuously.
 - The light ring around the blue buttons in the design was read as background
   separation, not a border. If it's real, `primary` needs a visible border colour.
+
+### Header (added with the header build)
+- **`--color-ink` (#010101) was added** rather than reusing `--color-text`
+  (#1a1a1a). The design specified #010101 for nav labels. If the two were meant
+  to be the same colour, delete `--color-ink` and point the header at
+  `--color-text`.
+- **Nav labels use `--fs-body-base`** (18px desktop). They were `--fs-body-xl`
+  (24px, per the original design) until this was changed on request. Only the
+  desktop tier is affected: the `<= 1024px` block overrides `.link` with
+  `--fs-heading-md` for the drawer, so narrow widths are untouched.
+- **The CTA uses `Button variant="solid" size="md"`** — 16px per the design on
+  desktop, 14px on mobile because `--fs-body-sm` shrinks. If the design needs
+  it locked at 16px everywhere, that's a conflict to resolve deliberately.
+- **The nav collapses behind a hamburger at <= 1024px**, the existing tablet
+  tier — no new breakpoint. Only desktop was specified, so the mobile panel's
+  styling is a judgement call.
+- **The header capsule is capped at 1200px, not `--max-width` (1152px).**
+  Requested explicitly. `--max-width` was deliberately left alone, because every
+  page section (hero, partners, footer, page `main`) uses it — changing the token
+  would move all of them. Consequence: the capsule is 48px wider than the content
+  below it, so its edges do not line up with the page. Resolve by either bumping
+  `--max-width` to 1200px (moves every section) or accepting the header as
+  intentionally wider.
+- **The 1025–~1168px desktop overflow is largely relieved** by the nav dropping
+  to 18px. The 50px gaps are still fixed, but the label text is ~25% narrower, so
+  the row's natural width fell well below the capsule's. Worth re-measuring in a
+  browser at ~1030px before calling it closed — if it still overflows, the fix is
+  a smaller desktop gap or a 4th tier, as before.
+- **The mobile drawer's labels use `--fs-heading-md`** (24px mobile), overriding
+  the inline nav's `--fs-body-xl` inside the `<= 1024px` block. 24px was specified
+  directly. **Unresolved:** no token is 24px at *both* narrow tiers, so this
+  renders 24px on mobile but **32px on tablet** (576-1024px). If 24px is meant to
+  be flat across every width, that needs a new token declared at 24px in all
+  three tier blocks — a deliberate scale addition, not a component one-off. The
+  desktop nav is untouched at 24px via `--fs-body-xl`.
+- **The CTA is hidden in the mobile drawer** (`display: none`), matching the
+  reference, which shows no button. Deleting that rule restores it.
+- **The logo is 81x33 with 18px vertical padding below 575px** (123x50 / 15px
+  above it), making the header row **69px** tall on phones against 80px on
+  desktop and tablet. Only the 81px width was specified; 33px is derived to hold
+  the desktop box's 2.46 ratio (81 / 2.46 = 32.9), which is what lets
+  `object-fit: contain` fill the box rather than letterbox. Note this is
+  the **first `<= 575px` block in `Header.module.css`** — the header previously
+  had a single `<= 1024px` block, so tablet keeps the desktop logo figures. If
+  "mobile" was meant to cover the whole collapsed range, move these two rules up
+  into the `<= 1024px` block instead.
