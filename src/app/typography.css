@@ -42,6 +42,10 @@
      --fs-body-sm     16px     16px    14px     UI text: nav labels, button labels
      --fs-body-xs     14px     14px    12px     Captions, legal, meta text
 
+   OFF-SCALE PAIR (footer's get-in-touch band, see the :root block)
+     --fs-cta-title   46px     38px    30px     the band's headline
+     --fs-cta-body    24px     18px    14px     the band's lede
+
    Notes on the collapsing steps:
    - Headings shrink at every tier; large display type is what actually breaks
      on narrow screens, so it gets the most reduction (xl loses 24px total).
@@ -84,6 +88,19 @@
      that grows on mobile, that is a second inverted pair and its own decision. */
   --fs-footer-heading: 18px;
   --fs-footer-link: 14px;
+
+  /* --- THE GET-IN-TOUCH BAND ---------------------------------------------
+     Its two sizes are OFF THE SCALE in both directions, which is why they are
+     their own tokens rather than points on it:
+       46px desktop sits between --fs-heading-lg (48) and --fs-heading-md (40);
+       30px mobile between --fs-heading-md (32) and --fs-heading-sm (24);
+       24px/14px body is --fs-body-xl on desktop but --fs-body-xl is 18px on
+       mobile, and nothing on the body scale pairs 24 with 14.
+     Snapping to 48/32 and 24/18 would have been the alternative — the specified
+     numbers were used instead, deliberately. Tablet is interpolated; only
+     desktop and mobile were given. */
+  --fs-cta-title: 46px;
+  --fs-cta-body: 24px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -104,6 +121,10 @@
        tier, so it takes the mobile sizes here rather than an interpolated pair. */
     --fs-footer-heading: 24px;
     --fs-footer-link: 18px;
+
+    /* Interpolated — only desktop and mobile were specified. */
+    --fs-cta-title: 38px;
+    --fs-cta-body: 18px;
   }
 }
 
@@ -140,6 +161,9 @@
        default paragraph — intentional, and the reason these live apart. */
     --fs-footer-heading: 24px;
     --fs-footer-link: 18px;
+
+    --fs-cta-title: 30px;
+    --fs-cta-body: 14px;
   }
 }
 

@@ -1,0 +1,135 @@
+/* The get-in-touch band: a full-bleed piece of artwork with a centred headline,
+   lede and CTA over it. Sits at the top of the footer, so it is on every page.
+
+   Its two type sizes are OFF the main scale and have their own tokens,
+   --fs-cta-title (46/38/30) and --fs-cta-body (24/18/14) — see the note in
+   typography.css for why they could not be points on it.
+
+   THE ARTWORK IS TRANSPARENT. It is three blurred shapes — two grey (#BFBFBF) at
+   the sides, one brand-blue at the bottom centre — sitting mostly BELOW its own
+   viewBox, with no background fill of any kind. So this band has to paint its own
+   white base: without it the footer's blue gradient (this is inside <footer>)
+   shows straight through and the whole band reads solid blue.
+
+   That base is why the headline is dark and the lede is white — they sit on
+   opposite halves of the result. Both colours are fixed to the artwork, not to a
+   theme. */
+.getInTouch {
+  position: relative;
+  background-color: var(--color-bg);
+  /* Own stacking context, so .backdrop's z-index: -1 stays inside the band and
+     cannot slide behind the footer's own gradient. */
+  isolation: isolate;
+  overflow: clip;
+  display: grid;
+  place-items: center;
+  /* 5rem either side puts the band at ~450px tall at 1440 — the artwork's own
+     height, so it is shown at roughly 1:1 rather than cropped hard. */
+  padding: 5rem var(--space);
+  text-align: center;
+}
+
+/* Fills the band exactly. The SVG carries preserveAspectRatio="none", so it
+   STRETCHES rather than cropping — which is the whole point: an `object-fit:
+   cover` raster pushed the artwork's top out of the band on any viewport wider
+   than 1440 and left a hard grey seam against the white page above. See
+   BookACallBackdrop.js. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.content {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Overrides the h2 default (--fs-heading-lg). Regular weight like the site's
+   other headlines — the accented run is the only bold part. Dark, because it
+   sits on the pale top half of the artwork. */
+.title {
+  font-size: var(--fs-cta-title);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--color-text);
+  /* A measure, not a fixed width: it is what puts the accented word on its own
+     second line, as the reference does. MEASURED at both tiers, and one value
+     satisfies both because `ch` scales with the token:
+       desktop needs 485-630px ("Let's build something" fits, "... Great" does not)
+       mobile  needs 317-410px
+     19ch is 551px at 46px and 361px at 30px — inside both windows. */
+  max-width: 19ch;
+}
+
+.accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradients below only
+   replace them where clipping a background to the glyphs actually works. */
+.blue {
+  color: var(--color-brand);
+}
+
+.green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .blue,
+  .green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+/* White, because this half of the artwork is brand blue. The size is carried by
+   the `p` itself — a font-size on .content would never reach it, since the
+   global `p` rule matches directly. See DESIGN-SYSTEM.md §2. */
+.description {
+  font-size: var(--fs-cta-body);
+  line-height: 1.4;
+  color: #ffffff;
+  /* multi_line_text_field: the two-line break in the reference is authored. */
+  white-space: pre-line;
+}
+
+.button {
+  margin-top: 0.5rem;
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+@media (max-width: 575px) {
+  .getInTouch {
+    padding: 4rem var(--space);
+  }
+}

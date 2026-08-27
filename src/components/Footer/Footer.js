@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFooter, getMenu } from '@/lib/shopify';
+import GetInTouch from './GetInTouch';
 import MailIcon from './MailIcon';
 import styles from './Footer.module.css';
 
@@ -12,6 +13,7 @@ import styles from './Footer.module.css';
 //   column_2_title  -> ...second ("About Us")
 //   column_3_title  -> ...third ("Contact Us")
 //   menu_1|2|3      -> handle of the Shopify menu holding each column's links
+//   get_in_touch_*  -> the CTA band above the columns; see GetInTouch.js
 //
 // Rendered once in the root layout so it appears on every page. No client JS —
 // it's links and an image.
@@ -90,10 +92,32 @@ export default async function Footer() {
 
   const logo = imageFrom(footer, 'logo');
 
+  // The CTA band's fields. `get_in_touch_button` is a `link`, whose value is
+  // JSON — unlike the case-studies button, which is a bare `url`.
+  const ctaButton = (() => {
+    const raw = fieldValue(footer, 'get_in_touch_button');
+    if (!raw) return null;
+    try {
+      const { text, url } = JSON.parse(raw);
+      return text && url ? { text, url } : null;
+    } catch {
+      return null;
+    }
+  })();
+
   if (!columns.length && !logo) return null;
 
   return (
     <footer className={styles.footer}>
+      {/* Above the columns, and inside <footer> so every page gets it from the
+          root layout. Its artwork is opaque, so it covers the footer's own
+          gradient rather than sitting on top of it. */}
+      <GetInTouch
+        title={fieldValue(footer, 'get_in_touch_title')}
+        description={fieldValue(footer, 'get_in_touch_description')}
+        button={ctaButton}
+      />
+
       <div className={styles.inner}>
         {logo && (
           <Link href="/" className={styles.brand} aria-label="Lower the Curve — home">

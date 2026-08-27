@@ -121,6 +121,21 @@ paragraph itself: `.legal p { font-size: var(--fs-body-xs); }`. This bit
 `Footer.module.css` — its copyright line silently rendered at the `p` default
 instead of its intended 14px.
 
+### The get-in-touch pair — off the scale on purpose
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-cta-title` | 46px | 38px | 30px | the footer CTA band's headline |
+| `--fs-cta-body` | 24px | 18px | 14px | the footer CTA band's lede |
+
+These are **not points on the scale, and could not be**: 46px sits between
+`--fs-heading-lg` (48) and `--fs-heading-md` (40); 30px between `--fs-heading-md`
+(32) and `--fs-heading-sm` (24); and while 24px is `--fs-body-xl` on desktop,
+that token is 18px on mobile — nothing on the body scale pairs 24 with 14.
+Snapping to 48/32 and 24/18 was the alternative; the specified numbers were used
+instead, deliberately. **Tablet is interpolated** — only desktop and mobile were
+given. Don't reach for these outside that band.
+
 ### The footer pair — the one place the scale runs backwards
 
 | Token | Desktop | Tablet | Mobile | Use for |
@@ -175,7 +190,7 @@ Defined in [src/app/globals.css](src/app/globals.css):
 | `--color-brand` | `#106cfd` | brand blue — primary actions, links, focus rings |
 | `--color-brand-dark` | `#004bc9` | gradient start, hover states |
 | `--color-brand-darker` | `#003a9e` | primary button hover gradient |
-| `--color-brand-tint` | `#eef4ff` | light blue wash — **currently unused**, see the `secondary` hover note in §4 |
+| `--color-brand-tint` | `#eef4ff` | light blue wash — the `inverse` button's hover (it stopped being `secondary`'s in the hover rework, see §4) |
 | `--color-accent-green` | `#3ba952` | secondary accent — the green half of the brand pair |
 | `--color-accent-green-dark` | `#2a773a` | dark end of the green gradient |
 
@@ -240,7 +255,7 @@ import Button from '@/components/ui/Button/Button';
 
 | Prop | Values | Default | Notes |
 |---|---|---|---|
-| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border, **inverting to a solid brand fill on hover**. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
+| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border, **inverting to a solid brand fill on hover**. `inverse` = white fill, blue label, **no border** — for use ON a brand-coloured surface. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
 | `size` | `md` \| `sm` | `md` | `md` = 16px label (`--fs-body-sm`), `sm` = 14px (`--fs-body-xs`). |
 | `arrow` | `right` \| `diagonal` \| `rise` \| `none` | `right` | `right` = →, `diagonal` = ↗ (same SVG rotated -45°), `rise` = → at rest swinging up to ↗ on hover. |
 | `href` | string | — | Present → renders a link. Absent → renders `<button>`. |
@@ -287,6 +302,14 @@ import Button from '@/components/ui/Button/Button';
   Client Component just to call `useId`.
 - Both variants carry a 2px border (transparent on `primary`) so the two are the
   same height side by side. Don't remove it.
+- **`inverse` exists because `secondary` cannot sit on blue.** They share the
+  white fill and blue label, but `secondary`'s hover inverts to a solid brand
+  fill — over the footer's blue CTA band that would make the button vanish into
+  the background. `inverse` drops the border and stays light on hover
+  (`--color-brand-tint`). Its arrow is painted like `secondary`'s, via the
+  `BLUE_ARROW_VARIANTS` set in `Button.js` rather than a `variant === 'secondary'`
+  check — add any future white-filled variant to that set or its arrow renders in
+  `currentColor` and disappears.
 - **`solid` exists for CMS-authored colours.** It's the one variant whose fill
   isn't a token: pass `style={{ '--btn-bg': hex, '--btn-fg': hex }}` and it uses
   them, falling back to `--color-brand` on white. Hover darkens via
@@ -1131,6 +1154,56 @@ before relying on them as final:
     silently retune the hero headline's green word. One consumer, so they stay
     raw. (`#298C6D` is the same value cited above as the artwork's dark green —
     re-deriving the text token from it is a separate, deliberate change.)
+
+### Get in touch (the footer's CTA band)
+- **It lives inside `<footer>`**, above the columns, so the root layout puts it on
+  **every page** with no per-page wiring.
+- All four fields come from the existing `footer` metaobject — `get_in_touch_title`,
+  `_description`, `_button`, `_background` — so **no query change was needed**:
+  the footer fragment already selects every field generically.
+- **THE ARTWORK IS INLINE (`BookACallBackdrop.js`), NOT THE CMS IMAGE.** It was
+  loaded from `get_in_touch_background` through `next/image` first, and that
+  cannot work: the file is 1440x450, so `object-fit: cover` scales it UP on any
+  viewport wider than 1440 and pushes its top out of the band. What renders then
+  starts mid-artwork, where the grey is already at full strength — **a hard
+  horizontal seam** against the white page above. `contain` would letterbox
+  instead; neither is right for a full-bleed wash.
+  - Inline, the SVG carries **`preserveAspectRatio="none"`** and simply stretches
+    to the band's box. Nothing is cropped at any width. A non-uniform stretch is
+    safe *because* the artwork is three soft gradients with no edge to distort.
+    Measured: the luminance step across the band's top edge is now **3-4 of 255**
+    at 390 / 1440 / 1920 — i.e. no visible seam.
+  - **`get_in_touch_background` is therefore an UNUSED field.** Delete it in the
+    admin, or re-wire it — but the seam returns unless the band is also given the
+    artwork's exact aspect ratio.
+  - The export's text is dropped: it ships the headline, lede and button
+    **flattened into paths**. Here they are real elements fed by the metaobject,
+    so they stay selectable, translatable and editable in Shopify.
+  - The export's `clipPath` is dropped too — it clips to 0,0,1440,450, which is
+    the viewBox, and an SVG viewport already clips to that.
+  - Only the blue stop pair reads tokens (they were `--color-brand-dark` /
+    `--color-brand` character for character); the two greys have no token and
+    stay literal.
+- **THE ARTWORK IS TRANSPARENT** — three blurred shapes sitting mostly *below*
+  their own viewBox, with **no background fill**. So the band paints its own
+  `--color-bg` base. Without it the footer's blue gradient shows straight through
+  and the whole band reads solid blue, which is exactly what it did first time.
+  - That base is also what makes the two text colours work: the headline is dark
+    because it sits on the pale top half, the lede white because it sits on the
+    blue bottom half. Both are fixed to the artwork, not to a theme.
+- **`.title`'s 19ch is measured, and one value covers both tiers** because `ch`
+  scales with the token: desktop needs 485-630px ("Let's build something" fits,
+  "… Great" does not) and mobile 317-410px; 19ch is 551px at 46px and 361px at
+  30px. That is what puts the accented word on its own line.
+- **The band is ~442px tall at 1440** against the artwork's own 450px, so it shows
+  at roughly 1:1 rather than being cropped hard. That comes from `padding: 5rem`,
+  not a fixed height — the content still drives it.
+- `object-position: center bottom` on the artwork: the glow's centre of gravity is
+  the blue at its foot, and that has to stay behind the button when the band is
+  taller or shorter than 450px.
+- The title parser is **colocated here**, matching HeroSection and PartnersSection.
+- The lede's line break is authored in the metafield (`\n` in a
+  multi_line_text_field) and survives via `white-space: pre-line`.
 
 ### Footer (added with the footer build)
 - **`--max-width` went 72rem -> 78rem (1152px -> 1248px)** and the header capsule

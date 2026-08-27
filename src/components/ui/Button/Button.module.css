@@ -75,6 +75,21 @@
   filter: brightness(0.9);
 }
 
+/* White pill for use ON a brand-coloured surface — the footer's get-in-touch
+   band. `secondary` is the same white fill and blue label, but its hover inverts
+   to a solid brand fill, which over a blue background would make the button
+   vanish into it. This one has no border and stays light on hover instead.
+   --color-brand-tint's only consumer, now that secondary stopped using it. */
+.inverse {
+  background-color: #ffffff;
+  color: var(--color-brand);
+  border-color: transparent;
+}
+
+.inverse:hover {
+  background-color: var(--color-brand-tint);
+}
+
 .secondary {
   background-color: #ffffff;
   color: var(--color-brand);
