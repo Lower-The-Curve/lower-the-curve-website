@@ -637,10 +637,10 @@ before relying on them as final:
 - **Responsiveness was swept at 14 widths** (320-1920) and three real faults came
   out of it. All three were found by measuring, not by looking:
   - **`--card-width` was uncapped on mobile** (`100vw - 3.5rem`), so at 575px the
-    card was **519x290** — far wider and flatter than the design's 525x350, with
-    the notch stretched into a 190x58 slot — and it jumped 519 -> 416 across the
-    575/576 boundary. Now `min(calc(100vw - 3.5rem), 26rem)`: it grows with the
-    viewport and then stops at the tablet width, so the two tiers meet.
+    card was 519x290 with the notch stretched into a 190x58 slot, and it jumped
+    519 -> 416 across the 575/576 boundary. It was capped at 26rem to fix that —
+    then **superseded**: mobile now shows ONE card filling the measure (below), so
+    the card is full width by design and `--card-width` is unused at that tier.
   - **The closing quote mark was a flex child of the author row**, taking ~50px
     out of it. On a 320-360px phone that squeezed the name box to 73-99px and
     "Rron Zogiani" wrapped onto two lines. It is now out of flow, pinned to the
@@ -651,10 +651,32 @@ before relying on them as final:
   - Verified across all 14 widths: no page overflow, no clipped quote, no wrapped
     name, no overlap. Card aspect now runs 0.64-1.33 against the design's 1.5,
     instead of 0.61-1.79.
-  - **320px is the floor, and it is tight.** The name fits with ~3px to spare, so
-    a noticeably longer name than "Rron Zogiani" will wrap there. If that matters,
-    the fix is a narrower notch on mobile — which means a second clip path, since
-    the 36.667% is baked into the path itself.
+  - **320px is the floor, and every pixel of the author row is accounted for.**
+    The row is ~264px wide there and splits into: the notch (36.667%), a 10px gap
+    to the name, the name box (102px), and the closing mark's reserved width. The
+    name fits with ~0-3px to spare, so **a name noticeably longer than "Rron
+    Zogiani" will wrap at 320px**, and any change that takes width from that row
+    will tip it over — adding the 10px gap did exactly that, and 4px was clawed
+    back by shrinking the closing mark from 1.5rem to 1.25rem.
+    If 320px needs real headroom, the fix is a narrower notch on mobile — which
+    means a second clip path, since the 36.667% is baked into the path itself.
+- **At `<= 575px` it is ONE card, centred, with no peek.** `.cardWrap` goes
+  `flex: 0 0 100%` and `scroll-snap-align: center`, and the track drops its
+  right-hand bleed and side padding — both of those exist only to let the next
+  card run past the page edge, which is the opposite of what this tier wants.
+  `.inner`'s own gutters then centre the card. Verified 320/390/575: equal 16/16
+  gutters, exactly one card in view, zero horizontal overflow.
+  - A side benefit: the full-width card gave the author row ~24px more, which took
+    the 320px name off two lines with room to spare.
+  - **The trade is the card's proportions at the top of the tier.** Filling the
+    measure means the card is as wide as the viewport, so it flattens as the
+    viewport grows: 288x386 (0.75) at 320, 358x338 (1.06) at 390, up to 543x290
+    (1.88) at 575 — against the design's 1.5. The notch flattens with it (199x58
+    at 575). That is inherent to one-card-full-width; capping the width would
+    bring back a peek or off-centre gutters.
+  - **576px is a hard switch** back to the tablet tier's 416px two-up, left-aligned
+    track. If the one-up centred treatment should hold up to 1024px, that rule
+    moves from the `<= 575px` block to the `<= 1024px` one.
 - **The track bleeds to the viewport's right edge** so the next card is cut by the
   page edge, as the reference shows, rather than by the grid column. Same walk-out
   `calc` as the solutions swoosh: half the leftover width plus the gutter.

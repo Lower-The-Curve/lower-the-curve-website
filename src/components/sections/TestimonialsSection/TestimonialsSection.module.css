@@ -445,14 +445,22 @@
 @media (max-width: 575px) {
   .inner {
     padding: 3rem var(--space);
-    /* Full width minus a sliver, so the next card's edge still signals that the
-       list scrolls — but CAPPED at the tablet width.
-       Uncapped this was `100vw - 3.5rem`, which at 575px gave a 519x290 card: far
-       wider and flatter than the design's 525x350, with the notch stretched into a
-       190x58 slot. It also meant the card jumped 519 -> 416 across the 575/576
-       boundary. The cap removes both: the card grows with the viewport up to
-       26rem and then stops, so 575 and 576 are the same size. */
-    --card-width: min(calc(100vw - 3.5rem), 26rem);
+  }
+
+  /* ONE CARD AT A TIME, CENTRED. No peek of the next card here — the card fills
+     the measure exactly, so .inner's own gutters centre it, and snapping lands
+     each card in the same place.
+     The right-hand bleed and the track's side padding come off with it: both
+     exist only to let the next card run past the page edge, which is the opposite
+     of what this tier wants. --card-width is unused here as a result. */
+  .track {
+    margin-right: 0;
+    padding: 1rem 0;
+  }
+
+  .cardWrap {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
   }
 
   .card {
@@ -460,14 +468,15 @@
     gap: 1.5rem;
   }
 
-  /* Same correction as above, for this tier's 1.75rem of card padding. The gap
-     after the notch drops to 0.5rem and the mark shrinks, because on a 320px
-     phone the row is only ~264px wide and the name needs every pixel of it. */
+  /* Same correction as above, for this tier's 1.75rem of card padding. The last
+     term is the gap between the logo and the name — 0.625rem (10px), requested.
+     It comes straight out of the name's width, which on the narrowest phones is
+     already tight; see the note on 320px in DESIGN-SYSTEM.md. */
   .author {
     margin-left: -1.75rem;
     margin-right: -1.75rem;
-    padding-left: calc(36.667% + 1.2833rem + 0.25rem);
-    padding-right: calc(1.75rem + 1.5rem + 0.25rem);
+    padding-left: calc(36.667% + 1.2833rem + 0.625rem);
+    padding-right: calc(1.75rem + 1.25rem + 0.25rem);
     gap: 1rem;
   }
 
@@ -475,8 +484,12 @@
     padding: 0.75rem 1rem;
   }
 
+  /* 1.25rem, not 1.5: the 10px logo-to-name gap came out of the name's width, and
+     on a 320px card that tipped "Rron Zogiani" onto two lines. Shrinking the
+     closing mark by 4px hands those pixels back, which is a better trade than a
+     wrapped name — the mark is decoration. */
   .quoteClose {
-    width: 1.5rem;
+    width: 1.25rem;
     right: 1.75rem;
     bottom: 1.5rem;
   }
