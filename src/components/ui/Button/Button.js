@@ -8,6 +8,8 @@ import ArrowIcon from './ArrowIcon';
 // PROPS
 //   variant  'primary'   filled brand-blue gradient, white label   (default)
 //            'secondary' white fill, blue label, blue border
+//            'inverse'   white fill, blue label, no border — for use ON brand
+//                        (the footer's get-in-touch band)
 //            'solid'     flat fill, white label. Override either colour per
 //                        instance with the --btn-bg / --btn-fg custom
 //                        properties (used for CMS-authored button colours).
@@ -26,6 +28,10 @@ import ArrowIcon from './ArrowIcon';
 //   <Button href="/contact" arrow="diagonal">Book a Call</Button>
 //   <Button variant="secondary" size="sm" onClick={...}>Explore More</Button>
 //   <Button href={url} variant="solid" arrow="none" style={{ '--btn-bg': hex }}>…</Button>
+// Variants whose fill is white, so their arrow has to be painted rather than
+// inherit currentColor.
+const BLUE_ARROW_VARIANTS = new Set(['secondary', 'inverse']);
+
 // One SVG, three rotations. `rise` is the only one that differs between rest and
 // hover, so it needs its own class rather than a modifier on `right`.
 const ARROW_CLASSES = {
@@ -53,14 +59,14 @@ export default function Button({
     .filter(Boolean)
     .join(' ');
 
-  // The arrow is blue-on-white for the secondary variant, so it needs the
-  // gradient stroke. The primary variant's arrow is white and inherits colour.
+  // The arrow is blue-on-white for the variants with a white fill, so those need
+  // the gradient stroke. primary/solid arrows are white and inherit colour.
   const content = (
     <>
       <span className={styles.label}>{children}</span>
       {arrow !== 'none' && (
         <ArrowIcon
-          gradient={variant === 'secondary'}
+          gradient={BLUE_ARROW_VARIANTS.has(variant)}
           className={ARROW_CLASSES[arrow] ?? ARROW_CLASSES.right}
         />
       )}
