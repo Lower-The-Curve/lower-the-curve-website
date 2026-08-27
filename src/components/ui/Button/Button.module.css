@@ -81,15 +81,42 @@
   border-color: var(--color-brand);
 }
 
+/* An outlined pill needs a hover you can actually see. This was
+   `background-color: var(--color-brand-tint)` — #ffffff to #eef4ff, a ~3%
+   luminance step that read as nothing, especially on the frosted white cards in
+   SolutionsSection. Confirmed in-browser that it fired; it just wasn't visible.
+   Inverting to the brand fill is unmistakable and reuses tokens already here. */
 .secondary:hover {
-  background-color: var(--color-brand-tint);
+  background-color: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+}
+
+/* The secondary arrow is stroked with the brand GRADIENT, which would vanish on
+   the blue fill above. A CSS `stroke` beats the SVG's stroke="url(#...)"
+   presentation attribute, so this repaints it white — for the hovered button only.
+   NOT done by recolouring the gradient's stops: every arrow on the page ships the
+   same `ltcArrowGradient` id, so url(#...) resolves to the FIRST definition in the
+   document and one button's hover would repaint every arrow on the page. */
+.secondary:hover .arrow path,
+.secondary:hover .arrowDiagonal path,
+.secondary:hover .arrowRise path {
+  stroke: #ffffff;
 }
 
 /* --- ARROW -------------------------------------------------------------- */
 .arrow,
-.arrowDiagonal {
+.arrowDiagonal,
+.arrowRise {
   flex-shrink: 0;
   transition: transform 0.2s ease;
+}
+
+/* So the secondary arrow's repaint eases in with the fill rather than snapping. */
+.arrow path,
+.arrowDiagonal path,
+.arrowRise path {
+  transition: stroke 0.2s ease;
 }
 
 /* ↗ same SVG, rotated. Negative angle because the SVG's Y axis points down. */
@@ -102,5 +129,14 @@
 }
 
 .button:hover .arrowDiagonal {
+  transform: rotate(-45deg) translateX(3px);
+}
+
+/* `rise`: straight at rest, swinging up to the diagonal on hover. Deliberately
+   its own arrow value rather than a change to `right`'s hover — `right` is what
+   the header CTA uses, and it should keep pointing where it points. The nudge is
+   composed AFTER the rotation, so it travels along the arrow's new axis (up and
+   to the right) instead of sideways. */
+.button:hover .arrowRise {
   transform: rotate(-45deg) translateX(3px);
 }

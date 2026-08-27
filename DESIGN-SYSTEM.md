@@ -85,14 +85,14 @@ block overrides the wider one. **Keep that order.**
 |---|---|---|---|---|
 | `--fs-heading-xl` | 64px | 52px | 40px | Hero / large page headline (one per page) |
 | `--fs-heading-lg` | 48px | 40px | 32px | Major section headings |
-| `--fs-heading-md` | 40px | 32px | 24px | Sub-section headings |
-| `--fs-heading-sm` | 32px | 24px | **24px** | Card titles, smallest heading |
+| `--fs-heading-md` | 40px | 32px | **32px** | Sub-section headings |
+| `--fs-heading-sm` | 32px | 24px | 24px | Card titles, smallest heading |
 
 ### Paragraph / body
 
 | Token | Desktop | Tablet | Mobile | Use for |
 |---|---|---|---|---|
-| `--fs-body-xl` | 24px | 20px | 16px | Lede / intro paragraph under a headline |
+| `--fs-body-xl` | 24px | 20px | **18px** | Lede / intro paragraph under a headline |
 | `--fs-body-lg` | 22px | 18px | 16px | Emphasised body copy |
 | `--fs-body-base` | 18px | 16px | 16px | **Default** — `p` and `body`, long-form copy |
 | `--fs-body-sm` | 16px | 16px | 14px | UI text: nav labels, button labels |
@@ -171,10 +171,11 @@ Defined in [src/app/globals.css](src/app/globals.css):
 | `--color-bg` | `#ffffff` | page background |
 | `--color-text` | `#1a1a1a` | default text |
 | `--color-ink` | `#010101` | near-black UI labels — header nav, hamburger bars |
+| `--color-text-muted` | `#4a4a4a` | muted body copy — a lede under a headline, supporting card copy |
 | `--color-brand` | `#106cfd` | brand blue — primary actions, links, focus rings |
 | `--color-brand-dark` | `#004bc9` | gradient start, hover states |
 | `--color-brand-darker` | `#003a9e` | primary button hover gradient |
-| `--color-brand-tint` | `#eef4ff` | light blue wash (secondary button hover) |
+| `--color-brand-tint` | `#eef4ff` | light blue wash — **currently unused**, see the `secondary` hover note in §4 |
 | `--color-accent-green` | `#3ba952` | secondary accent — the green half of the brand pair |
 | `--color-accent-green-dark` | `#2a773a` | dark end of the green gradient |
 
@@ -191,7 +192,10 @@ Everything else (buttons, arrows) keeps the dark-on-left order above.
 ### Rules
 - **No brand-blue hex codes in components.** Use the tokens.
 - Neutral one-offs (e.g. a single muted body grey) are tolerated but should be
-  promoted to a token the second time they're used.
+  promoted to a token the second time they're used. `--color-text-muted` is that
+  promotion: the hero lede's `#4a4a4a` became a token when `SolutionsSection`
+  needed the same grey. It clears 8.6:1 on white, so unlike the green accent it
+  is safe at any size.
 - **`--color-accent-green` is display-text only.** It clears 3:1 on white (the
   WCAG large-text floor), not 4.5:1. `--color-brand` sits at 4.58:1, so the two
   accents are *not* interchangeable — don't put the green on body copy, labels or
@@ -236,9 +240,9 @@ import Button from '@/components/ui/Button/Button';
 
 | Prop | Values | Default | Notes |
 |---|---|---|---|
-| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
+| `variant` | `primary` \| `secondary` \| `solid` | `primary` | `primary` = blue gradient fill, white label. `secondary` = white fill, blue label + 2px blue border, **inverting to a solid brand fill on hover**. `solid` = **flat** fill, white label; both colours overridable per instance via the `--btn-bg` / `--btn-fg` custom properties. |
 | `size` | `md` \| `sm` | `md` | `md` = 16px label (`--fs-body-sm`), `sm` = 14px (`--fs-body-xs`). |
-| `arrow` | `right` \| `diagonal` \| `none` | `right` | `right` = →, `diagonal` = ↗ (same SVG rotated -45°). |
+| `arrow` | `right` \| `diagonal` \| `rise` \| `none` | `right` | `right` = →, `diagonal` = ↗ (same SVG rotated -45°), `rise` = → at rest swinging up to ↗ on hover. |
 | `href` | string | — | Present → renders a link. Absent → renders `<button>`. |
 | `type` | button/submit/reset | `button` | Only used when rendering a `<button>`. |
 | `className` | string | — | Merged after the internal classes, so it can override. |
@@ -251,8 +255,31 @@ import Button from '@/components/ui/Button/Button';
 - **Arrow colour:** `secondary` uses the brand **gradient** stroke (blue arrow on
   white); `primary` uses `currentColor` (white arrow on blue). A gradient arrow
   on the blue fill would be invisible.
+- **`secondary`'s hover inverts to the brand fill** — blue background, white
+  label, white arrow — rather than the `--color-brand-tint` wash it used to have.
+  That wash was `#ffffff` to `#eef4ff`, a ~3% luminance step that read as no
+  hover at all, especially on `SolutionsSection`'s frosted white cards. It was
+  confirmed in-browser (CDP, computed styles before/after a real pointer move)
+  that the old rule *did* fire — it simply wasn't visible. `--color-brand-tint`
+  now has no consumer.
+- **The white arrow on that hover is a CSS `stroke` on the path**, not a
+  recolouring of the gradient's stops. CSS `stroke` beats the SVG's
+  `stroke="url(#…)"` presentation attribute, so it repaints the hovered button's
+  arrow only. Recolouring the stops would NOT work: every arrow on the page ships
+  the same `ltcArrowGradient` id, so `url(#…)` resolves to the **first**
+  definition in the document and hovering one button would repaint every arrow on
+  the page. Verified — with three other buttons present, only the hovered one's
+  stroke changes. **This is the duplicate-id caveat below turning from harmless
+  into load-bearing: keep per-button state out of the gradient definition.**
 - **The diagonal arrow is not a second icon** — it's the same path rotated in
-  CSS, which keeps stroke weight and cap style identical.
+  CSS, which keeps stroke weight and cap style identical. `rise` is the same
+  trick again: no rotation at rest, `rotate(-45deg)` on hover, eased by the
+  transition the arrow already had.
+- **`rise` is its own arrow value, not a change to `right`'s hover.** The header
+  CTA uses the default `right` and should keep pointing where it points, so the
+  rise behaviour had to be opt-in. Its nudge is composed *after* the rotation
+  (`rotate(-45deg) translateX(3px)`), so the arrow travels up-and-right along its
+  new axis rather than sideways.
 - **Padding is in `em`**, so it scales from the label size. Changing `size`
   changes the whole button, not just the text.
 - Multiple gradient arrows on one page repeat the `<linearGradient>` id. Harmless
@@ -346,11 +373,12 @@ before relying on them as final:
   are unchanged (16px / 14px) and the prop is a public-ish API, so it was left
   alone. Renaming the props to `sm`/`xs` would realign them — a deliberate API
   change, not a token one.
-- **Mobile collapses the body scale from 5 steps to 3**: `xl`+`lg`+`base` →
-  16px, `sm` → 14px, `xs` → 12px. Because `xl`, `lg` and `base` are all 16px
-  there, **a lede and default body copy are indistinguishable by size on
-  mobile** — separate them with weight or colour, or give `--fs-body-xl` its
-  own mobile value (a deliberate scale change).
+- ~~**Mobile collapses the body scale from 5 steps to 3**~~ **RESOLVED — it is 4
+  now.** `--fs-body-xl` was given its own mobile value (16px → **18px**) when the
+  solutions cards' titles were specified at 18px on a phone. So mobile runs
+  `xl` 18 / `lg`+`base` 16 / `sm` 14 / `xs` 12, and a lede is once again
+  distinguishable from body copy by size. **The hero's lede reads the same token,
+  so it moved 16px → 18px on mobile too.**
 - ~~**`PartnersSection` heading was snapped 24px → `--fs-heading-sm`**~~
   **CONFIRMED.** `--fs-heading-sm` is the intended desktop size (32px).
 - **`HeroSection` title lost its fluid `clamp()`** in favour of the three-tier
@@ -384,13 +412,13 @@ before relying on them as final:
   the row's natural width fell well below the capsule's. Worth re-measuring in a
   browser at ~1030px before calling it closed — if it still overflows, the fix is
   a smaller desktop gap or a 4th tier, as before.
-- **The mobile drawer's labels use `--fs-heading-md`** (24px mobile), overriding
-  the inline nav's `--fs-body-xl` inside the `<= 1024px` block. 24px was specified
-  directly. **Unresolved:** no token is 24px at *both* narrow tiers, so this
-  renders 24px on mobile but **32px on tablet** (576-1024px). If 24px is meant to
-  be flat across every width, that needs a new token declared at 24px in all
-  three tier blocks — a deliberate scale addition, not a component one-off. The
-  desktop nav is untouched at 24px via `--fs-body-xl`.
+- ~~**The mobile drawer's labels use `--fs-heading-md`** … renders 24px on mobile
+  but 32px on tablet~~ **RESOLVED.** They now read **`--fs-heading-sm`**, which is
+  24px at *both* narrow tiers, so the drawer is a flat 24px across the whole
+  collapsed range. This fell out of raising `--fs-heading-md`'s mobile value to
+  32px for the solutions heading — the drawer had to move off that token anyway,
+  and `--fs-heading-sm` was already the size it wanted. No new token was needed.
+  The desktop nav is untouched.
 - **The CTA is hidden in the mobile drawer** (`display: none`), matching the
   reference, which shows no button. Deleting that rule restores it.
 - **The logo is 81x33 with 18px vertical padding below 575px** (123x50 / 15px
@@ -475,6 +503,392 @@ before relying on them as final:
   gradient with no detail to protect; a separate mobile crop would need a second
   image field.
 
+
+### Type scale changes made for the solutions section
+- **`--fs-heading-md` mobile: 24px → 32px.** The section heading is specified at
+  40px desktop / 32px mobile and no existing token spans that pair. Raising it
+  also **un-collapsed the two smallest heading steps** — `md` and `sm` were both
+  24px on mobile and are now 32px and 24px.
+  - Knock-on: the header's mobile drawer read this token for its spec'd 24px, so
+    it was repointed at `--fs-heading-sm` — see the resolved note below.
+  - Knock-on: `.statValue` shares the token with the section heading (both are
+    40px on desktop), so **the stats numbers went 24px → 32px on mobile**.
+- **`--fs-body-xl` mobile: 16px → 18px.** The solution card titles are specified
+  at 18px on a phone, and no mobile token was 18px — `xl`, `lg` and `base` all
+  sat at 16px. Knock-on: **the hero's lede moved 16px → 18px on mobile**, as it
+  reads the same token.
+- Nothing on desktop or tablet moved: the section heading is still 40/32, the
+  card titles 24/20, and every paragraph 18/16.
+
+### Solutions (added with the solutions build)
+- **The solution card title is the one real type conflict here.** The design
+  specifies **24px**, and the heading scale has no 24px desktop step
+  (`--fs-heading-sm` is 32px). `--fs-body-xl` is the only token that is 24px on
+  desktop, so `.itemTitle` is an `<h3>` reading a **body** token. Consequences:
+  it drops to **20px on tablet and 16px on mobile**, where it lands on exactly
+  the same size as the copy beneath it and is separated by weight (700) alone.
+  If the card title should stay visibly above body copy at every tier, that is a
+  **new heading step at 24/24/20** (or similar) declared in all three blocks —
+  a deliberate scale addition, not a component one-off.
+- Every other size on the section is a straight token: heading
+  `--fs-heading-md` (40px, overriding the `h2` default), stat value
+  `--fs-heading-md`, and the lede, solution copy and stat labels all take the
+  **global `p` default** (`--fs-body-base`, 18px) with no font-size written in
+  the module at all.
+- **`--color-text-muted` was added** — see §3. `HeroSection.module.css` was
+  repointed at it in the same change, so there is no `#4a4a4a` left in `src/`.
+- **`use_stats` picks a whole LAYOUT, not just whether a card shows.**
+  - `true` — **split**: heading, lede and the blue stats card down a narrow left
+    column, the solutions listed in a wider right one. 1348px tall at 1440.
+  - `false` — **stacked**: heading and lede centred across the full measure, the
+    solutions in a two-up grid beneath. No card, **and no swoosh** — the arc is
+    anchored to the card's top edge, so with no card there is nothing for it to
+    meet, and the stacked reference shows no arc. 928px tall at 1440.
+  - Both collapse to one centred column at `<= 1024px`, where they converge.
+  - **At `<= 1024px` the split layout also drops its stats card and the blue
+    arc**, so from there down the two layouts render identically. This uses the
+    scale's existing collapse point rather than a breakpoint of its own — the
+    same width at which the section goes to one column — so the card and the arc
+    disappear exactly as the layout stacks, with no in-between state. **The site
+    still has only two breakpoints, 1024px and 575px.**
+  - **One rule hides both**, because the arc's backdrop is a *child* of
+    `.statsBlock` (it anchors to the card's top edge). `display: none` on the
+    block takes the artwork with it, so the two cannot get out of sync — hiding
+    them separately would leave the arc floating against nothing the first time
+    someone edited one rule and not the other. Verified: present at 1025px, gone
+    at 1024px, no horizontal overflow at any width.
+  - That also made the old `.backdrop` re-anchoring rules in the `<= 1024px`
+    block **dead code** — with the block hidden its children never render — so
+    they were removed. `.statsBlock`'s comment records what to restore if the
+    card is ever brought back below 1024px.
+  - The modifiers (`.withStats` / `.noStats`) are **(0,2,0) selectors**, so every
+    value they set has to be matched at that specificity to be overridden in a
+    media query — a bare `.description` loses to `.noStats .description` even
+    inside `@media (max-width: 1024px)`. That is why several rules in the narrow
+    blocks are written `.item, .noStats .item`.
+  - The stacked layout's cards use `padding: 2rem; gap: 2rem` against the split
+    layout's 2.5rem/3rem. **Measured**: that leaves a 403px text column against
+    the reference's ~404, which is what keeps "Seamless Shopify Integrations"
+    (376px) on one line. At the split layout's values it was 371px and wrapped.
+- **The layout is one responsive grid, not two designs.** Desktop is 5fr/7fr —
+  heading + lede + stats card on the left, the solution list on the right.
+  At `<= 1024px` it collapses to a single centred column (the intro centres, the
+  solution rows stay left-aligned) and the stats card goes two-across; at
+  `<= 575px` the card goes single-column. Both existing breakpoints, no new tier.
+- **THE STACKED HEADING'S LINE BREAK CANNOT BE A MEASURE, so `<br>` is parsed.**
+  The reference breaks it "High-impact Shopify / solutions to grow your startup".
+  That needs a `max-width` which fits "solutions to grow your startup" (**608px** —
+  the accents are bold, so the line is wider than the same text plain) but not
+  "High-impact Shopify solutions" (**603px**). No number is both, and
+  `text-wrap: balance` picks the other split because it minimises the longest
+  line. So the parser honours `<br>` and the break is authored in the title:
+  `High-impact Shopify <br> solutions to <span class="blue-gradient">grow</span> your <span class="blue-gradient">startup</span>`
+  `.noStats .title`'s 26ch is then a **ceiling** (it just has to clear 608px so it
+  never adds a break of its own), not the thing producing the break. Without the
+  `<br>` the heading still sets on two lines, just turning one word later.
+- **The heading's accents are authored, not hardcoded**, the same convention as
+  the hero headline and the partners heading — and this component accepts
+  **both**: `<strong>`/`<b>` for a bold run in the body colour, and
+  `<span class="blue-gradient">` / `"green-gradient"` for a bold gradient run.
+  Parsed, never injected. The live title carries **no markup**, so it currently
+  renders flat; the design wants:
+  `High-impact Shopify solutions to <span class="blue-gradient">grow</span> <strong>your</strong> <span class="blue-gradient">startup</span>`
+- **The stats card gradient runs top-to-bottom (180deg), not on the 135deg
+  diagonal** — `--color-brand` at the top into `--color-brand-dark` at the
+  bottom, so it is lightest at the top. Specified by design. Every other gradient
+  on the site is the 135deg diagonal (buttons, partners block, headline accents),
+  so this card is the single deliberate exception; it is not a mistake to
+  straighten out.
+- **The divider rule between icon and copy is a raw `#e3e3e3`** — one consumer,
+  a hairline border rather than text. Promote it if a second component needs it.
+- **The icon column width is a local custom property (`--icon-size`)** on the
+  section: 106px / 80px / 56px. One value drives the image and the grid column,
+  so every divider lines up down the list no matter how tall an icon is. 106px is
+  the icons' native SVG width.
+- **The Learn More buttons use `arrow="rise"`** — straight → at rest, swinging up
+  to ↗ on hover, alongside the `secondary` fill inversion. See §4.
+- **The solution order is pinned in code, not driven by the CMS.** The live
+  `solution` list is authored in the exact reverse of the design, and the Shopify
+  admin connector was unavailable to fix it at the source, so
+  `SolutionsSection.js` carries a `SOLUTION_ORDER` array of handles and sorts by
+  it. **Consequence: dragging the items in the admin no longer changes anything.**
+  Deleting `SOLUTION_ORDER` and the `inDesignOrder()` call hands ordering back to
+  the CMS in one edit. A handle not in the array sorts after every listed one and
+  keeps its CMS position among the other unlisted ones, so a fifth solution added
+  in the admin is appended rather than dropped.
+- **Each solution row is a frosted card** — `rgba(255, 255, 255, 0.9)` +
+  `backdrop-filter: blur(12.5px)` + `border-radius: 25px`, specified by design.
+  Near-opaque white means it is invisible against the page background and reads
+  as glass only where the swoosh passes behind it. The `-webkit-` prefix stays
+  (Safari still needs it); with neither prefix supported the rgba fill alone is a
+  clean fallback, so there is no `@supports` guard.
+- **The row gap is 0**, per design — the cards stack flush and their radii meet.
+  That makes the card padding the ONLY thing separating one row's copy from the
+  next, so it is the single number that controls the list's vertical rhythm.
+- **The card's padding is inferred** — the treatment was specified without one,
+  and a 25px radius needs something to round. `2rem` desktop (1.5rem tablet,
+  1.25rem mobile) gives 4rem of copy-to-copy spacing with the gap at 0. If design
+  has a real padding, that's the one number to change.
+- **The section lede is a FALLBACK constant in the component, not CMS copy.**
+  The `solutions` definition has no description field and the Admin connector was
+  unauthorized, so `FALLBACK_DESCRIPTION` in `SolutionsSection.js` stands in for
+  it. Adding a `description` / `paragraph` / `subtitle` field in the admin takes
+  over with no code change — **delete the constant when that happens**, because
+  marketing copy sitting in a component is exactly what a headless CMS is meant
+  to prevent. Its presence is also load-bearing for the layout: the paragraph is
+  132px tall, and without it the stats card sat 119px above the reference.
+- **The section was calibrated against a headless 1440px render**, not eyeballed:
+  Chrome renders the page, a script measures the boxes, and the numbers are
+  compared with the reference (which is 1440x1330). That loop set `.inner`'s
+  4rem padding, the cards' 2.5rem, the stats gap and `.title`'s 16ch measure.
+  Result at 1440: section **1348px** tall against the reference's 1330, stats
+  card **x 128..519** against 120..510, card top **397** against 384. Reproduce it by adding a temporary route
+  that renders the section alone — the hero's `100vh` otherwise inflates with the
+  capture window. (Note an `_`-prefixed app directory is a Next private folder
+  and will 404.)
+- **`.title` is capped at 16ch, not 20ch** — 20ch broke the headline as
+  "High-impact Shopify / solutions to grow your / startup" instead of the
+  reference's "High-impact / Shopify solutions to / grow your startup".
+- **The swoosh is anchored to the stats card, not to the section.** Its backdrop
+  hangs off `.statsBlock` with `bottom: 100%` — putting the SVG's bottom edge on
+  the card's top — then `translateY(var(--swoosh-underside))` pushes it back down
+  by a share of the SVG's own height so the ARC's underside lands there instead.
+  - **A fixed offset from the section top cannot work.** The two things move
+    independently: the arc holds the 1440x604 ratio so its height scales with the
+    VIEWPORT WIDTH, while the card's top is set by how many lines the heading and
+    lede wrap to. Measured with no offset, the arc's underside at the card's left
+    edge sits at y **387 / 545 / 733** for widths of 1025 / 1440 / 1920 — against
+    a card top of ~400 throughout. No constant meets all three. An earlier
+    `--swoosh-lift: 156px` did meet it at 1440 and nowhere else.
+  - `--swoosh-underside` is **16%**, chosen so the two meet at every desktop
+    width rather than at one. Measured overlap of the arc over the card's top
+    edge: **10 / 12 / 15 / 19 / 23px** at 1025 / 1280 / 1440 / 1920 / 2560 — it
+    grows with the viewport, as the reference's does, and never opens a gap.
+  - **The space above the card lives on `.statsBlock`, not on `.stats`**, so the
+    block's top edge and the card's top edge are the same line — which is what
+    the backdrop anchors to. With the margin on `.stats` the anchor sat 1.5rem
+    above the card and `--swoosh-underside` had to absorb the difference, which
+    made it two numbers pretending to be one. Moving `.statsBlock`'s margin now
+    moves the card and the swoosh together.
+  - **`--window-size` is not a layout viewport below ~500px.** Chrome clamps the
+    window, so a `--window-size=400` screenshot is 400px of a much wider render —
+    it looks like catastrophic overflow and is an artifact. Use CDP
+    `Emulation.setDeviceMetricsOverride` for any narrow-width check; measured
+    that way, 390px has `document.scrollWidth === 390` and nothing overflows.
+  - CDP `Page.captureScreenshot` with `captureBeyondViewport` draws a small dark
+    badge into the image. It is a capture artifact — it does not appear in a
+    plain `--screenshot` of the same page. Don't go hunting for it in the DOM.
+  - To measure the overlap, render the section twice — once normally, once with
+    `[class*="backdrop"]{display:none}` injected — and diff the two. The arc and
+    the card are the same blue, so they cannot be told apart in a single render.
+  - The horizontal offset walks back out to the viewport edge:
+    `left: calc(-1 * (max(0px, (100vw - var(--max-width)) / 2) + var(--space)))`
+    with `width: 100vw`, valid because `.statsBlock` starts at the content edge.
+  - **`.solutions` is `overflow: clip`** (not `hidden`, which would create a
+    scroll container) — the artwork is 100vw wide and taller than the space above
+    the card, so it overhangs on three sides and must be trimmed. Without this it
+    paints up over the partners section and widens the page.
+  - **`.statsBlock` renders even with no stats**, so an empty stats list can't
+    take the artwork with it.
+  - At `<= 1024px` `.statsBlock` drops to `position: static`, which hands the
+    backdrop's containing block back to `.solutions`, and the backdrop goes to
+    `top: 0` — one column there, so there is nothing beside the arc to meet.
+- **The arc still does not reproduce the reference's placement, and cannot as
+  supplied.** At 100% width the given path shows a **46px** sliver at the
+  section's top edge; the reference shows ~**240px**. Solving for a scale and
+  offset that produce both the top width and the left crossing needs ~**2.2x**
+  the section width, so the reference's artwork is a larger composition and this
+  SVG is one path lifted out of it. The lift above matches the one relationship
+  that was specified (arc meets card); the rest needs the real artwork.
+- **The stats card's geometry is measured, not guessed.** Both reference images
+  agree as *ratios of the content measure* (which is scale-independent, unlike
+  reading pixels off a screenshot): the card is ~31% of the measure, not the ~40%
+  the left grid column would give it, it is inset from that column's left edge
+  rather than flush, and its stats run ~141px value-top to value-top. Hence
+  `max-width: 23.5rem`, `margin-left: 2rem`, `padding: 2rem`, `gap: 4rem`. Both
+  the cap and the inset come off at `<= 1024px`, where the card owns the width.
+- **The stats card's radius moved 24px -> 25px** to match. 24px was an invented
+  value from the initial build; 25px is the specified one, so the section now has
+  a single radius rather than two that differ by a pixel.
+- **The section became full-bleed to carry the swoosh.** `--max-width` and the
+  gutters moved from `.solutions` onto `.inner`, so the section box spans the
+  viewport while the content keeps exactly the measure it had (everything is
+  border-box, so the numbers didn't change). The blue arc is pinned to the top at
+  `width: 100%`, `z-index: -1`, inside an `isolation: isolate` context — the same
+  arrangement as the hero's artwork.
+- **The swoosh is drawn in `SwooshBackdrop.js`, not authored in Shopify.** The
+  `solutions` metaobject has no image field, so the Figma export lives in the
+  component. Its gradient stops read `--color-brand-dark` / `--color-brand`
+  instead of the raw hexes the export shipped (identical colours), and its
+  gradient id is namespaced `ltcSolutionsSwoosh` rather than `paint0_linear_*`,
+  so a second pasted export can't collide with it. Same two edits as
+  `ChevronsDownIcon`.
+- **It renders at every width**, scaling with the 1440x604 aspect ratio. The
+  mobile reference shows no swoosh — if it is meant to be desktop-only, that is a
+  `display: none` in the `<= 575px` block, not a change to the artwork.
+- **The stacked layout has two blurred accents** (`BlueDot.js`, `GreenGlow.js`),
+  rendered only when `use_stats` is false — the split layout has the swoosh and
+  the stats card carrying the colour, and its reference shows neither.
+  - **They anchor to different boxes on purpose.** `.blueDot` hangs off `.inner`,
+    so `left: var(--space)` lands it exactly on the content's left edge at any
+    width. Anchoring it to the section would mean walking back out with a
+    `calc(... 100vw ...)`, and 100vw includes the scrollbar — which would push it
+    ~15px off the text edge on Windows. `.greenGlow` hangs off the section,
+    because it is meant to bleed off the page edge rather than line up with text.
+  - Both render at native size (68x68, 113x175). They are punctuation, not
+    artwork that has to line up with anything, so they do not scale.
+  - **The dot crosses to the top-RIGHT at `<= 575px`**, per the narrow reference,
+    bleeding ~43% off the edge (`right: -1.5rem`; `.solutions`'s `overflow: clip`
+    is what trims it). `left: auto` is required in that rule — with both `left`
+    and `right` set on a non-stretched absolute box, `left` wins and the override
+    does nothing. **Tablet (576-1024px) keeps it on the left**: only desktop and
+    mobile were given, and 575px is the scale's existing mobile tier rather than
+    a new breakpoint.
+  - `GreenGlow`'s circle is centred *outside* its own viewBox (cx 25.5, r 74.5 in
+    a 113-wide box), so only its right-hand edge shows. That is the artwork, not a
+    clipping bug.
+  - The blur is a real `feGaussianBlur` inside each SVG, not a CSS filter.
+  - `BlueDot`'s stops read the brand tokens; `GreenGlow`'s stay raw hexes, for the
+    same reason as the green swoosh's did (the green tokens are contrast-tuned for
+    *text* and reusing them would retune the hero headline's green word).
+  - Both files namespace their gradient AND filter ids. Figma names the first of
+    each identically in every export (`paint0_linear_*`, `filter0_f_*`) and
+    `url(#id)` resolves to the first match in the document, so two un-namespaced
+    exports on one page silently share one definition.
+- **There is no green swoosh.** One was built from a Figma export and then
+  removed on request; only the blue arc at the top remains. Two things worth
+  keeping if it ever comes back: (a) the export's `<foreignObject>` +
+  `backdrop-filter: blur(50px)` + 1%-opacity white `<rect>` is Figma's
+  *background* blur and is wrong here — at `z-index: -1` it blurs the page behind
+  the artwork rather than softening the shape, and softening is `filter: blur()`;
+  (b) a bottom-anchored artboard usually carries empty space below its lowest
+  point, so it needs a `translateY` nudge (measured 5.9% for the 2093x1149
+  export, 9.85% for the 1440x1149 one) before the shape actually meets the next
+  section.
+- **`.solutions` keeps `overflow: clip`** — it is the blue arc that needs it (100vw
+  wide and taller than the space above the stats card), not the green one.
+- **The section lede is a FALLBACK constant in the component, not CMS copy.**
+  The `solutions` definition has no description field and the Admin connector was
+  unauthorized, so `FALLBACK_DESCRIPTION` in `SolutionsSection.js` stands in for
+  it. Adding a `description` / `paragraph` / `subtitle` field in the admin takes
+  over with no code change — **delete the constant when that happens**, because
+  marketing copy sitting in a component is exactly what a headless CMS is meant
+  to prevent. Its presence is also load-bearing for the layout: the paragraph is
+  132px tall, and without it the stats card sat 119px above the reference.
+- **The section was calibrated against a headless 1440px render**, not eyeballed:
+  Chrome renders the page, a script measures the boxes, and the numbers are
+  compared with the reference (which is 1440x1330). That loop set `.inner`'s
+  4rem padding, the cards' 2.5rem, the stats gap and `.title`'s 16ch measure.
+  Result at 1440: section **1348px** tall against the reference's 1330, stats
+  card **x 128..519** against 120..510, card top **397** against 384. Reproduce it by adding a temporary route
+  that renders the section alone — the hero's `100vh` otherwise inflates with the
+  capture window. (Note an `_`-prefixed app directory is a Next private folder
+  and will 404.)
+- **`.title` is capped at 16ch, not 20ch** — 20ch broke the headline as
+  "High-impact Shopify / solutions to grow your / startup" instead of the
+  reference's "High-impact / Shopify solutions to / grow your startup".
+- **The swoosh is anchored to the stats card, not to the section.** Its backdrop
+  hangs off `.statsBlock` with `bottom: 100%` — putting the SVG's bottom edge on
+  the card's top — then `translateY(var(--swoosh-underside))` pushes it back down
+  by a share of the SVG's own height so the ARC's underside lands there instead.
+  - **A fixed offset from the section top cannot work.** The two things move
+    independently: the arc holds the 1440x604 ratio so its height scales with the
+    VIEWPORT WIDTH, while the card's top is set by how many lines the heading and
+    lede wrap to. Measured with no offset, the arc's underside at the card's left
+    edge sits at y **387 / 545 / 733** for widths of 1025 / 1440 / 1920 — against
+    a card top of ~400 throughout. No constant meets all three. An earlier
+    `--swoosh-lift: 156px` did meet it at 1440 and nowhere else.
+  - `--swoosh-underside` is **16%**, chosen so the two meet at every desktop
+    width rather than at one. Measured overlap of the arc over the card's top
+    edge: **10 / 12 / 15 / 19 / 23px** at 1025 / 1280 / 1440 / 1920 / 2560 — it
+    grows with the viewport, as the reference's does, and never opens a gap.
+  - **The space above the card lives on `.statsBlock`, not on `.stats`**, so the
+    block's top edge and the card's top edge are the same line — which is what
+    the backdrop anchors to. With the margin on `.stats` the anchor sat 1.5rem
+    above the card and `--swoosh-underside` had to absorb the difference, which
+    made it two numbers pretending to be one. Moving `.statsBlock`'s margin now
+    moves the card and the swoosh together.
+  - To measure the overlap, render the section twice — once normally, once with
+    `[class*="backdrop"]{display:none}` injected — and diff the two. The arc and
+    the card are the same blue, so they cannot be told apart in a single render.
+  - The horizontal offset walks back out to the viewport edge:
+    `left: calc(-1 * (max(0px, (100vw - var(--max-width)) / 2) + var(--space)))`
+    with `width: 100vw`, valid because `.statsBlock` starts at the content edge.
+  - **`.solutions` is `overflow: clip`** (not `hidden`, which would create a
+    scroll container) — the artwork is 100vw wide and taller than the space above
+    the card, so it overhangs on three sides and must be trimmed. Without this it
+    paints up over the partners section and widens the page.
+  - **`.statsBlock` renders even with no stats**, so an empty stats list can't
+    take the artwork with it.
+  - At `<= 1024px` `.statsBlock` drops to `position: static`, which hands the
+    backdrop's containing block back to `.solutions`, and the backdrop goes to
+    `top: 0` — one column there, so there is nothing beside the arc to meet.
+- **The arc still does not reproduce the reference's placement, and cannot as
+  supplied.** At 100% width the given path shows a **46px** sliver at the
+  section's top edge; the reference shows ~**240px**. Solving for a scale and
+  offset that produce both the top width and the left crossing needs ~**2.2x**
+  the section width, so the reference's artwork is a larger composition and this
+  SVG is one path lifted out of it. The lift above matches the one relationship
+  that was specified (arc meets card); the rest needs the real artwork.
+- **The stats card's geometry is measured, not guessed.** Both reference images
+  agree as *ratios of the content measure* (which is scale-independent, unlike
+  reading pixels off a screenshot): the card is ~31% of the measure, not the ~40%
+  the left grid column would give it, it is inset from that column's left edge
+  rather than flush, and its stats run ~141px value-top to value-top. Hence
+  `max-width: 23.5rem`, `margin-left: 2rem`, `padding: 2rem`, `gap: 4rem`. Both
+  the cap and the inset come off at `<= 1024px`, where the card owns the width.
+- **The stats card's radius moved 24px -> 25px** to match. 24px was an invented
+  value from the initial build; 25px is the specified one, so the section now has
+  a single radius rather than two that differ by a pixel.
+- **The section became full-bleed to carry the swoosh.** `--max-width` and the
+  gutters moved from `.solutions` onto `.inner`, so the section box spans the
+  viewport while the content keeps exactly the measure it had (everything is
+  border-box, so the numbers didn't change). The blue arc is pinned to the top at
+  `width: 100%`, `z-index: -1`, inside an `isolation: isolate` context — the same
+  arrangement as the hero's artwork.
+- **The swoosh is drawn in `SwooshBackdrop.js`, not authored in Shopify.** The
+  `solutions` metaobject has no image field, so the Figma export lives in the
+  component. Its gradient stops read `--color-brand-dark` / `--color-brand`
+  instead of the raw hexes the export shipped (identical colours), and its
+  gradient id is namespaced `ltcSolutionsSwoosh` rather than `paint0_linear_*`,
+  so a second pasted export can't collide with it. Same two edits as
+  `ChevronsDownIcon`.
+- **It renders at every width**, scaling with the 1440x604 aspect ratio. The
+  mobile reference shows no swoosh — if it is meant to be desktop-only, that is a
+  `display: none` in the `<= 575px` block, not a change to the artwork.
+- **The green swoosh is anchored to the section's BOTTOM edge**, full width, so
+  it meets the next section with no gap. It is an out-of-flow layer, so it cannot
+  crop or shorten the section itself.
+  - **The artboard is 2093x1149** — the wide export, in which the whole path fits
+    (x 0 to ~2029) rather than being clipped at the left. It is much shallower per
+    unit of width than the blue arc (1149/2093 against 1149/1440), so at 100%
+    width it renders roughly half the height the first 1440-wide green export did
+    and sits comfortably inside the section.
+  - **It needed a 5.9% downward nudge (`--green-swoosh-tail`).** The artwork's
+    lowest point is y~1081 of the 1149 viewBox, so the box carries an empty tail
+    below the shape and, flush at `bottom: 0`, the green stopped short of the
+    boundary. The nudge pushes that tail past it, where `overflow: clip` eats it.
+    Verified touching (gap 0px) at 1025 / 1440 / 1920 / 2560.
+    (The earlier 1440-wide export needed 9.85% — its lowest pixels sat outside
+    the viewBox, so more of its box was empty. Re-measure if the artboard changes.)
+  - A `translateY`, not a negative `bottom`: percentages resolve against the
+    *container's* height on `bottom` but the *element's own* on `translateY`,
+    which is what lets one value hold at every width.
+  - `overflow: clip` still trims any overhang, which on a bottom-anchored shape
+    is the right end to lose.
+  - **The export's Figma background-blur was dropped** — a `<foreignObject>` with
+    `backdrop-filter: blur(50px)` and a 1%-opacity white `<rect>`. At `z-index: -1`
+    that would blur the page *behind* the artwork, not soften the shape, and it
+    would stand up a 1440x1149 blur surface beside cards already running their own
+    `backdrop-filter`. **The reference's green does look softer than what renders**
+    — if that softness is wanted it is `filter: blur()` on the SVG, a different
+    effect worth confirming against the design.
+  - **Its gradient stops stay raw hexes** (`#80EA71` / `#298C6D`). They are NOT
+    the green tokens: `--color-accent-green` and `--color-accent-green-dark` are
+    contrast-tuned because they colour *text*, and pointing this at them would
+    silently retune the hero headline's green word. One consumer, so they stay
+    raw. (`#298C6D` is the same value cited above as the artwork's dark green —
+    re-deriving the text token from it is a separate, deliberate change.)
 
 ### Footer (added with the footer build)
 - **`--max-width` went 72rem -> 78rem (1152px -> 1248px)** and the header capsule

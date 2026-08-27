@@ -4,6 +4,11 @@
   /* Near-black used for navigation / high-contrast UI labels in the design.
      Deliberately darker than --color-text. */
   --color-ink: #010101;
+  /* Muted body grey — the lede under a headline and the supporting copy in a
+     card, which the design sets lighter than --color-text. Promoted to a token
+     on its second consumer (the hero lede and the solutions copy). 8.6:1 on
+     white, so it is safe at any size. */
+  --color-text-muted: #4a4a4a;
 
   /* Brand blues, taken from the button/arrow gradient in the design. */
   --color-brand: #106cfd;

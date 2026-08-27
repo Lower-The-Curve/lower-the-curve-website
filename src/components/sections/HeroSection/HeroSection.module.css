@@ -145,7 +145,7 @@
 .description {
   margin: 0;
   font-size: var(--fs-body-xl);
-  color: #4a4a4a;
+  color: var(--color-text-muted);
   max-width: 48ch;
   /* multi_line_text_field: authored line breaks are meaningful. */
   white-space: pre-line;

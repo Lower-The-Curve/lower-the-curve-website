@@ -31,13 +31,12 @@
      Token              Desktop  Tablet  Mobile   Use for
      --fs-heading-xl    64px     52px    40px     Hero / large page headline (one per page)
      --fs-heading-lg    48px     40px    32px     Major section headings
-     --fs-heading-md    40px     32px    24px     Sub-section headings
+     --fs-heading-md    40px     32px    32px     Sub-section headings
      --fs-heading-sm    32px     24px    24px     Card titles, smallest heading
-                                               (mobile matches -md: see that block)
 
    PARAGRAPH / BODY
      Token              Desktop  Tablet  Mobile   Use for
-     --fs-body-xl     24px     20px    16px     Lede / intro paragraph under a headline
+     --fs-body-xl     24px     20px    18px     Lede / intro paragraph under a headline
      --fs-body-lg     22px     18px    16px     Emphasised body copy
      --fs-body-base   18px     16px    16px     DEFAULT — `p` and `body`, long-form copy
      --fs-body-sm     16px     16px    14px     UI text: nav labels, button labels
@@ -48,13 +47,13 @@
      on narrow screens, so it gets the most reduction (xl loses 24px total).
    - --fs-body-sm and --fs-body-xs are unchanged on tablet. 16px body copy
      reads fine on a tablet; shrinking it only hurts legibility.
-   - Mobile has 3 body sizes against desktop's 5, so steps merge: xl+lg+base
-     all land on 16px, sm lands on 14px, xs lands on 12px. Intentional — mobile
-     does not need five distinct body sizes.
-   - Consequence worth knowing: because xl, lg and base are all 16px on mobile,
-     a lede paragraph and default body copy are the SAME size there. If a mobile
-     design needs the lede to stand out, it has to do it with weight or colour,
-     not size — or --fs-body-xl needs its own mobile value.
+   - Mobile has 4 body sizes against desktop's 5: lg and base merge on 16px,
+     while xl keeps its own value. Intentional — mobile does not need five
+     distinct body sizes, but it does need the lede to read above body copy.
+   - --fs-body-xl was 16px on mobile until the solutions card titles needed 18px
+     there. That collapse used to make a lede and default body copy identical on
+     a phone; they are now 18px against 16px. The hero's lede reads --fs-body-xl
+     too, so it moved with it.
    ------------------------------------------------------------------------ */
 :root {
   --fs-heading-xl: 64px;
@@ -117,17 +116,20 @@
   :root {
     --fs-heading-xl: 40px;
     --fs-heading-lg: 32px;
-    --fs-heading-md: 24px;
-    /* 24px, not the 18px this used to be — requested for the partners heading,
-       which is the token's only consumer (and nothing renders an <h4>).
-       CONSEQUENCE: --fs-heading-md and --fs-heading-sm are now BOTH 24px at this
-       tier, so the two smallest heading steps are indistinguishable on mobile —
-       the same collapse the body scale already has. If a card title ever needs to
-       sit visibly below a sub-section heading on a phone, that needs a new step,
-       not a nudge to this one. */
+    /* 32px, not the 24px it was — the solutions section heading is specified at
+       40px desktop / 32px mobile, and no other token spans that pair. Raising it
+       here also un-collapses the two smallest heading steps: md and sm were BOTH
+       24px at this tier, and are now 32px and 24px.
+
+       The header's mobile drawer used to read this token for its spec'd 24px and
+       now reads --fs-heading-sm instead, which is 24px at BOTH narrow tiers — so
+       that move also fixed the drawer rendering 32px on tablet. */
+    --fs-heading-md: 32px;
     --fs-heading-sm: 24px;
 
-    --fs-body-xl: 16px;
+    /* 18px, not 16px — the solutions cards' titles are specified at 18px on a
+       phone, and this is the body scale's top step. The hero's lede shares it. */
+    --fs-body-xl: 18px;
     --fs-body-lg: 16px;
     --fs-body-base: 16px;
     --fs-body-sm: 14px;

@@ -305,11 +305,13 @@
     gap: 3.25rem;
   }
 
-  /* 24px on mobile, per spec. --fs-heading-md is the only token that lands on
-     24px at the mobile tier; note it resolves to 32px on tablet (576-1024px).
-     See DESIGN-SYSTEM.md "Open decisions". */
+  /* 24px on mobile, per spec — and now 24px on tablet too. This read
+     --fs-heading-md until that token was raised to 32px on mobile for the
+     solutions heading; --fs-heading-sm is 24px at BOTH narrow tiers, so the swap
+     kept the spec'd mobile size AND closed the open question about the drawer
+     rendering 32px on tablet. */
   .link {
-    font-size: var(--fs-heading-md);
+    font-size: var(--fs-heading-sm);
     line-height: 1.2;
     white-space: normal;
   }
