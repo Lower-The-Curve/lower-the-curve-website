@@ -8,6 +8,10 @@ import PartnersSection, {
 import SolutionsSection, {
   SOLUTIONS_TYPE,
 } from '@/components/sections/SolutionsSection/SolutionsSection';
+import TestimonialsSection, {
+  TESTIMONIALS_TYPE,
+  TESTIMONIALS_TYPE_CORRECTED,
+} from '@/components/sections/TestimonialsSection/TestimonialsSection';
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
@@ -52,6 +56,12 @@ export default async function HomePage() {
             return <PartnersSection key={section.id} section={section} />;
           case SOLUTIONS_TYPE:
             return <SolutionsSection key={section.id} section={section} />;
+          // Two cases on purpose: the live definition's API identifier is
+          // misspelled `testimonails`, and recreating it correctly must not
+          // silently blank the section out. See testimonials.shared.js.
+          case TESTIMONIALS_TYPE:
+          case TESTIMONIALS_TYPE_CORRECTED:
+            return <TestimonialsSection key={section.id} section={section} />;
           case CASE_STUDIES_TYPE:
             return <CaseStudiesSection key={section.id} section={section} />;
           default:

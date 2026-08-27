@@ -565,6 +565,203 @@ before relying on them as final:
   `PartnersSection` still carry their own older, narrower copies — fold them in if
   either grows a second accent.
 
+### Testimonials (added with the testimonials build)
+- **THE LIVE API IDENTIFIERS ARE MISSPELLED, and that is the real key.** The
+  section type is **`testimonails`** (the "ai" transposed) and its items are
+  **`teestimonial`** (doubled e). Shopify fixes an API identifier at creation and
+  does NOT rename it when the display name is corrected, so the typo is what the
+  code must match. This is why the section rendered nothing at first: the type
+  string was right by spelling and wrong by fact.
+  - `page.js` dispatches on **both** spellings (`TESTIMONIALS_TYPE` and
+    `TESTIMONIALS_TYPE_CORRECTED`), so recreating the definition correctly cannot
+    silently blank the section out.
+  - The item type never has to be matched — the cards are read through the
+    reference list, not by type — so `teestimonial` needs no handling.
+- **The live shape, as authored:**
+
+  | type | field | holds |
+  |---|---|---|
+  | `testimonails` | `title` | heading |
+  | | `description` | the lede |
+  | | `testimonial` | list.metaobject_reference -> the cards |
+  | `teestimonial` | `description` | **the quotation** — not `quote` |
+  | | `name` | e.g. "Rron Zogiani" |
+  | | `company` | e.g. "CEO" |
+
+  The readers accept `quote` / `text` / `description` for the quotation, so the
+  live naming works as-is.
+- **One thing is still missing from the content:** the title carries **no accent
+  markup**, so "love" and "us" are not blue. Paste this as the title:
+  `Why they <span class="blue-gradient">love</span> working with <span class="blue-gradient">us</span>`
+- **The card's overhang offset lives on `.logoBox`, not `.author`.** On `.author`
+  it shifted the whole row, so a testimonial with no logo — which is every one of
+  them today — dragged the NAME out past the card's left edge and clipped it.
+  Putting it on the plate means the row is unaffected when there is no plate.
+- **It adds no tokens.** Every specified size was already on the scale: heading
+  `--fs-heading-md` (40), lede the `p` default `--fs-body-base` (18), quote
+  `--fs-body-lg` (22), name and company `--fs-body-base` (18). The name is
+  separated from the company by weight and colour, not size, because the design
+  gives both 18px.
+- **The site's second Client Component**, after `HeaderNav`'s mobile drawer — and
+  the first *section* that is one. The carousel needs state and a scroll listener,
+  which is the one case the conventions allow `'use client'` for.
+  - Because of that the **type constant and the GraphQL fragment live in
+    `testimonials.shared.js`**, not in the component: the page query imports the
+    fragment, and a server-side query module must not pull a client module into
+    its graph. `TestimonialsSection.js` is a two-line barrel that re-exports both
+    sides, so the page still imports from one path like every other section.
+  - The carousel is a **native scroll container with CSS scroll-snap**, not a
+    JS-driven slider — it works by swipe, trackpad, keyboard and screen reader
+    before any of the JS runs. The arrows and the progress bar are enhancements
+    on top of it, and both are hidden outright when everything already fits.
+  - The arrow step is **read off the DOM** (first card's width + the computed
+    `column-gap`) rather than hardcoded, so it stays in step with whatever the CSS
+    is doing at that breakpoint. Verified: 520px = 496 card + 24 gap, exactly.
+  - `--card-width` and `--card-gap` are declared on `.inner` because the JS reads
+    the gap from there — one element owns both, so the JS and the CSS cannot
+    disagree about how far a step is.
+- **`.testimonials` is `overflow-x: clip`, and it fixes a real bug.** The track's
+  right-hand bleed is a negative margin built from `100vw` — and **100vw includes
+  the scrollbar while the layout width does not**. With a real scrollbar present
+  the track ran **8px past the page** and gave the whole document a horizontal
+  scroll, measured at both 1440 and 1920. Every earlier sweep used
+  `--hide-scrollbars`, which is exactly why it was missed: **test overflow with
+  scrollbars ON.**
+  - **`clip`, not `hidden`.** Verified in-browser: `overflow-x: hidden` computes
+    `overflow-y` to **`auto`**, making the section a vertical scroll container as
+    a side effect; `clip` leaves it `visible`. Both remove the 8px, and the
+    carousel still scrolls either way — `clip` just has no second effect. Same
+    reasoning as `.solutions`.
+  - Re-verified at 10 widths from 320 to 2560 with scrollbars on: zero horizontal
+    overflow, carousel scrollable, both arrows present at every width.
+- **Responsiveness was swept at 14 widths** (320-1920) and three real faults came
+  out of it. All three were found by measuring, not by looking:
+  - **`--card-width` was uncapped on mobile** (`100vw - 3.5rem`), so at 575px the
+    card was 519x290 with the notch stretched into a 190x58 slot, and it jumped
+    519 -> 416 across the 575/576 boundary. It was capped at 26rem to fix that —
+    then **superseded**: mobile now shows ONE card filling the measure (below), so
+    the card is full width by design and `--card-width` is unused at that tier.
+  - **The closing quote mark was a flex child of the author row**, taking ~50px
+    out of it. On a 320-360px phone that squeezed the name box to 73-99px and
+    "Rron Zogiani" wrapped onto two lines. It is now out of flow, pinned to the
+    card's bottom-right — decoration should not take width from content.
+  - **Taking it out of flow then let it sit ON the name**, since nothing reserved
+    its space. `.author`'s `padding-right` now includes the mark's width plus a
+    gap, at both tiers.
+  - Verified across all 14 widths: no page overflow, no clipped quote, no wrapped
+    name, no overlap. Card aspect now runs 0.64-1.33 against the design's 1.5,
+    instead of 0.61-1.79.
+  - **320px is the floor, and every pixel of the author row is accounted for.**
+    The row is ~264px wide there and splits into: the notch (36.667%), a 10px gap
+    to the name, the name box (102px), and the closing mark's reserved width. The
+    name fits with ~0-3px to spare, so **a name noticeably longer than "Rron
+    Zogiani" will wrap at 320px**, and any change that takes width from that row
+    will tip it over — adding the 10px gap did exactly that, and 4px was clawed
+    back by shrinking the closing mark from 1.5rem to 1.25rem.
+    If 320px needs real headroom, the fix is a narrower notch on mobile — which
+    means a second clip path, since the 36.667% is baked into the path itself.
+- **At `<= 575px` it is ONE card, centred, with no peek.** `.cardWrap` goes
+  `flex: 0 0 100%` and `scroll-snap-align: center`, and the track drops its
+  right-hand bleed and side padding — both of those exist only to let the next
+  card run past the page edge, which is the opposite of what this tier wants.
+  `.inner`'s own gutters then centre the card. Verified 320/390/575: equal 16/16
+  gutters, exactly one card in view, zero horizontal overflow.
+  - A side benefit: the full-width card gave the author row ~24px more, which took
+    the 320px name off two lines with room to spare.
+  - **The trade is the card's proportions at the top of the tier.** Filling the
+    measure means the card is as wide as the viewport, so it flattens as the
+    viewport grows: 288x386 (0.75) at 320, 358x338 (1.06) at 390, up to 543x290
+    (1.88) at 575 — against the design's 1.5. The notch flattens with it (199x58
+    at 575). That is inherent to one-card-full-width; capping the width would
+    bring back a peek or off-centre gutters.
+  - **576px is a hard switch** back to the tablet tier's 416px two-up, left-aligned
+    track. If the one-up centred treatment should hold up to 1024px, that rule
+    moves from the `<= 575px` block to the `<= 1024px` one.
+- **The track bleeds to the viewport's right edge** so the next card is cut by the
+  page edge, as the reference shows, rather than by the grid column. Same walk-out
+  `calc` as the solutions swoosh: half the leftover width plus the gutter.
+- **THE CARD IS A NOTCHED SHAPE, NOT A ROUNDED RECTANGLE.** Design's SVG is a
+  525x350 rounded rect (23.78px corners) with a **bite cut out of the bottom
+  left** — 36.667% of the width by **20%** of the height. That bite is the seat the
+  logo plate sits in; the plate does not overlap the card, it fills the cut.
+  - **The notch is 20% tall, not the design frame's 25%.** On a 525x350 frame
+    those are the same 87.5px, but the real card is taller than 350 — 442px at
+    1440 — and a fraction of a taller card is a taller notch. 25% came out at
+    **110px** and visibly squeezed the quote above it. 20% lands at **88px**, the
+    design's absolute size, leaving 24px of clearance under the last line. It
+    cannot be pinned in pixels: an objectBoundingBox clip only speaks in
+    fractions, which is the trade for a card whose height follows its content.
+  - **The notch's height fraction lives in THREE places** and they must move
+    together: the clip path's y values, `NOTCH_HEIGHT`, and `.logoBox`'s `height`.
+    The first two are in `CardShape.js`. A mismatch shows as a gap or an overlap
+    between the plate and the bite.
+  - **`clip-path: path(...)` — design's own CSS — CANNOT BE USED, and the reason
+    is worth remembering.** `path()` takes ABSOLUTE user units, so it pins the
+    card to exactly 525x350 and clips away anything past those coordinates rather
+    than letting the box grow. Measured with the real copy: a six-line quote
+    overflowed the 350px box by **27px** and lost its last line, and a 525px card
+    is wider than a 390px phone. A card whose height comes from its content has to
+    clip against an SVG `clipPath` in **objectBoundingBox units** — the same
+    outline as fractions of whatever box the card ends up being.
+  - The one cost of that: each axis scales independently, so the corner arcs go
+    slightly elliptical when the card is not 525:350. At the real 496x442 it is a
+    couple of pixels on a 23.78px radius.
+  - **The element is clipped, not painted behind.** That is what makes the notch
+    cut the card's background AND its `backdrop-filter`, rather than leaving a
+    rectangle of frosted white showing through the bite.
+  - **The logo plate is a SIBLING of the clipped card, not a child.** `clip-path`
+    clips descendants, so a plate inside the card was cut away by the very notch it
+    fills — and took the name beside it with it. `.cardWrap` is the positioning
+    context; the plate is absolutely placed at `36.667% x 25%`, the same two
+    fractions the clip path is built from, so plate and bite cannot drift.
+  - **The edge is a 6px stroke, half-clipped, so it renders as 3px.** `CardShape`
+    strokes the same outline with `vector-effect="non-scaling-stroke"`; the card's
+    clip eats the outer half, so **the rendered edge is always half `strokeWidth`**
+    — that is the number to change. The export's mask trick produced 1px; the
+    thickening is deliberate. Verified at 1:1: exactly 3 CSS px.
+  - **The gradient runs WHITE to grey, left to right**, so the left-hand end of the
+    edge is white on a white page and stays invisible however thick it is.
+    Thickening only shows on the right and along the bottom. That is the export's
+    own gradient, not a bug — if the edge needs to read all the way round, the
+    white stop is the thing to change.
+  - **`.notched .author`'s `padding-left` carries a `+1.8333rem` correction, and
+    it is not a fudge.** Percentage padding resolves against the CONTAINING
+    BLOCK's width — the card's content box, i.e. the card minus its 2.5rem of
+    padding either side — not against the element's own. A bare `36.667%` lands
+    short of the notch by `36.667% x 5rem`. Adding it back makes the total exactly
+    36.667% of the CARD. Verified: name at 202px against a 182px notch on desktop,
+    138 against 122 on mobile.
+  - **The plate is `position: absolute` at the card's bottom-left**, filling the
+    notch — verified at offset `left: 0, bottom: 0`, 182x88 on desktop and 122x72
+    on mobile, with the logo scaled to fit inside it.
+  - **The live field is `company_logo`, not `logo`.** The reader takes
+    `company_logo` first, then `logo` / `image` as fallbacks. Worth knowing: while
+    the key did not match, the plate rendered nothing and every card showed an
+    empty bite out of its corner — a missing image here reads as a broken shape,
+    not as a missing image.
+- **The card has NO fixed height** — it is set by the quote, and flex makes every
+  card in the track match the tallest. Verified 496x442 at 1440 and 334x362 at 390,
+  with zero content overflow on a 7-line quote.
+- The 23.78px radius lives in the clip path itself rather than a `border-radius`;
+  putting both on would round an already-rounded shape. **Note `SolutionsSection`'s
+  cards use 25px**; if the two frosted-card treatments are meant to match, that is
+  one number to settle.
+- **The logo plate has no fill and no shadow** — it is a positioning box, not a
+  surface. The notch is cut out of the card, so what shows behind the logo is the
+  page itself; a white plate on a white page was only contributing a shadow edge.
+  Its `border-radius` went with them, since with no background it clipped nothing.
+- **The logo is capped at `max-width: 100px`** against a `2.25rem` height.
+  `object-fit: contain` is what keeps a wide mark's proportions once the cap binds
+  — max-width plus a fixed height would otherwise squash it horizontally. Verified:
+  the live 124x50 mark renders 89x36, under the cap; forcing a taller height clamps
+  the box to 100px wide and `contain` preserves the aspect.
+- **The progress bar is a fixed-width thumb that slides**, not a bar that grows —
+  it reads as a position indicator rather than a loading bar. `--progress` runs
+  0 to 1 and the translate covers exactly the remaining rail.
+- **The quote mark is drawn (`QuoteMark.js`)**, not typed: the design's mark is two
+  hard-edged slabs and no font's “ glyph is close enough. One SVG, rotated a half
+  turn for the closing pair.
+
 ### Solutions (added with the solutions build)
 - **The solution card title is the one real type conflict here.** The design
   specifies **24px**, and the heading scale has no 24px desktop step

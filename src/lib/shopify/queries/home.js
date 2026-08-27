@@ -1,6 +1,7 @@
 import { heroSectionFragment } from '@/components/sections/HeroSection/HeroSection';
 import { partnersSectionFragment } from '@/components/sections/PartnersSection/PartnersSection';
 import { solutionsSectionFragment } from '@/components/sections/SolutionsSection/SolutionsSection';
+import { testimonialsSectionFragment } from '@/components/sections/TestimonialsSection/testimonials.shared';
 import { caseStudiesSectionFragment } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
 
 // Home page content. The `content` metaobject (handle "home") has one reference
