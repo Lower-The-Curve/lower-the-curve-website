@@ -42,8 +42,15 @@ purpose, update `DESIGN-SYSTEM.md` in the same change.
 - Reusable site content = **metaobjects**. Product-specific content =
   **metafields**.
 - A page's content is a `content` metaobject keyed by handle (`home`,
-  `services`, …) with a `sections` field that references section metaobjects
-  (e.g. `hero_section`). `sections` may be a single reference or a list.
+  `services`, …) with **one reference field per component slot**, and the slot
+  order IS the render order (the admin labels them "Component 1" … "Component
+  5"). A slot may hold a single reference or a list.
+- **The live API keys do not match those labels** — Shopify never renames a key
+  when its display name changes, so home's slots are `sections`, `section_2`,
+  `component_3`, … Never read the order off the metaobject's `fields` array:
+  the Storefront API returns it **alphabetically**, not in authored order. Alias
+  the keys to `component1`…`componentN` in the page query (see
+  `queries/home.js`) — that aliased list is the one place render order lives.
 
 ## Project layout
 - `src/lib/shopify/index.js` — Storefront API client (`shopifyFetch`) + one
@@ -69,7 +76,11 @@ Each section component exports THREE things:
 1. Create the component with its **colocated fragment**, TYPE constant, and reader.
 2. In the relevant `queries/<page>.js`: import the fragment, spread
    `...XFields` onto the section `reference` AND `references.nodes`, and append
-   `${xSectionFragment}` to the query.
+   `${xSectionFragment}` to the query. On `home.js` that means adding it to the
+   shared `PageComponentFields` fragment, so the new type can go in **any** slot.
+   Do NOT add a separate by-type `getX()` helper for a section the page's
+   `content` entry already references — that fetches the same data twice and
+   takes the ordering out of the CMS's hands.
 3. In the page's `switch (section.type)`, add `case X_SECTION_TYPE`.
 4. **Always remember the fragment.** A new section with no fragment spread in the
    query returns no data. This is the most common mistake — double-check it.

@@ -1,0 +1,534 @@
+/* Solutions section. Two columns on desktop: the heading, its lede and the blue
+   stats card on the left, the list of solutions on the right. Collapses to one
+   centred column on tablet and phone.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   Specified type: heading 40px (--fs-heading-md), lede 18px (the `p` default,
+   --fs-body-base), solution title 24px (--fs-body-xl — see the note on
+   .itemTitle), solution copy 18px, stat value 40px, stat label 18px. */
+/* FULL-BLEED: the measure and the padding live on .inner, so the section box
+   itself spans the viewport and the swoosh can reach both edges. Geometry is
+   unchanged from putting them here — everything is border-box, so
+   `max-width: var(--max-width)` still includes the --space gutters. */
+.solutions {
+  position: relative;
+  /* Own stacking context, so .backdrop's z-index: -1 stays inside the section
+     and can never slide behind the page background. Same trick as the hero. */
+  isolation: isolate;
+  /* Width of the icon column. One value drives the icon, the column and
+     therefore where every divider rule lands, so the rows can't drift apart. */
+  --icon-size: 106px;
+  /* Where the arc's underside sits inside its own box, as a share of the SVG's
+     height, measured at the stats card's left edge. The backdrop is anchored so
+     the SVG's BOTTOM lands on the card's top, then pushed back down by this so
+     the ARC's underside lands there instead. See .backdrop.
+
+     Set to the WIDEST of the measured values (the one 1025px needs) rather than
+     an average, so the two are guaranteed to meet at every desktop width. The
+     arc therefore dips slightly over the card's top corner as the viewport
+     grows — 0px at 1025 up to ~29px at 1920 — which is what the reference
+     shows too. */
+  --swoosh-underside: 16%;
+  /* The artwork is 100vw wide and taller than the space above the card, so it
+     overhangs the section on three sides. `clip` (not `hidden`) trims it without
+     creating a scroll container. */
+  overflow: clip;
+}
+
+/* --- BACKDROP -----------------------------------------------------------
+   The blue swoosh, at the full viewport width, positioned so the underside of
+   its left-hand band meets the top edge of the stats card.
+
+   WHY IT IS ANCHORED TO THE CARD AND NOT TO THE SECTION.
+   A fixed offset from the section's top cannot hold that relationship, because
+   the two things move independently: the arc holds a 1440x604 ratio so its
+   height scales with the VIEWPORT WIDTH, while the card's top is set by how many
+   lines the heading and lede wrap to and barely moves. Measured unlifted, the
+   arc's underside at the card's left edge sits at y 387 / 545 / 733 for viewport
+   widths of 1025 / 1440 / 1920 — against a card top of roughly 400 throughout.
+   No single constant meets all three.
+
+   So the backdrop hangs off the stats block instead: `bottom: 100%` puts the
+   SVG's bottom edge exactly on the card's top, and translateY pushes it back
+   down by --swoosh-underside — a share of the SVG's own height, so it scales
+   with the artwork — leaving the ARC's underside on that edge at any width.
+
+   The horizontal offset walks back out to the viewport's left edge: .inner is
+   centred with a --max-width cap and --space of padding, and .statsBlock starts
+   at that content edge.
+   ---------------------------------------------------------------------- */
+/* The space above the card lives HERE, not on .stats, so .statsBlock's top edge
+   and the card's top edge are the same line — which is what the backdrop anchors
+   to. With the margin on .stats instead, the anchor sat that distance above the
+   card and the offset below had to absorb the difference.
+   Moving this one value moves the card AND the swoosh together. */
+.statsBlock {
+  position: relative;
+  width: 100%;
+  /* On top of .intro's own 1.5rem flex gap, so 4rem of air under the lede. */
+  margin-top: 2.5rem;
+}
+
+.backdrop {
+  position: absolute;
+  bottom: 100%;
+  left: calc(
+    -1 * (max(0px, (100vw - var(--max-width)) / 2) + var(--space))
+  );
+  width: 100vw;
+  transform: translateY(var(--swoosh-underside));
+  z-index: -1;
+  pointer-events: none;
+}
+
+.swoosh {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Belt and braces with `height: auto`: inline SVG's intrinsic sizing is the
+     one place where a missing aspect ratio silently collapses the box to the
+     UA's 150px default. Matches the viewBox. */
+  aspect-ratio: 1440 / 604;
+}
+
+.inner {
+  /* Sections own their measure and their rhythm; the page's `main` adds
+     neither. See DESIGN-SYSTEM.md §5. */
+  position: relative;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: grid;
+  align-items: start;
+}
+
+/* --- DECORATIVE ACCENTS (stacked layout only) ---------------------------
+   Two blurred blobs. Both sit behind the content, and both are rendered at their
+   native size rather than scaled — they are punctuation, not artwork that has to
+   line up with anything.
+
+   They anchor to DIFFERENT boxes on purpose:
+
+   .blueDot hangs off .inner, so `left: var(--space)` lands it exactly on the
+   content's left edge at any width. Anchoring it to the section instead would
+   mean walking back out with a `calc(... 100vw ...)`, and 100vw includes the
+   scrollbar — which would push it off the text edge by ~15px on Windows.
+
+   .greenGlow hangs off the section, because it is meant to bleed off the page
+   edge, not to line up with the text. Its circle is centred outside its own
+   viewBox, so only the right-hand edge shows — see GreenGlow.js.
+   ---------------------------------------------------------------------- */
+.blueDot,
+.greenGlow {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.blueDot {
+  top: 2.5rem;
+  left: var(--space);
+}
+
+.greenGlow {
+  bottom: 3.5rem;
+  left: 0;
+}
+
+/* --- THE TWO LAYOUTS ----------------------------------------------------
+   Driven by the metaobject's `use_stats` boolean, which picks a whole layout
+   rather than just showing or hiding a card.
+
+   withStats — split: heading, lede and the stats card down a narrow left column,
+   the solutions listed in a wider right one.
+   noStats   — stacked: heading and lede centred across the full measure, the
+   solutions in a two-up grid beneath. No card, and no swoosh (it anchors to the
+   card's top edge, so with no card there is nothing for it to meet).
+
+   Both collapse to one centred column at <= 1024px, where they converge.
+   ---------------------------------------------------------------------- */
+.withStats .inner {
+  /* ~42 / 58, measured off the reference: the heading column is visibly the
+     narrower of the two. */
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 4rem;
+}
+
+.noStats .inner {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem;
+}
+
+/* Narrower columns than the split layout's single list, so the icons come down
+   with them. */
+.noStats {
+  --icon-size: 80px;
+}
+
+.noStats .intro {
+  align-items: center;
+  text-align: center;
+}
+
+/* Wider measures than the split layout's, because the intro now has the whole
+   page width.
+
+   26ch (650px) is a CEILING, not the break. The reference's break cannot be
+   produced by any measure — it needs one that fits "solutions to grow your
+   startup" (608px, the accents are bold and so wider than plain text) but not
+   "High-impact Shopify solutions" (603px), and no number is both. The break is
+   authored with <br> in the title instead; see SolutionsSection.js. This value
+   just has to clear 608px so it never adds a break of its own, while still
+   holding the intro to a readable measure. */
+.noStats .title {
+  max-width: 26ch;
+}
+
+.noStats .description {
+  max-width: 80ch;
+}
+
+/* Two up. Row gap stays 0 like the split layout — the cards' own padding is the
+   separation — and the column gap follows the same rule. */
+.noStats .list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Tighter than the split layout's card, because two of them now share the width.
+   MEASURED: this leaves 403px of text column against the reference's ~404, which
+   is what keeps "Seamless Shopify Integrations" (376px) on one line. At the split
+   layout's 2.5rem/3rem it was 371px and the title wrapped. */
+.noStats .item {
+  padding: 2rem;
+  gap: 2rem;
+}
+
+/* --- INTRO COLUMN ------------------------------------------------------- */
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+/* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
+   which is --fs-heading-md. Regular weight, like the hero headline: the emphasis
+   comes from the accented run, which is the only bold part. */
+.title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  /* A measure, not a fixed width. `ch` scales with the heading token, so the
+     design's three-line break ("High-impact / Shopify solutions to / grow your
+     startup") holds at 40px, 32px and 24px without a media query. */
+  max-width: 16ch;
+}
+
+/* The accented runs in the heading. The weight lives on .accent rather than on
+   each colour, so "the accented words are the bold ones" is stated once. */
+.accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradients below only
+   replace them where clipping a background to the glyphs actually works. */
+.blue {
+  color: var(--color-brand);
+}
+
+.green {
+  color: var(--color-accent-green);
+}
+
+/* Same guarded background-clip technique as the hero headline — it needs BOTH
+   background-clip: text and text-fill-color, or `color: transparent` would
+   render invisible words. Delete this block to revert to the flat colours above. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .blue,
+  .green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Bright blue at the top-left, dark at the bottom-right — the hero's headline
+     order, mirrored from the buttons'. See DESIGN-SYSTEM.md §3. */
+  .blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+/* 18px comes from the global `p` rule (--fs-body-base) — no font-size needed
+   here, and one on .intro would never reach the paragraph anyway (a directly
+   matching rule beats an inherited one; see DESIGN-SYSTEM.md §2). */
+.description {
+  color: var(--color-text-muted);
+  max-width: 46ch;
+}
+
+/* --- STATS CARD ---------------------------------------------------------
+   The gradient runs straight down — lighter --color-brand at the top into
+   --color-brand-dark at the bottom — rather than on the 135deg diagonal the
+   buttons, the partners block and the headline accents all use. That diagonal is
+   the house default (see DESIGN-SYSTEM.md); this card is the one deliberate
+   exception, so don't "fix" it back.
+   ---------------------------------------------------------------------- */
+.stats {
+  list-style: none;
+  /* Flush with the heading and lede above it — one left edge down the whole
+     column. (The reference reads as a small inset, but that was measurement
+     noise on a scaled screenshot; aligned is the intent.) Width is measured:
+     ~31% of the content measure, not the full ~40% the left column gives it.
+     No margin: the space above is .statsBlock's, so the swoosh tracks it. */
+  margin: 0;
+  padding: 2rem;
+  width: 100%;
+  max-width: 24.5rem;
+  border-radius: 25px;
+  background-image: linear-gradient(
+    180deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  /* Generous, and measured: the reference's six stats run ~137px value-top to
+     value-top, which this gap plus the value's and label's own line boxes adds
+     up to. */
+  gap: 4.75rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Not a heading — a display number — so it carries the size itself rather than
+   relying on an element default. 40px desktop, per the design. */
+.statValue {
+  font-size: var(--fs-heading-md);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* 18px from the global `p` rule again; only the colour differs here. */
+.statLabel {
+  color: #ffffff;
+}
+
+/* --- SOLUTIONS LIST ----------------------------------------------------- */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  /* Zero, per design: the frosted cards stack flush and their own padding is the
+     only thing separating one row's copy from the next (2rem + 2rem = 4rem on
+     desktop). Nothing to override at the narrow tiers — the padding shrinks
+     there and takes the spacing with it. */
+  gap: 0;
+}
+
+/* Each solution is a frosted card. Near-opaque white, so it is invisible where
+   it sits on the page background and reads as glass only where the swoosh passes
+   behind it — which is the whole point of the blur.
+
+   -webkit- prefix stays: backdrop-filter is unprefixed in Chrome and Firefox but
+   still needs it in Safari. Where neither is supported the rgba fill alone is a
+   clean fallback, so no @supports guard is needed. */
+.item {
+  display: grid;
+  /* Fixed icon column, so every divider rule lines up down the list regardless
+     of how tall an individual icon is. */
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+  /* INFERRED: the card treatment was specified without a padding, and a radius
+     needs something to round. With the row gap at 0 this padding is the ONLY
+     separation between one card's copy and the next — 2.5rem puts the rows on
+     the reference's ~307px title-to-title pitch. */
+  padding: 2.5rem;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+
+.icon {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The vertical rule between the icon and the copy. Runs the height of the copy
+   block, which is what the reference shows. */
+.body {
+  border-left: 1px solid #e3e3e3;
+  padding-left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+/* CONFLICT WORTH KNOWING: the design asks for 24px here, and the heading scale
+   has no 24px desktop step (--fs-heading-sm is 32px). --fs-body-xl is the only
+   token that is 24px on desktop, so an h3 reads a body token. Consequence: this
+   drops to 20px on tablet and 16px on mobile, where it lands on the same size as
+   the copy underneath it and is told apart by weight alone. See DESIGN-SYSTEM.md. */
+.itemTitle {
+  font-size: var(--fs-body-xl);
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.itemDescription {
+  color: var(--color-text-muted);
+}
+
+.itemButton {
+  margin-top: 0.5rem;
+}
+
+/* --- TABLET (<= 1024px) -------------------------------------------------
+   One column. The intro centres, matching the narrow reference; the solution
+   rows stay left-aligned.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .solutions {
+    --icon-size: 80px;
+  }
+
+  /* The split layout drops its stats card AND the blue arc here, so below this
+     width the two layouts render identically: centred heading and lede over one
+     column of solutions.
+
+     ONE RULE HIDES BOTH, because the arc's backdrop is a CHILD of .statsBlock
+     (it anchors to the card's top edge). Hiding the block takes the artwork with
+     it and the two cannot get out of sync — hiding them separately would leave
+     the arc floating against nothing the first time someone edited one rule and
+     not the other.
+
+     This is also why there are no .backdrop overrides in this block: with the
+     block gone its children never render, so re-anchoring the arc to the section
+     would be dead code. If the card is ever brought back below 1024px, the arc
+     needs `top: 0; bottom: auto; left: 0; right: 0; width: auto; transform: none`
+     restored here — there is no card beside it at this width to meet. */
+  .statsBlock {
+    display: none;
+  }
+
+  /* Both modifiers are (0,2,0), so this has to match that to win. */
+  .withStats .inner,
+  .noStats .inner {
+    padding: 4rem var(--space);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+
+  /* One column here too — the two-up grid needs the width it no longer has. */
+  .noStats .list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The layout modifiers are (0,2,0) selectors, so every value they set has to be
+     matched at that specificity to be overridden here — a bare `.description`
+     would lose to `.noStats .description` even inside this media query. */
+  .noStats .description {
+    max-width: 60ch;
+  }
+
+  .intro {
+    align-items: center;
+    text-align: center;
+  }
+
+  .title {
+    max-width: 24ch;
+  }
+
+  .description {
+    max-width: 60ch;
+  }
+
+  .stats {
+    /* Two across once the card has the full page width to itself — so the
+       desktop measure cap comes off. */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 2.5rem;
+    max-width: none;
+    padding: 2.5rem;
+    text-align: left;
+  }
+
+  .item,
+  .noStats .item {
+    gap: 2rem;
+    padding: 1.5rem;
+  }
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+@media (max-width: 575px) {
+  .solutions {
+    --icon-size: 56px;
+  }
+
+  .inner {
+    padding: 3rem var(--space);
+  }
+
+  .statsBlock {
+    margin-top: 2rem;
+  }
+
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 2.5rem 1.75rem;
+    gap: 1.75rem;
+  }
+
+  .item,
+  .noStats .item {
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  /* The dot crosses to the other corner on a phone, per the narrow reference.
+     `left: auto` is required — without it the desktop `left` still applies and,
+     with both set, `left` wins for a non-stretched absolute box.
+     The negative offset lets it bleed off the edge as the reference shows;
+     .solutions's `overflow: clip` is what trims it. */
+  .blueDot {
+    top: 0.5rem;
+    left: auto;
+    right: -1.5rem;
+  }
+
+  .body {
+    padding-left: 1.25rem;
+  }
+}

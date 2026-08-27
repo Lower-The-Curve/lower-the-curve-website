@@ -15,6 +15,7 @@ import ArrowIcon from './ArrowIcon';
 //            'sm'        14px label
 //   arrow    'right'     → straight arrow  (default)
 //            'diagonal'  ↗ same arrow rotated 45°
+//            'rise'      → at rest, rotating to ↗ on hover
 //            'none'      no icon
 //   href     given  → renders a link (next/link internally, <a> for external
 //                     or hash/mailto targets)
@@ -25,6 +26,14 @@ import ArrowIcon from './ArrowIcon';
 //   <Button href="/contact" arrow="diagonal">Book a Call</Button>
 //   <Button variant="secondary" size="sm" onClick={...}>Explore More</Button>
 //   <Button href={url} variant="solid" arrow="none" style={{ '--btn-bg': hex }}>…</Button>
+// One SVG, three rotations. `rise` is the only one that differs between rest and
+// hover, so it needs its own class rather than a modifier on `right`.
+const ARROW_CLASSES = {
+  right: styles.arrow,
+  diagonal: styles.arrowDiagonal,
+  rise: styles.arrowRise,
+};
+
 export default function Button({
   children,
   variant = 'primary',
@@ -52,7 +61,7 @@ export default function Button({
       {arrow !== 'none' && (
         <ArrowIcon
           gradient={variant === 'secondary'}
-          className={arrow === 'diagonal' ? styles.arrowDiagonal : styles.arrow}
+          className={ARROW_CLASSES[arrow] ?? ARROW_CLASSES.right}
         />
       )}
     </>

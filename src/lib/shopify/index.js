@@ -7,7 +7,6 @@
 import {
   getHomePageQuery,
   getServicesPageQuery,
-  getPartnersQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -326,21 +325,6 @@ export async function getHomePage() {
   });
 
   return body?.data?.metaobject ?? null;
-}
-
-/**
- * Fetch the `partners` section metaobject (holds a title + a list of partner
- * items). There is a single partners section, so we return the first node.
- *
- * @returns {Promise<object|null>} The partners section node, or null if none.
- */
-export async function getPartners() {
-  const { body } = await shopifyFetch({
-    query: getPartnersQuery,
-    variables: { first: 1 },
-  });
-
-  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
 }
 
 /**
