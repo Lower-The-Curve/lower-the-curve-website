@@ -520,6 +520,51 @@ before relying on them as final:
 - Nothing on desktop or tablet moved: the section heading is still 40/32, the
   card titles 24/20, and every paragraph 18/16.
 
+### Case Studies (added with the case-studies build)
+- **The live `case_studies` entry** sits in home's Component 4 with `title`,
+  `description`, `image` and `button`.
+- **`button` is typed `url`, not `link` — and that carries NO label.** This is
+  worth knowing because it silently broke the button: a `link` field's value is
+  JSON (`{"text":…,"url":…}`) and a `url` field's is a bare string, so
+  `JSON.parse` threw and the button was dropped with no error anywhere.
+  `linkFrom()` now accepts both shapes.
+  - Because a `url` has no text, the label falls back to a `BUTTON_TEXT` constant
+    in the component. **Authoring a `button_text` field, or retyping `button` to
+    `link`, takes over with no code change** — do that and delete the constant,
+    since copy belongs in the CMS.
+- **Paragraphs come from blank lines** in the one `description` field, so an
+  editor adds or removes one by pressing return twice. Single line breaks inside
+  a paragraph survive via `white-space: pre-line`.
+- **Two things in the live data worth fixing** (neither is a code problem): the
+  button URL reads `lowerthecruve.com` — **"cruve", a typo** — and the image has
+  no alt text, so it renders `alt=""`. A real alt would be better for anything
+  that carries meaning.
+- **It adds no tokens.** Both specified sizes were already on the scale:
+  40px/32px is `--fs-heading-md` (40/32/32 — the pair the solutions build had just
+  produced) and 18px/16px is the `p` default `--fs-body-base` (18/16/16), so the
+  paragraphs carry no font-size at all.
+- **`.title`'s 21ch is measured.** The reference breaks it "Case Studies that
+  speak / for themselves", which needs a measure that fits "Case Studies that
+  speak" (**490px**, with "Case Studies" bold) but not "…that speak for"
+  (**555px**); 21ch is 525px, inside that window with room either side. On a phone
+  the column is narrower than any of it (358px at 390px wide) and caps the measure
+  itself, producing the narrow reference's break with no override — which is why
+  there is no `.title` rule in the media queries.
+- **Three paragraphs, one field.** `description` is split on blank lines, so an
+  editor adds or removes a paragraph by pressing return twice. Single line breaks
+  inside a paragraph survive via `white-space: pre-line`.
+- **The image is first in the DOM**, so it stacks above the copy when the grid
+  collapses — the narrow reference's order, with no `order` property.
+- **`.hasMedia` gates the two-column split.** The default is one column, so an
+  entry with no image doesn't leave an empty grid cell and half the measure unused.
+- **The decorative green blobs are not built.** The reference has a small blurred
+  green dot top-left and a large green wash top-right; no assets were supplied.
+- **The title parser moved to `src/components/ui/accentedTitle.js`** in this
+  change and is now shared with `SolutionsSection` (verified: Solutions' rendered
+  heading markup is byte-identical before and after). `HeroSection` and
+  `PartnersSection` still carry their own older, narrower copies — fold them in if
+  either grows a second accent.
+
 ### Solutions (added with the solutions build)
 - **The solution card title is the one real type conflict here.** The design
   specifies **24px**, and the heading scale has no 24px desktop step

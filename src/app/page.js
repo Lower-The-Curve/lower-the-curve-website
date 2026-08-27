@@ -8,6 +8,9 @@ import PartnersSection, {
 import SolutionsSection, {
   SOLUTIONS_TYPE,
 } from '@/components/sections/SolutionsSection/SolutionsSection';
+import CaseStudiesSection, {
+  CASE_STUDIES_TYPE,
+} from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
 import styles from './page.module.css';
 
 // The home `content` entry's component slots, in the order the admin shows them
@@ -49,6 +52,8 @@ export default async function HomePage() {
             return <PartnersSection key={section.id} section={section} />;
           case SOLUTIONS_TYPE:
             return <SolutionsSection key={section.id} section={section} />;
+          case CASE_STUDIES_TYPE:
+            return <CaseStudiesSection key={section.id} section={section} />;
           default:
             return null;
         }

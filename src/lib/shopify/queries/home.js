@@ -1,6 +1,7 @@
 import { heroSectionFragment } from '@/components/sections/HeroSection/HeroSection';
 import { partnersSectionFragment } from '@/components/sections/PartnersSection/PartnersSection';
 import { solutionsSectionFragment } from '@/components/sections/SolutionsSection/SolutionsSection';
+import { caseStudiesSectionFragment } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
 
 // Home page content. The `content` metaobject (handle "home") has one reference
 // field per component slot, and the ORDER OF THOSE SLOTS is the order the page
@@ -60,6 +61,7 @@ export const getHomePageQuery = /* GraphQL */ `
       ...HeroSectionFields
       ...PartnersSectionFields
       ...SolutionsSectionFields
+      ...CaseStudiesSectionFields
     }
     references(first: 20) {
       nodes {
@@ -67,10 +69,12 @@ export const getHomePageQuery = /* GraphQL */ `
         ...HeroSectionFields
         ...PartnersSectionFields
         ...SolutionsSectionFields
+        ...CaseStudiesSectionFields
       }
     }
   }
   ${heroSectionFragment}
   ${partnersSectionFragment}
   ${solutionsSectionFragment}
+  ${caseStudiesSectionFragment}
 `;

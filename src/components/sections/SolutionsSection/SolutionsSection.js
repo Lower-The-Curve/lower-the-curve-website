@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button/Button';
 import SwooshBackdrop from './SwooshBackdrop';
 import BlueDot from './BlueDot';
 import GreenGlow from './GreenGlow';
+import accentedTitle from '@/components/ui/accentedTitle';
 import styles from './SolutionsSection.module.css';
 
 // The solutions section is a single `solutions` metaobject with:
@@ -149,82 +150,6 @@ function inDesignOrder(items) {
   return [...items].sort((a, b) => rank(a) - rank(b));
 }
 
-// The design accents two words of the heading — "grow" and "startup" — in the
-// brand gradient, and sets the rest of that line bold against a regular-weight
-// heading. Which words those are is editorial, so they're authored in the
-// metafield as HTML rather than matched by word in here. Same convention as
-// HeroSection's title and PartnersSection's <strong>:
-//
-//   High-impact Shopify solutions to <span class="blue-gradient">grow</span>
-//   <strong>your</strong> <span class="blue-gradient">startup</span>
-//
-// <br> is honoured too, because WHERE THIS HEADLINE BREAKS CANNOT BE EXPRESSED AS
-// A MEASURE. The reference breaks it "High-impact Shopify / solutions to grow your
-// startup", which would need a max-width that fits "solutions to grow your
-// startup" (608px — the accents are bold, so the line is wider than the same text
-// plain) but not "High-impact Shopify solutions" (603px). No number is both.
-// Authoring the break is the only way, and it is the right home for it: where a
-// headline turns is editorial, not layout.
-//
-// Parsed, never injected — there is no dangerouslySetInnerHTML. Only <strong>/<b>,
-// <br>, and a <span> whose class is in ACCENT_CLASSES produce an element, so a
-// stray tag or a pasted <script> can't become markup. A title with no markup
-// renders as plain text, which is not an error — it just wraps on its own.
-const ACCENT_CLASSES = {
-  'blue-gradient': styles.blue,
-  'green-gradient': styles.green,
-};
-
-// The first alternative cannot swallow `<br>`: `\b` after `b` needs a non-word
-// character next and `r` is a word character, so `<br>` falls through to the
-// third alternative rather than being read as an unclosed <b>.
-const MARKUP =
-  /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>|<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
-
-function accentedTitle(title) {
-  const parts = [];
-  let cursor = 0;
-
-  for (const match of title.matchAll(MARKUP)) {
-    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
-
-    if (match[1]) {
-      // <strong> / <b>: bold, but in the body colour.
-      parts.push(
-        <strong key={match.index} className={styles.accent}>
-          {match[2]}
-        </strong>
-      );
-    } else if (match[3] !== undefined) {
-      // A <span>. Tolerates extra classes (`class="blue-gradient wide"`).
-      const accent = match[3]
-        .split(/\s+/)
-        .map((name) => ACCENT_CLASSES[name])
-        .find(Boolean);
-
-      parts.push(
-        accent ? (
-          <span key={match.index} className={`${styles.accent} ${accent}`}>
-            {match[4]}
-          </span>
-        ) : (
-          match[4]
-        )
-      );
-    } else {
-      // <br>: an authored line break. It is the only alternative with no capture
-      // groups, which is what `match[3] !== undefined` above distinguishes — an
-      // empty class attribute is "" and must still take the span branch.
-      parts.push(<br key={match.index} />);
-    }
-
-    cursor = match.index + match[0].length;
-  }
-
-  if (cursor < title.length) parts.push(title.slice(cursor));
-  return parts;
-}
-
 export default function SolutionsSection({ section }) {
   if (!section) return null;
 
@@ -266,7 +191,15 @@ export default function SolutionsSection({ section }) {
       <div className={styles.inner}>
         {!hasStats && <BlueDot className={styles.blueDot} />}
         <div className={styles.intro}>
-          {title && <h2 className={styles.title}>{accentedTitle(title)}</h2>}
+          {title && (
+            <h2 className={styles.title}>
+              {accentedTitle(title, {
+                accent: styles.accent,
+                blue: styles.blue,
+                green: styles.green,
+              })}
+            </h2>
+          )}
           {description && <p className={styles.description}>{description}</p>}
 
           {/* The swoosh is anchored to the top of this block rather than to the

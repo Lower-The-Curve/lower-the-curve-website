@@ -1,0 +1,175 @@
+/* Case studies section. Device mockups on the left, heading + copy + CTA on the
+   right; one centred column on tablet and phone with the image on top.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   Specified type: heading 40px desktop / 32px mobile (--fs-heading-md, which is
+   40/32/32 and lands on both), body 18px / 16px (the `p` default,
+   --fs-body-base, which is 18/16/16). Both requested sizes are already on the
+   scale, so this section adds no tokens. */
+.caseStudies {
+  position: relative;
+  /* Own stacking context, so any future decorative layer's z-index: -1 stays
+     inside the section. Same arrangement as SolutionsSection. */
+  isolation: isolate;
+  overflow: clip;
+}
+
+.inner {
+  /* Sections own their measure and their rhythm; the page's `main` adds neither.
+     See DESIGN-SYSTEM.md §5. */
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: grid;
+  /* One column by default, so a section with no image doesn't leave an empty
+     grid cell and half the measure unused. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+/* ~40 / 60, measured off the reference. Only applied when there is actually an
+   image to put in the first column. */
+.hasMedia .inner {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+/* --- MEDIA -------------------------------------------------------------- */
+.media {
+  min-width: 0;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --- CONTENT ------------------------------------------------------------ */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+/* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
+   which is --fs-heading-md. Regular weight like the other section headings: the
+   emphasis comes from the accented runs, which are the only bold part. */
+.title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  /* MEASURED, not guessed. The reference breaks this "Case Studies that speak /
+     for themselves", which needs a measure that fits "Case Studies that speak"
+     (490px, with "Case Studies" bold) but not "…that speak for" (555px). 21ch is
+     525px, inside that window with room either side.
+     On a phone the column is narrower than any of this — 358px at 390px wide —
+     so it caps the measure itself and produces the narrow reference's break
+     ("Case Studies that / speak for themselves") with no help needed. */
+  max-width: 21ch;
+}
+
+/* The accented runs. The weight lives here rather than on each colour, so "the
+   accented words are the bold ones" is stated once. */
+.accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradients below only
+   replace them where clipping a background to the glyphs actually works. */
+.blue {
+  color: var(--color-brand);
+}
+
+.green {
+  color: var(--color-accent-green);
+}
+
+/* Same guarded background-clip technique as the other headlines — it needs BOTH
+   background-clip: text and text-fill-color, or `color: transparent` would render
+   invisible words. Delete this block to revert to the flat colours above. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .blue,
+  .green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Bright blue at the top-left, dark at the bottom-right — the headline order,
+     mirrored from the buttons'. See DESIGN-SYSTEM.md §3. */
+  .blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+/* The three blocks of body copy. Gap rather than paragraph margins, because the
+   global `p` rule zeroes those. */
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 18px desktop / 16px mobile comes from the global `p` rule (--fs-body-base) —
+   no font-size needed here, and one on .copy would never reach the paragraphs
+   anyway (a directly matching rule beats an inherited one; DESIGN-SYSTEM.md §2). */
+.paragraph {
+  color: var(--color-text-muted);
+  /* multi_line_text_field: single line breaks inside a paragraph are authored
+     and meaningful. Blank lines already became separate paragraphs. */
+  white-space: pre-line;
+}
+
+.button {
+  margin-top: 0.5rem;
+}
+
+/* --- TABLET (<= 1024px) -------------------------------------------------
+   One centred column, image on top. The image is first in the DOM, so the stack
+   order needs no `order` property.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .hasMedia .inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .paragraph {
+    max-width: 60ch;
+  }
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+@media (max-width: 575px) {
+  .inner {
+    padding: 3rem var(--space);
+    gap: 2rem;
+  }
+
+  .copy {
+    gap: 1.25rem;
+  }
+}
