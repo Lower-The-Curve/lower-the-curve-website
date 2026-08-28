@@ -17,6 +17,9 @@ export const HERO_SECTION_TYPE = 'hero_section';
 //   title                -> single_line_text_field, the headline
 //   description          -> multi_line_text_field, optional lede under it
 //   image                -> file_reference, the full-bleed background artwork
+//   image_mobile         -> file_reference, an optional phone-shaped counterpart
+//                           to `image`; see mobileImage below for what happens
+//                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
 //   margin_top           -> number_integer, extra space above the section (px)
@@ -61,8 +64,14 @@ function fieldValue(section, ...keys) {
   return null;
 }
 
-function imageFrom(section, key) {
-  return field(section, key)?.reference?.image ?? null;
+// First resolved image across the given keys. Multi-key for the same reason
+// fieldValue is: a rename in the admin shouldn't blank the artwork out.
+function imageFrom(section, ...keys) {
+  for (const key of keys) {
+    const image = field(section, key)?.reference?.image;
+    if (image) return image;
+  }
+  return null;
 }
 
 // `number_integer` values arrive as strings. Anything unparseable (or absent)
@@ -142,6 +151,17 @@ export default function HeroSection({ section }) {
   const title = fieldValue(section, 'title');
   const description = fieldValue(section, 'description');
   const image = imageFrom(section, 'image');
+  // The phone-shaped artwork. The live `hero_section` entry has no value for this
+  // today, so it resolves to null and `image` covers every width — the hero is
+  // never left with no artwork. Set `image_mobile` on the metaobject and it takes
+  // over below the mobile breakpoint with no code change; `mobile_image` is
+  // accepted too, so whichever spelling the field ends up with wins.
+  //
+  // NOTE: the Storefront API omits fields that have no value, so a field existing
+  // on the definition but left empty looks identical to no field at all from here.
+  // If setting it has no effect, check the field is published to the Storefront
+  // API rather than assuming the key is wrong.
+  const mobileImage = imageFrom(section, 'image_mobile', 'mobile_image');
   const scrollText = fieldValue(
     section,
     'scroll_botttom_text',
@@ -161,15 +181,33 @@ export default function HeroSection({ section }) {
           header renders over it — see HeroSection.module.css. */}
       {image && (
         <div className={styles.backdrop}>
+          {/* Two elements rather than one with a swapped src: this is a Server
+              Component, so there is no viewport to branch on at render time and
+              the choice has to be made in CSS. When no mobile artwork is authored
+              the desktop one carries every width and neither class is applied. */}
           <Image
             src={image.url}
             alt={image.altText ?? ''}
             fill
             sizes="100vw"
             priority
-            className={styles.backdropImage}
+            className={`${styles.backdropImage} ${
+              mobileImage ? styles.wide : ''
+            }`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
+
+          {mobileImage && (
+            <Image
+              src={mobileImage.url}
+              alt={mobileImage.altText ?? ''}
+              fill
+              sizes="100vw"
+              priority
+              className={`${styles.backdropImage} ${styles.narrow}`}
+              unoptimized={/\.svg(\?|$)/i.test(mobileImage.url)}
+            />
+          )}
         </div>
       )}
 

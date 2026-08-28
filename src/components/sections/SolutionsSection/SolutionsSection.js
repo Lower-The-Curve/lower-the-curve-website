@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import SwooshBackdrop from './SwooshBackdrop';
+import GreenCurveBackdrop from './GreenCurveBackdrop';
 import BlueDot from './BlueDot';
 import GreenGlow from './GreenGlow';
 import accentedTitle from '@/components/ui/accentedTitle';
@@ -184,97 +185,115 @@ export default function SolutionsSection({ section }) {
         hasStats ? styles.withStats : styles.noStats
       }`}
     >
-      {/* Stacked layout only. The split layout has the swoosh and the stats card
-          carrying the colour, and the split reference shows neither of these. */}
-      {!hasStats && <GreenGlow className={styles.greenGlow} />}
+      {/* CLIPPING BOX. It exists because the section itself must NOT clip: the
+          green curve below hangs past the section's bottom edge on purpose. Every
+          other piece of artwork here still has to be trimmed at that box — the
+          swoosh overhangs the top, the blue dot bleeds off the side on a phone,
+          the green glow off the left — so the clip moved down one level onto a
+          wrapper that has the same geometry as the section.
 
-      <div className={styles.inner}>
-        {!hasStats && <BlueDot className={styles.blueDot} />}
-        <div className={styles.intro}>
-          {title && (
-            <h2 className={styles.title}>
-              {accentedTitle(title, {
-                accent: styles.accent,
-                blue: styles.blue,
-                green: styles.green,
-              })}
-            </h2>
-          )}
-          {description && <p className={styles.description}>{description}</p>}
+          `clip` rather than `hidden`: hidden would make this a scroll container.
+          `position: relative` is load-bearing — .greenGlow is absolute, and if its
+          containing block were the section (outside this box) it would escape the
+          clip entirely rather than being trimmed by it. */}
+      <div className={styles.clip}>
+        {/* Stacked layout only. The split layout has the swoosh and the stats card
+            carrying the colour, and the split reference shows neither of these. */}
+        {!hasStats && <GreenGlow className={styles.greenGlow} />}
 
-          {/* The swoosh is anchored to the top of this block rather than to the
-              section, so it meets the stats card at any width — see the CSS.
-              Both live or neither: with no card the arc has nothing to meet, and
-              the stacked reference shows no arc. */}
-          {hasStats && (
-            <div className={styles.statsBlock}>
-              <div className={styles.backdrop}>
-                <SwooshBackdrop className={styles.swoosh} />
-              </div>
-
-              <ul className={styles.stats}>
-                {stats.map((stat) => {
-                  const value = fieldValue(stat, 'value', 'title');
-                  const label = fieldValue(stat, 'description', 'label');
-
-                  return (
-                    <li key={stat.id} className={styles.stat}>
-                      {value && (
-                        <span className={styles.statValue}>{value}</span>
-                      )}
-                      {label && <p className={styles.statLabel}>{label}</p>}
-                    </li>
-                  );
+        <div className={styles.inner}>
+          {!hasStats && <BlueDot className={styles.blueDot} />}
+          <div className={styles.intro}>
+            {title && (
+              <h2 className={styles.title}>
+                {accentedTitle(title, {
+                  accent: styles.accent,
+                  blue: styles.blue,
+                  green: styles.green,
                 })}
-              </ul>
-            </div>
-          )}
-        </div>
+              </h2>
+            )}
+            {description && <p className={styles.description}>{description}</p>}
 
-        <ul className={styles.list}>
-          {solutions.map((item) => {
-            const itemTitle = fieldValue(item, 'title', 'name');
-            const itemDescription = fieldValue(item, 'description');
-            const icon = imageFrom(item, 'image', 'icon');
-            const button = linkFrom(item, 'button', 'link');
-
-            return (
-              <li key={item.id} className={styles.item}>
-                {icon && (
-                  <Image
-                    src={icon.url}
-                    alt={icon.altText ?? ''}
-                    width={icon.width ?? 106}
-                    height={icon.height ?? 106}
-                    className={styles.icon}
-                    unoptimized={/\.svg(\?|$)/i.test(icon.url)}
-                  />
-                )}
-
-                <div className={styles.body}>
-                  {itemTitle && (
-                    <h3 className={styles.itemTitle}>{itemTitle}</h3>
-                  )}
-                  {itemDescription && (
-                    <p className={styles.itemDescription}>{itemDescription}</p>
-                  )}
-                  {button && (
-                    <Button
-                      href={button.url}
-                      variant="secondary"
-                      size="sm"
-                      arrow="rise"
-                      className={styles.itemButton}
-                    >
-                      {button.text}
-                    </Button>
-                  )}
+            {/* The swoosh is anchored to the top of this block rather than to the
+                section, so it meets the stats card at any width — see the CSS.
+                Both live or neither: with no card the arc has nothing to meet, and
+                the stacked reference shows no arc. */}
+            {hasStats && (
+              <div className={styles.statsBlock}>
+                <div className={styles.backdrop}>
+                  <SwooshBackdrop className={styles.swoosh} />
                 </div>
-              </li>
-            );
-          })}
-        </ul>
+
+                <ul className={styles.stats}>
+                  {stats.map((stat) => {
+                    const value = fieldValue(stat, 'value', 'title');
+                    const label = fieldValue(stat, 'description', 'label');
+
+                    return (
+                      <li key={stat.id} className={styles.stat}>
+                        {value && (
+                          <span className={styles.statValue}>{value}</span>
+                        )}
+                        {label && <p className={styles.statLabel}>{label}</p>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <ul className={styles.list}>
+            {solutions.map((item) => {
+              const itemTitle = fieldValue(item, 'title', 'name');
+              const itemDescription = fieldValue(item, 'description');
+              const icon = imageFrom(item, 'image', 'icon');
+              const button = linkFrom(item, 'button', 'link');
+
+              return (
+                <li key={item.id} className={styles.item}>
+                  {icon && (
+                    <Image
+                      src={icon.url}
+                      alt={icon.altText ?? ''}
+                      width={icon.width ?? 106}
+                      height={icon.height ?? 106}
+                      className={styles.icon}
+                      unoptimized={/\.svg(\?|$)/i.test(icon.url)}
+                    />
+                  )}
+
+                  <div className={styles.body}>
+                    {itemTitle && (
+                      <h3 className={styles.itemTitle}>{itemTitle}</h3>
+                    )}
+                    {itemDescription && (
+                      <p className={styles.itemDescription}>{itemDescription}</p>
+                    )}
+                    {button && (
+                      <Button
+                        href={button.url}
+                        variant="secondary"
+                        size="sm"
+                        arrow="rise"
+                        className={styles.itemButton}
+                      >
+                        {button.text}
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
+
+      {/* Split layout only, and deliberately OUTSIDE .clip so it can carry on into
+          the section below — see the .greenCurve block in the CSS. Paired with the
+          blue swoosh at the top of this same layout: both live or neither. */}
+      {hasStats && <GreenCurveBackdrop className={styles.greenCurve} />}
     </section>
   );
 }

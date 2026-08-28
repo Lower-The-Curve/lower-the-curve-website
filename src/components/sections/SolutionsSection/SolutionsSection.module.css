@@ -31,10 +31,61 @@
      grows — 0px at 1025 up to ~29px at 1920 — which is what the reference
      shows too. */
   --swoosh-underside: 16%;
-  /* The artwork is 100vw wide and taller than the space above the card, so it
-     overhangs the section on three sides. `clip` (not `hidden`) trims it without
-     creating a scroll container. */
+  /* How far the green curve at the bottom hangs BELOW the section, as a share of
+     its own height — so it scales with the artwork instead of drifting at wide
+     viewports, the same trick as --swoosh-underside above. This is the one knob
+     for "how much of the curve spills into the next section": 0% keeps it wholly
+     inside, 100% would push it wholly out. See .greenCurve. */
+  --curve-bleed: 38%;
+  /* NOTE: there is deliberately NO `overflow` here. The green curve has to escape
+     the section's bottom edge, and a clip on the section would cut it off — so the
+     clipping that the other artwork needs lives on .clip, one level in. */
+}
+
+/* The clipping box: same geometry as the section, but it trims what overflows.
+   The swoosh overhangs the top, the blue dot bleeds off the side on a phone and
+   the green glow off the left, and all three are trimmed here.
+
+   `clip` rather than `hidden` — hidden would make this a scroll container (and
+   would force overflow-y to `auto` too). Same choice as .testimonials.
+
+   `position: relative` is load-bearing, not decoration: an absolutely positioned
+   descendant is only clipped by a box that is inside its containing block chain.
+   Without it, .greenGlow would resolve against the section and paint straight
+   through this clip. */
+.clip {
+  position: relative;
   overflow: clip;
+}
+
+/* --- GREEN CURVE (split layout only) ------------------------------------
+   The bottom counterpart to the blue swoosh: full-bleed, anchored to the
+   section's bottom edge and then pushed down by --curve-bleed so its lower part
+   carries on over whatever section follows. It is a SIBLING of .clip for exactly
+   that reason — inside it, it would be trimmed at the section boundary.
+
+   `width: 100%`, not `100vw`, on purpose: 100vw includes the scrollbar and the
+   section's content box does not, so 100vw would push the page into a horizontal
+   scroll — the bug .testimonials documents. The swoosh has to use 100vw because
+   it walks back out from a centred box; this one starts at the section's own
+   left edge, so it doesn't.
+
+   z-index -1 keeps it behind the solution cards, which are translucent white, so
+   it reads through them as glass — the same relationship the swoosh has. The
+   section's `isolation: isolate` is what stops that -1 escaping the section.
+   ---------------------------------------------------------------------- */
+.greenCurve {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  /* Matches the viewBox. Belt and braces with `height: auto`: an inline SVG with
+     no aspect ratio collapses to the UA's 150px default. Same note as .swoosh. */
+  aspect-ratio: 1440 / 988;
+  transform: translateY(var(--curve-bleed));
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* --- BACKDROP -----------------------------------------------------------
@@ -293,6 +344,12 @@
    ---------------------------------------------------------------------- */
 .stats {
   list-style: none;
+  /* The line texture below is an absolutely positioned ::before, so the card is
+     its containing block; `isolation` makes the card a stacking context so that
+     the texture's `z-index: -1` cannot slip behind an ANCESTOR's background — it
+     stops at this card's own gradient, which is exactly where it belongs. */
+  position: relative;
+  isolation: isolate;
   /* Flush with the heading and lede above it — one left edge down the whole
      column. (The reference reads as a small inset, but that was measurement
      noise on a scaled screenshot; aligned is the intent.) Width is measured:
@@ -334,6 +391,40 @@
 /* 18px from the global `p` rule again; only the colour differs here. */
 .statLabel {
   color: #ffffff;
+}
+
+/* The swept line texture over the card's gradient.
+   ---------------------------------------------------------------------- 
+   A RASTER file rather than an inline SVG component, unlike every other bit of
+   artwork in this section. The Figma export is nominally an SVG, but its only
+   content is one <rect> filled with a pattern wrapping a 990x2416 embedded PNG —
+   there are no vector paths in it to keep. Inlining it would have put ~490KB of
+   base64 into the JS bundle for a decoration; as a WebP in /public it is 88KB,
+   cached separately, and never parsed by the client.
+
+   `z-index: -1` puts it ABOVE this element's own background but BELOW its in-flow
+   content, which is the painting order that needs no z-index on the stats
+   themselves. See the `isolation` note on .stats for why it stops here.
+
+   `background-size: 100% 100%` — the export stretches the bitmap to the frame with
+   preserveAspectRatio="none", so the lines are MEANT to skew with the card rather
+   than keep their angle. Don't "fix" this to `cover`; the card is taller than the
+   378x960 frame at some widths and cover would crop the sweep instead.
+
+   The image's own top ~11% is transparent, which is where the clear band above the
+   first stat comes from — it is baked into the artwork, not a background-position
+   offset here. */
+.stats::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: url('/textures/stats-card-lines.webp');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 /* --- SOLUTIONS LIST ----------------------------------------------------- */
@@ -422,8 +513,10 @@
   }
 
   /* The split layout drops its stats card AND the blue arc here, so below this
-     width the two layouts render identically: centred heading and lede over one
-     column of solutions.
+     width the two layouts converge on a centred heading and lede over one column
+     of solutions. The green curve at the bottom is the one thing that still tells
+     them apart — it is a bottom flourish rather than part of the card's
+     composition, so there is nothing for it to fall out of sync with.
 
      ONE RULE HIDES BOTH, because the arc's backdrop is a CHILD of .statsBlock
      (it anchors to the card's top edge). Hiding the block takes the artwork with
@@ -521,7 +614,7 @@
      `left: auto` is required — without it the desktop `left` still applies and,
      with both set, `left` wins for a non-stretched absolute box.
      The negative offset lets it bleed off the edge as the reference shows;
-     .solutions's `overflow: clip` is what trims it. */
+     .clip's `overflow: clip` is what trims it. */
   .blueDot {
     top: 0.5rem;
     left: auto;
