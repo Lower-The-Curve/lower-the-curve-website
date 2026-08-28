@@ -18,9 +18,27 @@
   margin-top: var(--hero-margin-top, 0px);
   margin-bottom: var(--hero-margin-bottom, 0px);
   /* The artwork reaches up under the header, so the section only needs the rest
-     of the first screen. svh keeps mobile browser chrome from adding a scroll. */
-  min-height: calc(100vh - var(--header-height));
-  min-height: calc(100svh - var(--header-height));
+     of the first screen. svh keeps mobile browser chrome from adding a scroll.
+
+     THIS SUBTRACTION IS LOAD-BEARING, INCLUDING ON MOBILE. The header is
+     `position: relative`, so it sits in flow and takes --header-height above this
+     section; the hero's own box gets the remainder, and the two together are
+     exactly one screen. The hero still READS as full-screen because .backdrop is
+     pulled up under the transparent header, so the artwork does span the whole
+     viewport — only the text box stops short.
+
+     A plain `min-height: 100svh` here was tried and reverted: measured in Chrome
+     at 375x667, 390x844 and 320x568, it put the section's bottom edge 93px past
+     the fold at every size and pushed the scroll cue out of view on load (its
+     bottom landed at 712 against a 667 viewport). Header height cannot be
+     reclaimed by making this taller — only by taking the header out of flow.
+
+     --hero-fold-gutter is slack subtracted from that height. Zero on desktop,
+     where the viewport is static and the section can land exactly on the fold;
+     see the mobile block for why a phone cannot. */
+  --hero-fold-gutter: 0px;
+  min-height: calc(100vh - var(--header-height) - var(--hero-fold-gutter));
+  min-height: calc(100svh - var(--header-height) - var(--hero-fold-gutter));
   display: grid;
   /* Two rows: the headline block takes the slack and centres in it, the scroll
      cue sits at the bottom. This is what puts the cue low in the section without
@@ -200,4 +218,71 @@
 .alignRight .scroll {
   align-items: flex-end;
   text-align: right;
+}
+
+/* --- MOBILE (<= 575px) --------------------------------------------------
+   The section ends clear of the fold instead of exactly on it.
+
+   Measured in Chrome across 320x568 through 575x800, `100svh - header` puts the
+   section's bottom edge at EXACTLY the fold — 0px of slack — and the header
+   token matches the rendered header to the pixel at every one of those sizes. So
+   the arithmetic is right, and on a static viewport nothing is cut off.
+
+   A phone's viewport is not static. The visible area moves as browser chrome
+   shows and hides, iOS Safari's bottom bar and the home indicator eat into it,
+   in-app browsers add their own furniture, and anything below iOS 15.4 has no
+   `svh` at all and falls back to the `vh` line — where 100vh is measured against
+   the LARGEST viewport and is taller than what you can see. Every one of those
+   costs a handful of pixels, and against 0px of slack every one of them turns
+   into "scroll a little to see the bottom of the section".
+
+   So the fold gutter buys tolerance. It also leaves a sliver of the next section
+   showing, which reads as a deliberate hint that the page continues rather than
+   as a gap. Raise it if the section still crowds the fold on a real device; it is
+   the one value to touch.
+   ---------------------------------------------------------------------- */
+@media (max-width: 575px) {
+  .hero {
+    --hero-fold-gutter: 2rem;
+    /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
+       tight under the headline — this gives the gutter back to the content. */
+    padding-bottom: 2rem;
+  }
+}
+
+/* --- ART DIRECTION (mobile artwork) -------------------------------------
+   Both backdrop images are rendered and one is hidden, because HeroSection is a
+   Server Component: there is no viewport at render time, so the swap has to
+   happen in CSS. `next/image` has no <picture>/<source> form, and this
+   two-element swap is the documented way to art-direct with it.
+
+   These classes are only applied when a mobile image is actually authored — with
+   one image it carries every width and neither rule matches, so the hero can
+   never end up with both hidden.
+
+   575px is the site's mobile tier, matching SolutionsSection and GetInTouch. If
+   the landscape desktop artwork also reads badly on a tablet, move both rules to
+   1024px — it is a one-value change, but it is a design call, so it is not made
+   here.
+
+   `display: none` and not `visibility`/opacity: the point is to stop the browser
+   fetching the artwork that is not in use. Next's lazy loader would normally do
+   that, but both images carry `priority` (this is the LCP element), so they are
+   preloaded eagerly — display:none is what keeps the unused one out of the way
+   visually. Both do get fetched; that is the cost of art direction with two
+   priority images, and it is why a second asset should only be added when it
+   genuinely improves the composition.
+   ---------------------------------------------------------------------- */
+.narrow {
+  display: none;
+}
+
+@media (max-width: 575px) {
+  .wide {
+    display: none;
+  }
+
+  .narrow {
+    display: block;
+  }
 }

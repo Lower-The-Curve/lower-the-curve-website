@@ -23,17 +23,21 @@
   overflow: clip;
   display: grid;
   place-items: center;
-  /* 5rem either side puts the band at ~450px tall at 1440 — the artwork's own
-     height, so it is shown at roughly 1:1 rather than cropped hard. */
+  /* 5rem either side puts the band at ~450px tall at 1440, against a 1440x523
+     artwork — so it sits close to 1:1 and the slight vertical compression is not
+     readable. Nothing is cropped at any width either, because
+     `preserveAspectRatio="none"` lets the artwork stretch to whatever box the band
+     is. The band's height is driven by its content, not by the artwork. */
   padding: 5rem var(--space);
   text-align: center;
 }
 
 /* Fills the band exactly. The SVG carries preserveAspectRatio="none", so it
-   STRETCHES rather than cropping — which is the whole point: an `object-fit:
-   cover` raster pushed the artwork's top out of the band on any viewport wider
-   than 1440 and left a hard grey seam against the white page above. See
-   BookACallBackdrop.js. */
+   STRETCHES rather than cropping — which is the whole point at desktop widths: an
+   `object-fit: cover` raster pushed the artwork's top out of the band on any
+   viewport wider than 1440 and left a hard grey seam against the white page above.
+   See BookACallBackdrop.js, and the mobile block at the foot of this file for why
+   the narrow tier does the opposite. */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -131,5 +135,41 @@
 @media (max-width: 575px) {
   .getInTouch {
     padding: 4rem var(--space);
+  }
+
+  /* COVER AND CENTRED, instead of the stretch the wider tiers use. A 1440x523
+     artwork squeezed into a ~375px-wide band is a 4x horizontal crush: the side
+     glows collapse onto the edges and the blue ellipse turns into a narrow
+     vertical smear. Keeping the aspect ratio and cropping the sides is the right
+     trade at this width.
+
+     WHY NOT `object-fit: cover`. It has no effect here — object-fit applies to
+     REPLACED elements (<img>, <video>, <canvas>), and this is an inline <svg>,
+     which is not one. The SVG equivalent is `preserveAspectRatio="xMidYMid slice"`
+     — but that is an attribute, not a CSS property, so a media query cannot reach
+     it, and this is a Server Component with no viewport to branch on at render
+     time. Swapping it would mean shipping the artwork twice.
+
+     So the box does the work instead: give the element the ARTWORK'S OWN aspect
+     ratio and let it overflow. `preserveAspectRatio="none"` then stretches it into
+     a box that is already correctly proportioned, which is no distortion at all —
+     the same picture `cover` would produce. Sized by height so it fills the band
+     vertically and spills horizontally; centred with the usual left/translate
+     pair, which keeps the blue glow (cx 705 of 1440, so dead centre) in frame
+     while the grey side glows crop away. .getInTouch's `overflow: clip` trims the
+     spill.
+
+     `min-width: 100%` is the safety net: if the band were ever short enough that
+     the height-driven width no longer reached both edges, this pins it to full
+     width and the aspect ratio drops out — degrading to the stretch the wider
+     tiers use rather than leaving a gap. */
+  .backdrop {
+    right: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 100%;
+    aspect-ratio: 1440 / 523;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
