@@ -39,6 +39,33 @@ grep -rniE "#106cfd|#004bc9" src/ | grep -v "app/globals.css\|ArrowIcon.js"
 ```
 Any hit is a raw value that should be a token.
 
+## CSS class names: BEM, and nothing else
+
+There are **no CSS Modules** in this repo. Every stylesheet is a plain `.css`
+file imported for its side effect, so class names reach the DOM exactly as
+written — which is why they must be BEM:
+
+```
+.block                 .solutions
+.block__element        .solutions__stat-value
+.block--modifier       .solutions--with-stats
+.block__element--mod   .btn__arrow--diagonal
+```
+
+One block per stylesheet, named for the component. Every selector is a single
+class. Modifiers are additive — the markup carries the base class *and* the
+modifier. No camelCase, no hashes, no abbreviations; hyphenate multi-word parts.
+
+Full rules and the block inventory: **CSS naming** in
+[.claude/agents/LTCBot.md](.claude/agents/LTCBot.md) and §6 of
+[DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
+
+```bash
+# should return nothing — a camelCase or hashed class name:
+grep -rnE 'className=\{?"[^"]*[a-z][A-Z]' src/
+grep -rnE '^\s*\.[a-z]+[A-Z]' src/
+```
+
 ## Everything else
 
 Stack conventions, the Shopify metaobject content model, the section-component

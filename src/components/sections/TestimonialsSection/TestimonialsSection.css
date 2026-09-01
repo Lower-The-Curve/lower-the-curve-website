@@ -1,4 +1,4 @@
-/* Testimonials. Heading, lede and the carousel controls in a narrow left column;
+/* Testimonials — the `testimonials` BEM block. Heading, lede and the carousel controls in a narrow left column;
    the cards scroll horizontally in a wider right one, bleeding off the right edge
    of the page so the next card peeks. One centred column on tablet and phone,
    with the controls below the cards.
@@ -19,7 +19,7 @@
   overflow-x: clip;
 }
 
-.inner {
+.testimonials__inner {
   max-width: var(--max-width);
   margin-inline: auto;
   padding: 4rem var(--space);
@@ -38,23 +38,23 @@
 /* Explicit placement: intro and controls stack down the left column, the track
    spans both rows on the right. Without this the controls would take the whole
    second row and push the track up. */
-.intro {
+.testimonials__intro {
   grid-column: 1;
   grid-row: 1;
 }
 
-.controls {
+.testimonials__controls {
   grid-column: 1;
   grid-row: 2;
 }
 
-.track {
+.testimonials__track {
   grid-column: 2;
   grid-row: 1 / span 2;
 }
 
 /* --- INTRO -------------------------------------------------------------- */
-.intro {
+.testimonials__intro {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -64,7 +64,7 @@
 /* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
    which is --fs-heading-md. Regular weight like the site's other headings; the
    accented runs are the only bold part. */
-.title {
+.testimonials__title {
   font-size: var(--fs-heading-md);
   font-weight: 400;
   line-height: 1.2;
@@ -72,29 +72,29 @@
   max-width: 14ch;
 }
 
-.accent {
+.testimonials__accent {
   font-weight: 700;
 }
 
-.blue {
+.testimonials__accent--blue {
   color: var(--color-brand);
 }
 
-.green {
+.testimonials__accent--green {
   color: var(--color-accent-green);
 }
 
 @supports ((background-clip: text) or (-webkit-background-clip: text)) and
   (-webkit-text-fill-color: transparent) {
-  .blue,
-  .green {
+  .testimonials__accent--blue,
+  .testimonials__accent--green {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
   }
 
-  .blue {
+  .testimonials__accent--blue {
     background-image: linear-gradient(
       135deg,
       var(--color-brand),
@@ -102,7 +102,7 @@
     );
   }
 
-  .green {
+  .testimonials__accent--green {
     background-image: linear-gradient(
       135deg,
       var(--color-accent-green-dark),
@@ -112,14 +112,14 @@
 }
 
 /* 18px desktop / 16px mobile is the global `p` rule (--fs-body-base) — no
-   font-size needed, and one on .intro would never reach the paragraph anyway. */
-.description {
+   font-size needed, and one on .testimonials__intro would never reach the paragraph anyway. */
+.testimonials__description {
   color: var(--color-text-muted);
   max-width: 42ch;
 }
 
 /* --- CONTROLS ----------------------------------------------------------- */
-.controls {
+.testimonials__controls {
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -128,7 +128,7 @@
   margin-top: 1rem;
 }
 
-.arrow {
+.testimonials__arrow {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -143,11 +143,11 @@
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
-.arrow:hover:not(:disabled) {
+.testimonials__arrow:hover:not(:disabled) {
   color: var(--color-brand);
 }
 
-.arrow:focus-visible {
+.testimonials__arrow:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 3px;
   border-radius: 4px;
@@ -155,23 +155,25 @@
 
 /* Kept visible rather than hidden at the ends: a control that appears and
    disappears shifts the layout under the pointer. */
-.arrow:disabled {
+.testimonials__arrow:disabled {
   opacity: 0.3;
   cursor: default;
 }
 
-.glyphLeft,
-.glyphRight {
+/* One chevron path, mirrored. The base carries the size for both directions, so
+   `--left` needs no rules of its own — pointing left IS the path as drawn. */
+.testimonials__glyph {
   width: 1.375rem;
   height: 1.375rem;
 }
 
-/* One chevron path, mirrored — same stroke weight and cap style both ways. */
-.glyphRight {
+/* Same stroke weight and cap style either way, so the right chevron is the left
+   one flipped rather than a second path. */
+.testimonials__glyph--right {
   transform: scaleX(-1);
 }
 
-.progress {
+.testimonials__progress {
   flex: 1;
   height: 3px;
   border-radius: 999px;
@@ -182,7 +184,7 @@
 /* The thumb is a fixed fraction of the rail that slides, rather than a bar that
    grows: it reads as a position indicator instead of a loading bar. --progress
    runs 0 to 1, so the translate covers exactly the remaining rail. */
-.progressBar {
+.testimonials__progress-bar {
   display: block;
   width: 35%;
   height: 100%;
@@ -193,7 +195,7 @@
 }
 
 /* --- TRACK -------------------------------------------------------------- */
-.track {
+.testimonials__track {
   list-style: none;
   margin: 0;
   display: flex;
@@ -203,7 +205,7 @@
   scroll-behavior: smooth;
   /* Bleeds to the viewport's right edge so the next card is cut by the page
      edge, as the reference shows, rather than by the grid column. The walk-out
-     mirrors .inner's own centring: half the leftover width, plus its gutter. */
+     mirrors .testimonials__inner's own centring: half the leftover width, plus its gutter. */
   margin-right: calc(
     -1 * (max(0px, (100vw - var(--max-width)) / 2) + var(--space))
   );
@@ -215,11 +217,11 @@
   scrollbar-width: none;
 }
 
-.track::-webkit-scrollbar {
+.testimonials__track::-webkit-scrollbar {
   display: none;
 }
 
-.track:focus-visible {
+.testimonials__track:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 4px;
   border-radius: 24px;
@@ -236,7 +238,7 @@
 /* The flex item and the positioning context. The clipped card and the logo plate
    are both children of it, which is what lets the plate sit in the notch without
    being clipped away by it. */
-.cardWrap {
+.testimonials__card-wrap {
   position: relative;
   flex: 0 0 var(--card-width);
   scroll-snap-align: start;
@@ -248,7 +250,7 @@
    `path()` is in absolute units, so it pins the card to 525x350 and clips away
    anything past it. Measured with the real copy, a six-line quote overflowed that
    box by 27px and lost its last line. See CardShape.js. */
-.card {
+.testimonials__card {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -266,7 +268,7 @@
 
 /* Fills the notch exactly — the same two fractions the clip path is built from,
    so the plate and the bite cannot drift apart at any card size. */
-.logoBox {
+.testimonials__logo-box {
   position: absolute;
   left: 0;
   bottom: 0;
@@ -284,7 +286,7 @@
    36.667% therefore lands short of the notch by 36.667% x 5rem. Adding it back
    makes the total exactly 36.667% of the CARD, which is what the notch is. The
    last 1.25rem is the gap between plate and name. */
-.author {
+.testimonials__author {
   margin-left: -2.5rem;
   margin-right: -2.5rem;
   padding-left: calc(36.667% + 1.8333rem + 1.25rem);
@@ -296,7 +298,7 @@
 /* The hairline edge, stretched over the card. The card clips it, so the 2px
    stroke shows only its inner half — a 1px inside border, as the export's mask
    produces. */
-.shape {
+.testimonials__shape {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -304,8 +306,9 @@
   pointer-events: none;
 }
 
-.quoteOpen,
-.quoteClose {
+/* The base carries everything the opening mark needs, so `--open` has no rules of
+   its own; `--close` below only states what a closing mark changes. */
+.testimonials__quote-mark {
   display: block;
   width: 2.125rem;
   color: var(--color-brand);
@@ -319,8 +322,8 @@
    ~50px (its own 34px plus the row gap) out of the author row, and on a 320-360px
    phone that squeezed the name box to 73-99px so "Rron Zogiani" wrapped onto two
    lines. It is decoration; the name is content, and the name should get the width.
-   Positioned against .cardWrap, which shares the card's box. */
-.quoteClose {
+   Positioned against .testimonials__card-wrap, which shares the card's box. */
+.testimonials__quote-mark--close {
   position: absolute;
   right: 2.5rem;
   bottom: 2rem;
@@ -329,7 +332,7 @@
 
 /* 22px desktop / 18px tablet / 16px mobile. A blockquote, so it needs the token
    explicitly — only `p` gets one by default. */
-.quote {
+.testimonials__quote {
   margin: 0;
   font-size: var(--fs-body-lg);
   line-height: 1.5;
@@ -337,21 +340,21 @@
 }
 
 /* --- AUTHOR ------------------------------------------------------------- */
-.author {
+.testimonials__author {
   display: flex;
   align-items: center;
   gap: 1.25rem;
   margin-top: auto;
 }
 
-/* The logo sits on its own opaque white plate: the card is only 90% opaque, and
-   a logo reading through to the artwork behind it looked washed out. */
-/* Only ever rendered when there is a logo; .notched positions it into the notch. */
-/* No fill and no shadow: the plate is a positioning box, not a surface. The notch
+/* Only ever rendered when there is a logo. Positioned into the notch by the rule
+   further up this file; this second block is the plate's own box.
+
+   No fill and no shadow: the plate is a positioning box, not a surface. The notch
    is cut out of the card, so what shows behind the logo is the page itself — a
    white plate on a white page was doing nothing but adding a shadow edge.
    (border-radius went too; with no background it clipped nothing.) */
-.logoBox {
+.testimonials__logo-box {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -362,7 +365,7 @@
 /* Height drives the logo, capped at 100px wide. `object-fit: contain` is what
    keeps a wide mark's proportions once the cap binds — without it, max-width plus
    a fixed height would squash it horizontally. */
-.logo {
+.testimonials__logo {
   display: block;
   width: auto;
   height: 2.25rem;
@@ -370,7 +373,7 @@
   object-fit: contain;
 }
 
-.who {
+.testimonials__who {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -379,14 +382,14 @@
 
 /* Both 18px, per the design — the name is separated by weight and colour, not
    size. --fs-body-base is the `p` default but these are spans, so they carry it. */
-.name {
+.testimonials__name {
   font-size: var(--fs-body-base);
   font-weight: 600;
   line-height: 1.3;
   color: var(--color-text);
 }
 
-.company {
+.testimonials__company {
   font-size: var(--fs-body-base);
   line-height: 1.3;
   color: var(--color-text-muted);
@@ -397,44 +400,44 @@
    bleed but loses the grid, so it spans the full measure.
    ---------------------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .inner {
+  .testimonials__inner {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     --card-width: 26rem;
   }
 
-  .intro {
+  .testimonials__intro {
     align-items: center;
     text-align: center;
   }
 
-  .title {
+  .testimonials__title {
     max-width: 18ch;
   }
 
-  .description {
+  .testimonials__description {
     max-width: 60ch;
   }
 
-  /* The reference puts the controls UNDER the cards on narrow. .controls is a
-     child of .intro, so it is moved with order on .inner's rows instead: .intro
+  /* The reference puts the controls UNDER the cards on narrow. .testimonials__controls is a
+     child of .testimonials__intro, so it is moved with order on .testimonials__inner's rows instead: .testimonials__intro
      first, then the track, then the controls, which are lifted out of the intro's
      flow by being ordered last on the grid. */
-  .intro,
-  .controls,
-  .track {
+  .testimonials__intro,
+  .testimonials__controls,
+  .testimonials__track {
     grid-column: 1;
   }
 
-  .intro {
+  .testimonials__intro {
     grid-row: 1;
   }
 
-  .track {
+  .testimonials__track {
     grid-row: 2;
   }
 
-  .controls {
+  .testimonials__controls {
     grid-row: 3;
     margin-top: 0;
     justify-self: center;
@@ -443,27 +446,27 @@
 
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 @media (max-width: 575px) {
-  .inner {
+  .testimonials__inner {
     padding: 3rem var(--space);
   }
 
   /* ONE CARD AT A TIME, CENTRED. No peek of the next card here — the card fills
-     the measure exactly, so .inner's own gutters centre it, and snapping lands
+     the measure exactly, so .testimonials__inner's own gutters centre it, and snapping lands
      each card in the same place.
      The right-hand bleed and the track's side padding come off with it: both
      exist only to let the next card run past the page edge, which is the opposite
      of what this tier wants. --card-width is unused here as a result. */
-  .track {
+  .testimonials__track {
     margin-right: 0;
     padding: 1rem 0;
   }
 
-  .cardWrap {
+  .testimonials__card-wrap {
     flex: 0 0 100%;
     scroll-snap-align: center;
   }
 
-  .card {
+  .testimonials__card {
     padding: 1.75rem 1.75rem 1.5rem;
     gap: 1.5rem;
   }
@@ -472,7 +475,7 @@
      term is the gap between the logo and the name — 0.625rem (10px), requested.
      It comes straight out of the name's width, which on the narrowest phones is
      already tight; see the note on 320px in DESIGN-SYSTEM.md. */
-  .author {
+  .testimonials__author {
     margin-left: -1.75rem;
     margin-right: -1.75rem;
     padding-left: calc(36.667% + 1.2833rem + 0.625rem);
@@ -480,7 +483,7 @@
     gap: 1rem;
   }
 
-  .logoBox {
+  .testimonials__logo-box {
     padding: 0.75rem 1rem;
   }
 
@@ -488,7 +491,7 @@
      on a 320px card that tipped "Rron Zogiani" onto two lines. Shrinking the
      closing mark by 4px hands those pixels back, which is a better trade than a
      wrapped name — the mark is decoration. */
-  .quoteClose {
+  .testimonials__quote-mark--close {
     width: 1.25rem;
     right: 1.75rem;
     bottom: 1.5rem;
@@ -496,7 +499,7 @@
 
 
 
-  .logo {
+  .testimonials__logo {
     height: 1.75rem;
   }
 }

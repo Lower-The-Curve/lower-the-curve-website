@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getFooter, getMenu } from '@/lib/shopify';
 import GetInTouch from './GetInTouch';
 import MailIcon from './MailIcon';
-import styles from './Footer.module.css';
+import './Footer.css';
 
 // Server Component: everything the footer renders comes from the `footer`
 // metaobject in Shopify (Settings > Custom data > Metaobjects > footer):
@@ -54,11 +54,11 @@ function hrefFor(item) {
 // absolute URL) has to be a plain anchor. Same split as the Button component.
 function FooterLink({ item }) {
   const href = hrefFor(item);
-  const icon = isEmailItem(item) ? <MailIcon className={styles.mailIcon} /> : null;
+  const icon = isEmailItem(item) ? <MailIcon className="site-footer__mail-icon" /> : null;
 
   if (/^(https?:|mailto:|tel:|#)/i.test(href)) {
     return (
-      <a href={href} className={styles.link}>
+      <a href={href} className="site-footer__link">
         {icon}
         {item.title}
       </a>
@@ -66,7 +66,7 @@ function FooterLink({ item }) {
   }
 
   return (
-    <Link href={href} className={styles.link}>
+    <Link href={href} className="site-footer__link">
       {icon}
       {item.title}
     </Link>
@@ -108,7 +108,7 @@ export default async function Footer() {
   if (!columns.length && !logo) return null;
 
   return (
-    <footer className={styles.footer}>
+    <footer className="site-footer">
       {/* Above the columns, and inside <footer> so every page gets it from the
           root layout. Its artwork is opaque, so it covers the footer's own
           gradient rather than sitting on top of it. */}
@@ -118,15 +118,15 @@ export default async function Footer() {
         button={ctaButton}
       />
 
-      <div className={styles.inner}>
+      <div className="site-footer__inner">
         {logo && (
-          <Link href="/" className={styles.brand} aria-label="Lower the Curve — home">
+          <Link href="/" className="site-footer__brand" aria-label="Lower the Curve — home">
             <Image
               src={logo.url}
               alt={logo.altText ?? 'Lower the Curve'}
               width={logo.width ?? 190}
               height={logo.height ?? 79}
-              className={styles.logo}
+              className="site-footer__logo"
               // SVGs skip the optimizer, so it never needs dangerouslyAllowSVG.
               unoptimized={/\.svg(\?|$)/i.test(logo.url)}
             />
@@ -136,13 +136,13 @@ export default async function Footer() {
         {columns.map((column) => (
           <nav
             key={column.title ?? column.items[0]?.id}
-            className={styles.column}
+            className="site-footer__column"
             aria-label={column.title ?? undefined}
           >
-            {column.title && <h2 className={styles.heading}>{column.title}</h2>}
+            {column.title && <h2 className="site-footer__heading">{column.title}</h2>}
 
             {column.items.length > 0 && (
-              <ul className={styles.menu}>
+              <ul className="site-footer__menu">
                 {column.items.map((item) => (
                   <li key={item.id}>
                     <FooterLink item={item} />

@@ -1,6 +1,6 @@
 import Button from '@/components/ui/Button/Button';
 import BookACallBackdrop from './BookACallBackdrop';
-import styles from './GetInTouch.module.css';
+import './GetInTouch.css';
 
 // The call-to-action band at the top of the footer. Because the footer is
 // rendered once in the root layout, this appears on every page.
@@ -28,8 +28,8 @@ import styles from './GetInTouch.module.css';
 // <script> stays literal text. A title with no markup renders plain, which is not
 // an error.
 const ACCENT_CLASSES = {
-  'blue-gradient': styles.blue,
-  'green-gradient': styles.green,
+  'blue-gradient': 'get-in-touch__accent--blue',
+  'green-gradient': 'get-in-touch__accent--green',
 };
 
 const ACCENT_SPAN =
@@ -50,7 +50,7 @@ function accentedTitle(title) {
 
     parts.push(
       accent ? (
-        <span key={match.index} className={`${styles.accent} ${accent}`}>
+        <span key={match.index} className={`get-in-touch__accent ${accent}`}>
           {match[2]}
         </span>
       ) : (
@@ -71,24 +71,24 @@ export default function GetInTouch({ title, description, button }) {
   if (!title && !description && !button) return null;
 
   return (
-    <section className={styles.getInTouch} aria-label="Get in touch">
-      <BookACallBackdrop className={styles.backdrop} />
+    <section className="get-in-touch" aria-label="Get in touch">
+      <BookACallBackdrop className="get-in-touch__backdrop" />
 
-      <div className={styles.content}>
+      <div className="get-in-touch__content">
         {title && (
-          <h2 className={styles.title}>
+          <h2 className="get-in-touch__title">
             {accentedTitle(title)}
           </h2>
         )}
 
-        {description && <p className={styles.description}>{description}</p>}
+        {description && <p className="get-in-touch__description">{description}</p>}
 
         {button && (
           <Button
             href={button.url}
             variant="inverse"
             arrow="diagonal"
-            className={styles.button}
+            className="get-in-touch__button"
           >
             {button.text}
           </Button>

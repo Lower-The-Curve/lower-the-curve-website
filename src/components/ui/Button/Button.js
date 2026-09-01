@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import styles from './Button.module.css';
+import './Button.css';
 import ArrowIcon from './ArrowIcon';
 
 // Shared pill button. Renders a <button>, a next/link <Link>, or a plain <a>
@@ -32,13 +32,18 @@ import ArrowIcon from './ArrowIcon';
 // inherit currentColor.
 const BLUE_ARROW_VARIANTS = new Set(['secondary', 'inverse']);
 
-// One SVG, three rotations. `rise` is the only one that differs between rest and
-// hover, so it needs its own class rather than a modifier on `right`.
-const ARROW_CLASSES = {
-  right: styles.arrow,
-  diagonal: styles.arrowDiagonal,
-  rise: styles.arrowRise,
+// One SVG, three rotations. `right` is the base — no modifier, because straight
+// at rest with a nudge on hover is what .btn__arrow already does.
+const ARROW_MODIFIERS = {
+  right: '',
+  diagonal: 'btn__arrow--diagonal',
+  rise: 'btn__arrow--rise',
 };
+
+function arrowClass(arrow) {
+  const modifier = ARROW_MODIFIERS[arrow] ?? ARROW_MODIFIERS.right;
+  return modifier ? `btn__arrow ${modifier}` : 'btn__arrow';
+}
 
 export default function Button({
   children,
@@ -50,12 +55,7 @@ export default function Button({
   type = 'button',
   ...rest
 }) {
-  const classes = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    className,
-  ]
+  const classes = ['btn', `btn--${variant}`, `btn--${size}`, className]
     .filter(Boolean)
     .join(' ');
 
@@ -63,11 +63,11 @@ export default function Button({
   // the gradient stroke. primary/solid arrows are white and inherit colour.
   const content = (
     <>
-      <span className={styles.label}>{children}</span>
+      <span className="btn__label">{children}</span>
       {arrow !== 'none' && (
         <ArrowIcon
           gradient={BLUE_ARROW_VARIANTS.has(variant)}
-          className={ARROW_CLASSES[arrow] ?? ARROW_CLASSES.right}
+          className={arrowClass(arrow)}
         />
       )}
     </>

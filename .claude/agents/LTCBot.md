@@ -28,8 +28,10 @@ purpose, update `DESIGN-SYSTEM.md` in the same change.
 
 ## Stack (hard constraints — never break)
 - Next.js **App Router**, **JavaScript + JSX only**. No TypeScript.
-- Styling: **CSS Modules** (`*.module.css`) + `src/app/globals.css`. No Tailwind,
-  no Hydrogen, no external CMS.
+- Styling: **plain CSS files with BEM class names** (`<Name>.css`, imported for
+  its side effect: `import './HeroSection.css'`) + `src/app/globals.css`. No CSS
+  Modules, no Tailwind, no Hydrogen, no external CMS. See the **CSS naming**
+  section below — it is a hard constraint, not a preference.
 - **Server Components by default.** Add `'use client'` only when interaction is
   required (state, events, browser APIs).
 - Shopify via the **Storefront API**. The token is read from an unprefixed env
@@ -58,11 +60,42 @@ purpose, update `DESIGN-SYSTEM.md` in the same change.
 - `src/lib/shopify/queries/` — **one file per page** (`home.js`, `services.js`),
   re-exported from `queries/index.js` (barrel). Query files import section
   fragments and spread them; they hardcode no field selections.
-- `src/components/sections/<Name>/<Name>.js` + `.module.css` — section components.
+- `src/components/sections/<Name>/<Name>.js` + `<Name>.css` — section components.
+  One BEM block per stylesheet, named after the component.
 - `src/components/Header`, `src/components/Footer` — site chrome, fetch menus via
   `getMenu(handle)` (`main-menu`, `footer`).
 - Pages in `src/app/**/page.js` fetch their helper, normalize sections, and
   dispatch by `type`.
+
+## CSS naming — BEM, no hashes, no exceptions
+There are **no CSS Modules** here. Class names ship to the DOM exactly as
+written, so BEM is what does the scoping that hashing used to do.
+
+```
+.block                 the component            .solutions
+.block__element        a part of it             .solutions__stat-value
+.block--modifier       a variant of the block   .solutions--with-stats
+.block__element--mod   a variant of a part      .btn__arrow--diagonal
+```
+
+Rules:
+- **One block per stylesheet**, named for the component in kebab-case. A file
+  declares classes for its own block and nothing else. (`Header.css` is
+  `site-header`; the nav inside it is its own block, `site-nav`, in
+  `HeaderNav.css`.)
+- **Every selector is a single class.** Never nest a block's own element under
+  another (`.solutions .solutions__item`) — it inflates specificity for nothing.
+  Descendant selectors are for a *modifier reaching an element*
+  (`.solutions--no-stats .solutions__list`), which is the one legitimate case.
+- **Modifiers are additive**: markup carries the base class AND the modifier
+  (`class="btn__arrow btn__arrow--diagonal"`), so the base rule is written once
+  and each modifier states only what it changes.
+- **No camelCase, no abbreviations, no hashes** in any class name. If a name
+  needs two words, hyphenate: `__stat-value`, `__brand-text`, `__card-wrap`.
+- In JSX, write the class as a **string literal** (`className="hero__title"`).
+  Build a modifier with a template literal only when it is conditional.
+- Class names are global. Before adding a block, `grep -rn "\.your-block" src/`
+  to be sure the name is free.
 
 ## Section component pattern (every section follows this)
 Each section component exports THREE things:
@@ -89,8 +122,8 @@ Each section component exports THREE things:
 1. `queries/<page>.js` with `getXPageQuery`, composing section fragments.
 2. Re-export it from `queries/index.js`.
 3. `getXPage()` helper in `lib/shopify/index.js` with the right `{ type, handle }`.
-4. `src/app/<page>/page.js` (+ `page.module.css`) that fetches, normalizes
-   sections, and dispatches by type.
+4. `src/app/<page>/page.js` (+ `page.css`, block `<page>-page` on the `<main>`)
+   that fetches, normalizes sections, and dispatches by type.
 
 ## Workflow habits
 - Before wiring a query, **verify it live** against the store (curl the

@@ -31,7 +31,8 @@ const MARKUP =
 
 /**
  * @param {string} title    The authored value, e.g. `Grow your <span class="blue-gradient">startup</span>`
- * @param {Object} classes  CSS-module classes from the calling component.
+ * @param {Object} classes  BEM class names from the calling component, e.g.
+ *   { accent: 'solutions__accent', blue: 'solutions__accent--blue' }.
  * @param {string} classes.accent  Applied to every accented run — this is where
  *   the weight lives, so "the accented words are the bold ones" is stated once.
  * @param {string} [classes.blue]   Paired with `blue-gradient`.

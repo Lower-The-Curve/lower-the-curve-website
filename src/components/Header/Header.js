@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getHeader, getMenu } from '@/lib/shopify';
 import HeaderNav from './HeaderNav';
-import styles from './Header.module.css';
+import './Header.css';
 
 // Server Component: everything the header renders comes from the `header`
 // metaobject in Shopify (Settings > Custom data > Metaobjects > header):
@@ -85,25 +85,25 @@ export default async function Header() {
   const ctaLabel = ratio !== null && ratio < 3 ? null : authoredLabel;
 
   return (
-    <header className={styles.header}>
-      <div className={styles.inner}>
+    <header className="site-header">
+      <div className="site-header__inner">
         {/* The rounded wrapper holds the logo, the nav and the CTA. */}
-        <div className={styles.capsule}>
-          <Link href="/" className={styles.brand} aria-label="Lower the Curve — home">
+        <div className="site-header__capsule">
+          <Link href="/" className="site-header__brand" aria-label="Lower the Curve — home">
             {logo ? (
               <Image
                 src={logo.url}
                 alt={logo.altText ?? 'Lower the Curve'}
                 width={logo.width ?? 124}
                 height={logo.height ?? 50}
-                className={styles.logo}
+                className="site-header__logo"
                 priority
                 // SVGs go through next/image unoptimized so the optimizer (and
                 // its dangerouslyAllowSVG opt-in) never enters the picture.
                 unoptimized={/\.svg(\?|$)/i.test(logo.url)}
               />
             ) : (
-              <span className={styles.brandText}>Lower the Curve</span>
+              <span className="site-header__brand-text">Lower the Curve</span>
             )}
           </Link>
 

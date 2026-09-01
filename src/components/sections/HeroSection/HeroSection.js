@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styles from './HeroSection.module.css';
+import './HeroSection.css';
 import ChevronsDownIcon from './ChevronsDownIcon';
 
 // The metaobject type this component renders. Used to dispatch sections to the
@@ -85,9 +85,9 @@ function pixels(section, key) {
 // space), so it's normalized before lookup. Center is the section's designed
 // default when the field is empty.
 const ALIGN_CLASSES = {
-  left: styles.alignLeft,
-  center: styles.alignCenter,
-  right: styles.alignRight,
+  left: 'hero--align-left',
+  center: 'hero--align-center',
+  right: 'hero--align-right',
 };
 
 function alignClass(section) {
@@ -108,8 +108,8 @@ function alignClass(section) {
 // tag or a pasted <script> can't turn into markup. A title with no spans renders
 // as plain text, and an unrecognised class keeps its words but drops the accent.
 const ACCENT_CLASSES = {
-  'green-gradient': styles.green,
-  'blue-gradient': styles.blue,
+  'green-gradient': 'hero__accent--green',
+  'blue-gradient': 'hero__accent--blue',
 };
 
 const ACCENT_SPAN =
@@ -130,7 +130,7 @@ function accentedTitle(title) {
 
     parts.push(
       accent ? (
-        <span key={match.index} className={`${styles.accent} ${accent}`}>
+        <span key={match.index} className={`hero__accent ${accent}`}>
           {match[2]}
         </span>
       ) : (
@@ -170,7 +170,7 @@ export default function HeroSection({ section }) {
 
   return (
     <section
-      className={`${styles.hero} ${alignClass(section)}`}
+      className={`hero ${alignClass(section)}`}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -178,22 +178,21 @@ export default function HeroSection({ section }) {
     >
       {/* Sits behind the content and reaches above the section's own top edge,
           so the artwork starts at the very top of the page and the transparent
-          header renders over it — see HeroSection.module.css. */}
+          header renders over it — see HeroSection.css. */}
       {image && (
-        <div className={styles.backdrop}>
+        <div className="hero__backdrop">
           {/* Two elements rather than one with a swapped src: this is a Server
               Component, so there is no viewport to branch on at render time and
-              the choice has to be made in CSS. When no mobile artwork is authored
-              the desktop one carries every width and neither class is applied. */}
+              the choice has to be made in CSS. When no mobile artwork is
+              authored the desktop one carries every width, so it gets no
+              --wide modifier and neither art-direction rule matches. */}
           <Image
             src={image.url}
             alt={image.altText ?? ''}
             fill
             sizes="100vw"
             priority
-            className={`${styles.backdropImage} ${
-              mobileImage ? styles.wide : ''
-            }`}
+            className={`hero__image ${mobileImage ? 'hero__image--wide' : ''}`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
 
@@ -204,22 +203,22 @@ export default function HeroSection({ section }) {
               fill
               sizes="100vw"
               priority
-              className={`${styles.backdropImage} ${styles.narrow}`}
+              className="hero__image hero__image--narrow"
               unoptimized={/\.svg(\?|$)/i.test(mobileImage.url)}
             />
           )}
         </div>
       )}
 
-      <div className={styles.content}>
-        {title && <h1 className={styles.title}>{accentedTitle(title)}</h1>}
-        {description && <p className={styles.description}>{description}</p>}
+      <div className="hero__content">
+        {title && <h1 className="hero__title">{accentedTitle(title)}</h1>}
+        {description && <p className="hero__description">{description}</p>}
       </div>
 
       {scrollText && (
-        <div className={styles.scroll}>
-          <span className={styles.scrollText}>{scrollText}</span>
-          <ChevronsDownIcon className={styles.scrollIcon} />
+        <div className="hero__scroll">
+          <span className="hero__scroll-text">{scrollText}</span>
+          <ChevronsDownIcon className="hero__scroll-icon" />
         </div>
       )}
     </section>

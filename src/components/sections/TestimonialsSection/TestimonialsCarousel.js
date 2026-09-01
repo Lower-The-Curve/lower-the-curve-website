@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import CardShape, { CARD_CLIP_PATH } from './CardShape';
 import QuoteMark from './QuoteMark';
-import styles from './TestimonialsSection.module.css';
+import './TestimonialsSection.css';
 
 // A Client Component — the second on the site, after HeaderNav's mobile drawer.
 // The carousel needs state and a scroll listener, which is the one case the
@@ -50,8 +50,8 @@ function imageFrom(node, ...keys) {
 // injected: only a <span> whose class is in ACCENT_CLASSES becomes an element, so
 // a stray tag or a pasted <script> stays literal text.
 const ACCENT_CLASSES = {
-  'blue-gradient': styles.blue,
-  'green-gradient': styles.green,
+  'blue-gradient': 'testimonials__accent--blue',
+  'green-gradient': 'testimonials__accent--green',
 };
 
 const ACCENT_SPAN =
@@ -71,7 +71,7 @@ function accentedTitle(title) {
 
     parts.push(
       accent ? (
-        <span key={match.index} className={`${styles.accent} ${accent}`}>
+        <span key={match.index} className={`testimonials__accent ${accent}`}>
           {match[2]}
         </span>
       ) : (
@@ -143,7 +143,7 @@ export default function TestimonialsCarousel({ section }) {
   const atEnd = progress >= 0.999;
 
   return (
-    <section className={styles.testimonials}>
+    <section className="testimonials">
       {/* The clip path every card references. Declared once per section: the id
           would resolve to the first definition anyway, so one is all there is. */}
       <svg width="0" height="0" aria-hidden="true" focusable="false">
@@ -157,10 +157,10 @@ export default function TestimonialsCarousel({ section }) {
         </defs>
       </svg>
 
-      <div className={styles.inner}>
-        <div className={styles.intro}>
-          {title && <h2 className={styles.title}>{accentedTitle(title)}</h2>}
-          {description && <p className={styles.description}>{description}</p>}
+      <div className="testimonials__inner">
+        <div className="testimonials__intro">
+          {title && <h2 className="testimonials__title">{accentedTitle(title)}</h2>}
+          {description && <p className="testimonials__description">{description}</p>}
 
         </div>
 
@@ -170,10 +170,10 @@ export default function TestimonialsCarousel({ section }) {
             controls under the CARDS on narrow, and only a grid item of .inner
             can be reordered past the track. */}
         {scrollable && (
-          <div className={styles.controls}>
+          <div className="testimonials__controls">
             <button
               type="button"
-              className={styles.arrow}
+              className="testimonials__arrow"
               onClick={() => step(-1)}
               disabled={atStart}
               aria-label="Previous testimonial"
@@ -183,16 +183,16 @@ export default function TestimonialsCarousel({ section }) {
 
             {/* Presentational: the real position is conveyed by the scroll
                 container itself, which assistive tech already reports. */}
-            <div className={styles.progress} aria-hidden="true">
+            <div className="testimonials__progress" aria-hidden="true">
               <span
-                className={styles.progressBar}
+                className="testimonials__progress-bar"
                 style={{ '--progress': progress }}
               />
             </div>
 
             <button
               type="button"
-              className={styles.arrow}
+              className="testimonials__arrow"
               onClick={() => step(1)}
               disabled={atEnd}
               aria-label="Next testimonial"
@@ -206,7 +206,7 @@ export default function TestimonialsCarousel({ section }) {
             holding focusable children is reachable, but one holding only text
             would not be. */}
         <ul
-          className={styles.track}
+          className="testimonials__track"
           ref={trackRef}
           tabIndex={0}
           role="group"
@@ -222,40 +222,40 @@ export default function TestimonialsCarousel({ section }) {
               // The plate is a SIBLING of the clipped card, not a child of it:
               // clip-path clips descendants, so a plate inside would be cut away
               // by the very notch it fills — and the name beside it with it.
-              <li key={item.id} className={styles.cardWrap}>
-                <div className={styles.card}>
-                  <CardShape className={styles.shape} />
+              <li key={item.id} className="testimonials__card-wrap">
+                <div className="testimonials__card">
+                  <CardShape className="testimonials__shape" />
 
-                  <QuoteMark className={styles.quoteOpen} />
+                  <QuoteMark className="testimonials__quote-mark testimonials__quote-mark--open" />
 
                   {quote && (
-                    <blockquote className={styles.quote}>{quote}</blockquote>
+                    <blockquote className="testimonials__quote">{quote}</blockquote>
                   )}
 
-                  <div className={styles.author}>
+                  <div className="testimonials__author">
                     {(name || company) && (
-                      <div className={styles.who}>
-                        {name && <span className={styles.name}>{name}</span>}
+                      <div className="testimonials__who">
+                        {name && <span className="testimonials__name">{name}</span>}
                         {company && (
-                          <span className={styles.company}>{company}</span>
+                          <span className="testimonials__company">{company}</span>
                         )}
                       </div>
                     )}
 
                     {/* Level with the name and hard against the card's right
                         edge, as the reference shows. */}
-                    <QuoteMark className={styles.quoteClose} />
+                    <QuoteMark className="testimonials__quote-mark testimonials__quote-mark--close" />
                   </div>
                 </div>
 
                 {logo && (
-                  <div className={styles.logoBox}>
+                  <div className="testimonials__logo-box">
                     <Image
                       src={logo.url}
                       alt={logo.altText ?? ''}
                       width={logo.width ?? 120}
                       height={logo.height ?? 50}
-                      className={styles.logo}
+                      className="testimonials__logo"
                       unoptimized={/\.svg(\?|$)/i.test(logo.url)}
                     />
                   </div>
@@ -283,7 +283,7 @@ function ArrowGlyph({ direction }) {
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className={direction === 'left' ? styles.glyphLeft : styles.glyphRight}
+      className={`testimonials__glyph testimonials__glyph--${direction}`}
     >
       <path d="M15 4L7 12l8 8" />
     </svg>

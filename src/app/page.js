@@ -15,7 +15,7 @@ import TestimonialsSection, {
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
-import styles from './page.module.css';
+import './page.css';
 
 // The home `content` entry's component slots, in the order the admin shows them
 // (Component 1 … Component 5). The query aliases the live field keys onto these
@@ -47,7 +47,7 @@ export default async function HomePage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(home?.[slot]));
 
   return (
-    <main className={styles.main}>
+    <main className="home-page">
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
