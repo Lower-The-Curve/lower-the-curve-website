@@ -2,6 +2,16 @@
 
 Project guidance for Claude Code working in this repo.
 
+## Read RULES.md FIRST — it is binding
+
+**[RULES.md](RULES.md) is the hard boundary for this repo.** Scope discipline,
+the fixed stack, secret handling, the commands you must not run, and what needs
+explicit approval before you touch it. Read it before you act, not after.
+
+If a request would break a rule in there, **stop and say which rule and what it
+collides with** — then offer the in-system alternative. Never work around a rule
+quietly.
+
 ## Read the design system FIRST
 
 **[DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) is required reading before you write any
