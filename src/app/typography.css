@@ -2,7 +2,7 @@
    TYPOGRAPHY — SINGLE SOURCE OF TRUTH
    ----------------------------------------------------------------------------
    Every font-size in this codebase must come from a token below.
-   Never write a raw px/rem font-size in a component CSS Module.
+   Never write a raw px/rem font-size in a component stylesheet.
 
    HOW IT WORKS
    Each token is declared three times — once per breakpoint tier — using the
@@ -19,8 +19,8 @@
    the narrower block simply overrides the wider one. Keep that order.
 
    USAGE
-     .pageTitle   { font-size: var(--fs-heading-xl); }
-     .cardBody    { font-size: var(--fs-body-base); }
+     .hero__title       { font-size: var(--fs-heading-xl); }
+     .solutions__body   { font-size: var(--fs-body-base); }
 
    The h1-h4 and p elements already default to the right token (see bottom of
    this file), so plain semantic markup is correctly sized with no CSS at all.
@@ -79,7 +79,7 @@
 
      That is why they are their own tokens and not points on the scale above: no
      scale token can express an inverted pair, and forcing one would have meant a
-     font-size media query inside Footer.module.css. Sizes were specified for
+     font-size media query inside Footer.css. Sizes were specified for
      desktop (18/14) and mobile (24/18); tablet takes the mobile values because
      that is where the stacked layout starts (<= 1024px, the header's existing
      collapse point).
@@ -169,7 +169,7 @@
 
 /* --- ELEMENT DEFAULTS -----------------------------------------------------
    Semantic markup is sized correctly out of the box. Override in a component
-   CSS Module only when the design genuinely differs, and always with a token.
+   stylesheet only when the design genuinely differs, and always with a token.
    ------------------------------------------------------------------------ */
 body {
   font-size: var(--fs-body-base);
@@ -193,8 +193,9 @@ h4 { font-size: var(--fs-heading-sm); }
    needs margin: 0 and its own line-height.
 
    Careful: a directly-matching rule always beats an inherited one, so this
-   font-size overrides any font-size set on an ancestor. A wrapper that sizes its
-   own prose (e.g. Footer's .legal) must target the `p`, not the wrapper. */
+   font-size overrides any font-size set on an ancestor. A block that sizes its
+   own prose (e.g. .get-in-touch__description) must put the token on the `p`
+   itself, not on a wrapper around it. */
 p {
   margin: 0;
   font-size: var(--fs-body-base);

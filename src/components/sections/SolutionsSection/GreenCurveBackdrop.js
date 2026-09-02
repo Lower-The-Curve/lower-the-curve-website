@@ -2,8 +2,8 @@
 // counterpart to SwooshBackdrop's blue arc at the top. It sweeps down from the
 // left edge and steepens away to the bottom right, and it deliberately hangs past
 // the section's bottom edge so it carries on into whatever section follows.
-// See the .greenCurve / .clip block in SolutionsSection.module.css for how that
-// bleed is arranged.
+// See the .solutions__green-curve / .solutions__clip block in
+// SolutionsSection.css for how that bleed is arranged.
 //
 // Decorative only — there is no image field on the `solutions` metaobject, so
 // the shape is drawn here rather than authored in Shopify, and it is aria-hidden

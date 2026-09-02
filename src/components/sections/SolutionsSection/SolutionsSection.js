@@ -5,7 +5,7 @@ import GreenCurveBackdrop from './GreenCurveBackdrop';
 import BlueDot from './BlueDot';
 import GreenGlow from './GreenGlow';
 import accentedTitle from '@/components/ui/accentedTitle';
-import styles from './SolutionsSection.module.css';
+import './SolutionsSection.css';
 
 // The solutions section is a single `solutions` metaobject with:
 //   - `title`       : single_line_text_field, the section heading
@@ -181,8 +181,8 @@ export default function SolutionsSection({ section }) {
 
   return (
     <section
-      className={`${styles.solutions} ${
-        hasStats ? styles.withStats : styles.noStats
+      className={`solutions ${
+        hasStats ? 'solutions--with-stats' : 'solutions--no-stats'
       }`}
     >
       {/* CLIPPING BOX. It exists because the section itself must NOT clip: the
@@ -193,49 +193,50 @@ export default function SolutionsSection({ section }) {
           wrapper that has the same geometry as the section.
 
           `clip` rather than `hidden`: hidden would make this a scroll container.
-          `position: relative` is load-bearing — .greenGlow is absolute, and if its
-          containing block were the section (outside this box) it would escape the
-          clip entirely rather than being trimmed by it. */}
-      <div className={styles.clip}>
+          `position: relative` is load-bearing — .solutions__green-glow is
+          absolute, and if its containing block were the section (outside this
+          box) it would escape the clip entirely rather than being trimmed by
+          it. */}
+      <div className="solutions__clip">
         {/* Stacked layout only. The split layout has the swoosh and the stats card
             carrying the colour, and the split reference shows neither of these. */}
-        {!hasStats && <GreenGlow className={styles.greenGlow} />}
+        {!hasStats && <GreenGlow className="solutions__green-glow" />}
 
-        <div className={styles.inner}>
-          {!hasStats && <BlueDot className={styles.blueDot} />}
-          <div className={styles.intro}>
+        <div className="solutions__inner">
+          {!hasStats && <BlueDot className="solutions__blue-dot" />}
+          <div className="solutions__intro">
             {title && (
-              <h2 className={styles.title}>
+              <h2 className="solutions__title">
                 {accentedTitle(title, {
-                  accent: styles.accent,
-                  blue: styles.blue,
-                  green: styles.green,
+                  accent: 'solutions__accent',
+                  blue: 'solutions__accent--blue',
+                  green: 'solutions__accent--green',
                 })}
               </h2>
             )}
-            {description && <p className={styles.description}>{description}</p>}
+            {description && <p className="solutions__description">{description}</p>}
 
             {/* The swoosh is anchored to the top of this block rather than to the
                 section, so it meets the stats card at any width — see the CSS.
                 Both live or neither: with no card the arc has nothing to meet, and
                 the stacked reference shows no arc. */}
             {hasStats && (
-              <div className={styles.statsBlock}>
-                <div className={styles.backdrop}>
-                  <SwooshBackdrop className={styles.swoosh} />
+              <div className="solutions__stats-block">
+                <div className="solutions__backdrop">
+                  <SwooshBackdrop className="solutions__swoosh" />
                 </div>
 
-                <ul className={styles.stats}>
+                <ul className="solutions__stats">
                   {stats.map((stat) => {
                     const value = fieldValue(stat, 'value', 'title');
                     const label = fieldValue(stat, 'description', 'label');
 
                     return (
-                      <li key={stat.id} className={styles.stat}>
+                      <li key={stat.id} className="solutions__stat">
                         {value && (
-                          <span className={styles.statValue}>{value}</span>
+                          <span className="solutions__stat-value">{value}</span>
                         )}
-                        {label && <p className={styles.statLabel}>{label}</p>}
+                        {label && <p className="solutions__stat-label">{label}</p>}
                       </li>
                     );
                   })}
@@ -244,7 +245,7 @@ export default function SolutionsSection({ section }) {
             )}
           </div>
 
-          <ul className={styles.list}>
+          <ul className="solutions__list">
             {solutions.map((item) => {
               const itemTitle = fieldValue(item, 'title', 'name');
               const itemDescription = fieldValue(item, 'description');
@@ -252,24 +253,24 @@ export default function SolutionsSection({ section }) {
               const button = linkFrom(item, 'button', 'link');
 
               return (
-                <li key={item.id} className={styles.item}>
+                <li key={item.id} className="solutions__item">
                   {icon && (
                     <Image
                       src={icon.url}
                       alt={icon.altText ?? ''}
                       width={icon.width ?? 106}
                       height={icon.height ?? 106}
-                      className={styles.icon}
+                      className="solutions__icon"
                       unoptimized={/\.svg(\?|$)/i.test(icon.url)}
                     />
                   )}
 
-                  <div className={styles.body}>
+                  <div className="solutions__body">
                     {itemTitle && (
-                      <h3 className={styles.itemTitle}>{itemTitle}</h3>
+                      <h3 className="solutions__item-title">{itemTitle}</h3>
                     )}
                     {itemDescription && (
-                      <p className={styles.itemDescription}>{itemDescription}</p>
+                      <p className="solutions__item-description">{itemDescription}</p>
                     )}
                     {button && (
                       <Button
@@ -277,7 +278,7 @@ export default function SolutionsSection({ section }) {
                         variant="secondary"
                         size="sm"
                         arrow="rise"
-                        className={styles.itemButton}
+                        className="solutions__item-button"
                       >
                         {button.text}
                       </Button>
@@ -290,10 +291,11 @@ export default function SolutionsSection({ section }) {
         </div>
       </div>
 
-      {/* Split layout only, and deliberately OUTSIDE .clip so it can carry on into
-          the section below — see the .greenCurve block in the CSS. Paired with the
-          blue swoosh at the top of this same layout: both live or neither. */}
-      {hasStats && <GreenCurveBackdrop className={styles.greenCurve} />}
+      {/* Split layout only, and deliberately OUTSIDE .solutions__clip so it can
+          carry on into the section below — see the .solutions__green-curve block
+          in the CSS. Paired with the blue swoosh at the top of this same layout:
+          both live or neither. */}
+      {hasStats && <GreenCurveBackdrop className="solutions__green-curve" />}
     </section>
   );
 }

@@ -37,14 +37,14 @@
   --space: 1rem;
 
   /* Rendered height of the site header: 0.75rem padding top and bottom around
-     an 80px capsule. The header enforces it (Header.module.css sets .capsule's
+     an 80px capsule. The header enforces it (Header.css sets the capsule's
      min-height from this token), and full-bleed sections read it to slide their
      artwork up under the transparent header. */
   --header-height: 104px;
 }
 
 /* The header's logo box shrinks on phones (33px tall against 50px), so the row
-   is shorter here. Mirrors the <= 575px block in Header.module.css. */
+   is shorter here. Mirrors the <= 575px block in Header.css. */
 @media (max-width: 575px) {
   :root {
     --header-height: 93px;

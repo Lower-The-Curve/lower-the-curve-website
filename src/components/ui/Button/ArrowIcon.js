@@ -1,6 +1,6 @@
 // The arrow used inside Button. Two directions, matching the design:
 //   'right'    → straight right arrow
-//   'diagonal' ↗ same arrow rotated 45° (rotation lives in Button.module.css)
+//   'diagonal' ↗ same arrow rotated 45° (rotation lives in Button.css)
 //
 // Stroke colour:
 //   gradient={true}  uses the brand blue gradient from the design (for the

@@ -19,7 +19,7 @@ Run through this before touching typography, colour, or buttons:
    → **Stop and tell the user** which existing token/component it collides with,
    and offer either (a) using the existing one or (b) extending the system
    deliberately. Never silently add a one-off value next to the system.
-4. **If it fits the system**, use the token. A component CSS Module should
+4. **If it fits the system**, use the token. A component stylesheet should
    contain **zero** raw font-sizes, zero font-family declarations, and zero hex
    colours for brand blue.
 5. **If you deliberately extend the system**, update this file in the same
@@ -33,7 +33,8 @@ Run through this before touching typography, colour, or buttons:
 | Font loading | [src/app/layout.js](src/app/layout.js) | Poppins via `next/font/google` |
 | Type scale tokens | [src/app/typography.css](src/app/typography.css) | **single source of truth** for every font-size |
 | Colour + layout tokens | [src/app/globals.css](src/app/globals.css) | brand blues, `--color-accent-green`, `--font-sans`, `--max-width`, `--space`, `--header-height` |
-| Button | [src/components/ui/Button/](src/components/ui/Button/) | `Button.js`, `Button.module.css`, `ArrowIcon.js` |
+| Button | [src/components/ui/Button/](src/components/ui/Button/) | `Button.js`, `Button.css`, `ArrowIcon.js` |
+| CSS class names | §6 below | BEM, one block per stylesheet, **no CSS Modules** |
 
 Import order in `layout.js` matters: `typography.css` **before** `globals.css`.
 
@@ -118,7 +119,7 @@ specificity. So this does **not** work:
 
 To size prose smaller (or larger) than the default, put the token on the
 paragraph itself: `.legal p { font-size: var(--fs-body-xs); }`. This bit
-`Footer.module.css` — its copyright line silently rendered at the `p` default
+`Footer.css` — its copyright line silently rendered at the `p` default
 instead of its intended 14px.
 
 ### The get-in-touch pair — off the scale on purpose
@@ -151,7 +152,7 @@ They are separate tokens rather than points on the scale because **no scale
 token can express an inverted pair**: 18px desktop is `--fs-body-base`, but that
 is 16px on mobile, not 24px; 14px desktop is `--fs-body-xs`, but that is 12px on
 mobile, not 18px. Forcing it would have meant a font-size media query inside
-`Footer.module.css`, which rule 2 below forbids.
+`Footer.css`, which rule 2 below forbids.
 
 Only desktop and mobile were specified. **Tablet takes the mobile values**,
 because that is where the stacked layout begins (≤ 1024px, reusing the header's
@@ -163,7 +164,7 @@ Don't reach for these outside the footer. Another component needing type that
 grows on mobile is a second inverted pair and its own decision.
 
 ### Rules
-- **No raw `px`/`rem` font-size in a component CSS Module. Ever.** Use a token.
+- **No raw `px`/`rem` font-size in a component stylesheet. Ever.** Use a token.
 - **No font-size media queries in components.** The tokens already respond.
 - Naming asymmetry to be aware of: headings run `xl → lg → md → sm` (4 steps),
   body runs `xl → lg → base → sm → xs` (5 steps). **There is no `--fs-body-md`
@@ -201,7 +202,7 @@ green accent mirrors it:
 
 **At 135deg the first stop is the top-left end**, so that stop order puts the
 dark blue on the *left*. The hero headline's blue accent deliberately reverses
-the stops to put the darker blue on the **right** — see the Hero notes in §6.
+the stops to put the darker blue on the **right** — see the Hero notes in §7.
 Everything else (buttons, arrows) keeps the dark-on-left order above.
 
 ### Rules
@@ -317,7 +318,7 @@ import Button from '@/components/ui/Button/Button';
   known at author time. Use `primary` for any button whose colour is ours.
 
 ### Rules
-- New visual treatment → **new `variant` in `Button.module.css`**, documented in
+- New visual treatment → **new `variant` in `Button.css`**, documented in
   the table above. Not a new component.
 - Button labels use body tokens, so they shrink on mobile (16px → 14px). If a
   design needs a button locked to a fixed px size, that's a **conflict** — raise
@@ -355,7 +356,7 @@ rather than the page pulling the header out of flow:
 .backdrop { position: absolute; top: calc(-1 * var(--header-height)); inset: 0 0 0 0; z-index: -1; }
 ```
 
-The token is **authoritative, not documentary**: `Header.module.css` sets
+The token is **authoritative, not documentary**: `Header.css` sets
 `.capsule`'s `min-height` from it, so the header can't silently drift away from
 the number sections are offsetting by. It resolves to the header's two real
 heights — 104px, and 93px at ≤575px where the logo box shrinks.
@@ -366,7 +367,103 @@ it moves.
 
 ---
 
-## 6. Open decisions
+## 6. CSS class names (BEM)
+
+**There are no CSS Modules in this repo.** Every stylesheet is a plain `.css`
+file imported for its side effect:
+
+```js
+import './HeroSection.css';
+…
+<h1 className="hero__title">
+```
+
+Class names therefore reach the DOM exactly as written. Nothing generates a hash
+for you, so the naming convention *is* the scoping mechanism — which is why it is
+in the design system rather than in a style guide.
+
+### The grammar
+
+| Form | Means | Example |
+|---|---|---|
+| `.block` | the component | `.solutions` |
+| `.block__element` | a part of it | `.solutions__stat-value` |
+| `.block--modifier` | a variant of the whole block | `.solutions--with-stats` |
+| `.block__element--modifier` | a variant of a part | `.btn__arrow--diagonal` |
+
+### The blocks
+
+| Block | Stylesheet |
+|---|---|
+| `btn` | [src/components/ui/Button/Button.css](src/components/ui/Button/Button.css) |
+| `site-header` | [src/components/Header/Header.css](src/components/Header/Header.css) |
+| `site-nav` | [src/components/Header/HeaderNav.css](src/components/Header/HeaderNav.css) |
+| `site-footer` | [src/components/Footer/Footer.css](src/components/Footer/Footer.css) |
+| `get-in-touch` | [src/components/Footer/GetInTouch.css](src/components/Footer/GetInTouch.css) |
+| `hero` | [src/components/sections/HeroSection/HeroSection.css](src/components/sections/HeroSection/HeroSection.css) |
+| `partners` | [src/components/sections/PartnersSection/PartnersSection.css](src/components/sections/PartnersSection/PartnersSection.css) |
+| `solutions` | [src/components/sections/SolutionsSection/SolutionsSection.css](src/components/sections/SolutionsSection/SolutionsSection.css) |
+| `testimonials` | [src/components/sections/TestimonialsSection/TestimonialsSection.css](src/components/sections/TestimonialsSection/TestimonialsSection.css) |
+| `case-studies` | [src/components/sections/CaseStudiesSection/CaseStudiesSection.css](src/components/sections/CaseStudiesSection/CaseStudiesSection.css) |
+| `home-page` | [src/app/page.css](src/app/page.css) |
+| `services-page` | [src/app/services/page.css](src/app/services/page.css) |
+
+The page blocks sit on the `<main>` element and carry no styling beyond
+`display: block` — sections own their own measure and rhythm (see §5).
+
+### Rules
+
+- **One block per stylesheet**, named after the component in kebab-case. A file
+  declares classes for its own block and nothing else. `Header.css` holds
+  `site-header`; the nav inside it is its own block in its own file, because
+  `site-header__nav-submenu-link` is not a name anyone wants to type.
+- **Every selector is a single class.** A 1:1 class-per-selector mapping is what
+  keeps specificity flat and predictable — the layout modifiers in
+  `solutions` depend on being exactly `(0,2,0)`, and a stray nested selector
+  silently outranks the media-query override written to beat it.
+  - Never nest a block's own element inside its block (`.solutions
+    .solutions__item`). It costs specificity and buys nothing.
+  - The one legitimate descendant selector is **a modifier reaching an element**:
+    `.solutions--no-stats .solutions__list`, `.hero--align-left .hero__content`.
+- **Modifiers are additive.** The markup carries the base class *and* the
+  modifier: `class="btn__arrow btn__arrow--diagonal"`. The base rule is written
+  once and each modifier states only what it changes — which is why
+  `btn__arrow--rise` needs no rest-state rule at all (straight at rest *is* the
+  base) and `testimonials__glyph--left` has no rules whatsoever.
+- **No camelCase, no hashes, no abbreviations.** Hyphenate multi-word parts:
+  `__stat-value`, `__brand-text`, `__card-wrap`, `__quote-mark`.
+- **In JSX, write a string literal**: `className="hero__title"`. Reach for a
+  template literal only when a modifier is conditional:
+  ```js
+  className={`solutions ${hasStats ? 'solutions--with-stats' : 'solutions--no-stats'}`}
+  ```
+  A map of authored values to modifiers (`ALIGN_CLASSES`, `ACCENT_CLASSES`) is
+  the pattern for CMS-driven variants.
+- **Class names are global now.** Before adding a block, check the name is free:
+  ```bash
+  grep -rn "\.your-block" src/
+  ```
+
+### Why not CSS Modules
+
+Modules append a hash (`HeroSection_hero__x7Kq2`), which makes the rendered DOM
+unreadable in devtools and in a page's view-source. BEM does the same job
+declaratively: the block prefix is the namespace, and it survives into the
+browser. The trade is that collisions are now prevented by discipline rather than
+by the compiler — hence the grep above.
+
+### Self-check
+
+```bash
+# a camelCase class in JSX, or a camelCase selector in CSS — both should be empty:
+grep -rnE 'className=\{?"[^"]*[a-z][A-Z]' src/
+grep -rnE '^\s*\.[a-z]+[A-Z]' src/
+
+# a CSS Module should never come back:
+grep -rn "module.css" src/
+```
+
+## 7. Open decisions
 
 These were judgement calls made during the initial build. Confirm with the user
 before relying on them as final:
@@ -449,7 +546,7 @@ before relying on them as final:
   desktop and tablet. Only the 81px width was specified; 33px is derived to hold
   the desktop box's 2.46 ratio (81 / 2.46 = 32.9), which is what lets
   `object-fit: contain` fill the box rather than letterbox. Note this is
-  the **first `<= 575px` block in `Header.module.css`** — the header previously
+  the **first `<= 575px` block in `Header.css`** — the header previously
   had a single `<= 1024px` block, so tablet keeps the desktop logo figures. If
   "mobile" was meant to cover the whole collapsed range, move these two rules up
   into the `<= 1024px` block instead.
@@ -800,7 +897,7 @@ before relying on them as final:
   `--fs-heading-md`, and the lede, solution copy and stat labels all take the
   **global `p` default** (`--fs-body-base`, 18px) with no font-size written in
   the module at all.
-- **`--color-text-muted` was added** — see §3. `HeroSection.module.css` was
+- **`--color-text-muted` was added** — see §3. `HeroSection.css` was
   repointed at it in the same change, so there is no `#4a4a4a` left in `src/`.
 - **`use_stats` picks a whole LAYOUT, not just whether a card shows.**
   - `true` — **split**: heading, lede and the blue stats card down a narrow left
@@ -1239,7 +1336,7 @@ before relying on them as final:
 - **The copyright line was removed.** The previous footer had one; neither
   reference image shows it. Add it back as a row inside `.inner` if it's needed
   for legal reasons.
-- **White is hardcoded as `#ffffff`**, matching `Button.module.css`, rather than
+- **White is hardcoded as `#ffffff`**, matching `Button.css`, rather than
   a new `--color-on-brand` token. If a third white-on-brand surface appears,
   promote it.
 - **The gradient stops are `--color-brand-dark` -> `--color-brand-darker` at

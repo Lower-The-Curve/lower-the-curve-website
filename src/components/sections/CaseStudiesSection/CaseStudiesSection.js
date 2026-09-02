@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
-import styles from './CaseStudiesSection.module.css';
+import './CaseStudiesSection.css';
 
 // The case studies section is a single `case_studies` metaobject with:
 //   - `title`       : single_line_text_field, the heading. Carries the accent
@@ -121,40 +121,42 @@ export default function CaseStudiesSection({ section }) {
 
   return (
     <section
-      className={`${styles.caseStudies} ${image ? styles.hasMedia : ''}`}
+      className={`case-studies ${
+        image ? 'case-studies--has-media' : ''
+      }`}
     >
-      <div className={styles.inner}>
+      <div className="case-studies__inner">
         {/* First in the DOM so it stacks ABOVE the copy when the grid collapses,
             which is what the narrow reference shows — no `order` needed. */}
         {image && (
-          <div className={styles.media}>
+          <div className="case-studies__media">
             <Image
               src={image.url}
               alt={image.altText ?? ''}
               width={image.width ?? 1000}
               height={image.height ?? 800}
-              className={styles.image}
+              className="case-studies__image"
               sizes="(max-width: 1024px) 100vw, 42vw"
               unoptimized={/\.svg(\?|$)/i.test(image.url)}
             />
           </div>
         )}
 
-        <div className={styles.content}>
+        <div className="case-studies__content">
           {title && (
-            <h2 className={styles.title}>
+            <h2 className="case-studies__title">
               {accentedTitle(title, {
-                accent: styles.accent,
-                blue: styles.blue,
-                green: styles.green,
+                accent: 'case-studies__accent',
+                blue: 'case-studies__accent--blue',
+                green: 'case-studies__accent--green',
               })}
             </h2>
           )}
 
           {description && (
-            <div className={styles.copy}>
+            <div className="case-studies__copy">
               {paragraphs(description).map((text, i) => (
-                <p key={i} className={styles.paragraph}>
+                <p key={i} className="case-studies__paragraph">
                   {text}
                 </p>
               ))}
@@ -166,7 +168,7 @@ export default function CaseStudiesSection({ section }) {
               href={button.url}
               variant="secondary"
               arrow="rise"
-              className={styles.button}
+              className="case-studies__button"
             >
               {buttonText}
             </Button>

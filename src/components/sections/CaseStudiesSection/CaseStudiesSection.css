@@ -1,4 +1,4 @@
-/* Case studies section. Device mockups on the left, heading + copy + CTA on the
+/* Case studies section — the `case-studies` BEM block. Device mockups on the left, heading + copy + CTA on the
    right; one centred column on tablet and phone with the image on top.
 
    Sizes come from the type scale in src/app/typography.css and colours from the
@@ -8,7 +8,7 @@
    40/32/32 and lands on both), body 18px / 16px (the `p` default,
    --fs-body-base, which is 18/16/16). Both requested sizes are already on the
    scale, so this section adds no tokens. */
-.caseStudies {
+.case-studies {
   position: relative;
   /* Own stacking context, so any future decorative layer's z-index: -1 stays
      inside the section. Same arrangement as SolutionsSection. */
@@ -16,7 +16,7 @@
   overflow: clip;
 }
 
-.inner {
+.case-studies__inner {
   /* Sections own their measure and their rhythm; the page's `main` adds neither.
      See DESIGN-SYSTEM.md §5. */
   max-width: var(--max-width);
@@ -32,23 +32,23 @@
 
 /* ~40 / 60, measured off the reference. Only applied when there is actually an
    image to put in the first column. */
-.hasMedia .inner {
+.case-studies--has-media .case-studies__inner {
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
 }
 
 /* --- MEDIA -------------------------------------------------------------- */
-.media {
+.case-studies__media {
   min-width: 0;
 }
 
-.image {
+.case-studies__image {
   display: block;
   width: 100%;
   height: auto;
 }
 
 /* --- CONTENT ------------------------------------------------------------ */
-.content {
+.case-studies__content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -58,7 +58,7 @@
 /* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
    which is --fs-heading-md. Regular weight like the other section headings: the
    emphasis comes from the accented runs, which are the only bold part. */
-.title {
+.case-studies__title {
   font-size: var(--fs-heading-md);
   font-weight: 400;
   line-height: 1.2;
@@ -75,17 +75,17 @@
 
 /* The accented runs. The weight lives here rather than on each colour, so "the
    accented words are the bold ones" is stated once. */
-.accent {
+.case-studies__accent {
   font-weight: 700;
 }
 
 /* Flat fills first, so the words are always readable. The gradients below only
    replace them where clipping a background to the glyphs actually works. */
-.blue {
+.case-studies__accent--blue {
   color: var(--color-brand);
 }
 
-.green {
+.case-studies__accent--green {
   color: var(--color-accent-green);
 }
 
@@ -94,8 +94,8 @@
    invisible words. Delete this block to revert to the flat colours above. */
 @supports ((background-clip: text) or (-webkit-background-clip: text)) and
   (-webkit-text-fill-color: transparent) {
-  .blue,
-  .green {
+  .case-studies__accent--blue,
+  .case-studies__accent--green {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -104,7 +104,7 @@
 
   /* Bright blue at the top-left, dark at the bottom-right — the headline order,
      mirrored from the buttons'. See DESIGN-SYSTEM.md §3. */
-  .blue {
+  .case-studies__accent--blue {
     background-image: linear-gradient(
       135deg,
       var(--color-brand),
@@ -112,7 +112,7 @@
     );
   }
 
-  .green {
+  .case-studies__accent--green {
     background-image: linear-gradient(
       135deg,
       var(--color-accent-green-dark),
@@ -123,23 +123,23 @@
 
 /* The three blocks of body copy. Gap rather than paragraph margins, because the
    global `p` rule zeroes those. */
-.copy {
+.case-studies__copy {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 /* 18px desktop / 16px mobile comes from the global `p` rule (--fs-body-base) —
-   no font-size needed here, and one on .copy would never reach the paragraphs
+   no font-size needed here, and one on .case-studies__copy would never reach the paragraphs
    anyway (a directly matching rule beats an inherited one; DESIGN-SYSTEM.md §2). */
-.paragraph {
+.case-studies__paragraph {
   color: var(--color-text-muted);
   /* multi_line_text_field: single line breaks inside a paragraph are authored
      and meaningful. Blank lines already became separate paragraphs. */
   white-space: pre-line;
 }
 
-.button {
+.case-studies__button {
   margin-top: 0.5rem;
 }
 
@@ -148,28 +148,28 @@
    order needs no `order` property.
    ---------------------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .hasMedia .inner {
+  .case-studies--has-media .case-studies__inner {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .content {
+  .case-studies__content {
     align-items: center;
     text-align: center;
   }
 
-  .paragraph {
+  .case-studies__paragraph {
     max-width: 60ch;
   }
 }
 
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 @media (max-width: 575px) {
-  .inner {
+  .case-studies__inner {
     padding: 3rem var(--space);
     gap: 2rem;
   }
 
-  .copy {
+  .case-studies__copy {
     gap: 1.25rem;
   }
 }

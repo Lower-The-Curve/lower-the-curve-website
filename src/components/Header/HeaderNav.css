@@ -1,0 +1,245 @@
+/* The header's nav list plus its CTA — the `site-nav` BEM block. The bar and the
+   capsule around it are the `site-header` block, in Header.css.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw values here.
+
+   Desktop (>= 1025px): an inline row inside the header capsule, 50px between
+                        items.
+   <= 1024px:           the same element becomes a full-height drawer sliding in
+                        from the left, with the toggle to the left of the logo.
+                        The site's existing tier — no new breakpoint.
+
+   The toggle and the scrim are siblings of the nav in the DOM rather than
+   children of it (the drawer is fixed-positioned, they are not), but they belong
+   to this block and are named for it. */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.site-nav__menu {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav__item {
+  position: relative;
+}
+
+.site-nav__link {
+  display: inline-block;
+  /* Desktop only — the <= 1024px block below overrides this with
+     --fs-heading-sm for the drawer. */
+  font-size: var(--fs-body-base); /* 18px desktop */
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-ink);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.site-nav__link:hover,
+.site-nav__link:focus-visible {
+  color: var(--color-brand);
+}
+
+.site-nav__cta {
+  flex-shrink: 0;
+}
+
+/* --- SUBMENU: hidden until its parent item is hovered/focused ----------- */
+.site-nav__submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 14rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.site-nav__item:hover .site-nav__submenu,
+.site-nav__item:focus-within .site-nav__submenu {
+  display: flex;
+}
+
+.site-nav__sublink {
+  display: block;
+  padding: 0.25rem 0;
+  font-size: var(--fs-body-sm);
+  color: var(--color-ink);
+  transition: color 0.2s ease;
+}
+
+.site-nav__sublink:hover,
+.site-nav__sublink:focus-visible {
+  color: var(--color-brand);
+}
+
+/* --- TOGGLE (hidden on desktop) ---------------------------------------- */
+.site-nav__toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.site-nav__toggle:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* One of the hamburger's three lines. */
+.site-nav__toggle-bar {
+  display: block;
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-ink);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Drawer close control. Hidden on desktop, where the nav is an inline row. */
+.site-nav__close {
+  display: none;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.site-nav__close:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Tap-outside scrim behind the drawer. Never shown on desktop. */
+.site-nav__scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.35);
+  transition: opacity 0.28s ease;
+}
+
+/* --- TABLET + MOBILE (<= 1024px) ---------------------------------------
+   Closed state keeps the capsule, with the hamburger on the left and the logo
+   on the right. Opening slides a full-height drawer in from the left.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  /* order:-1 puts the hamburger ahead of the logo, so the capsule's
+     space-between reads toggle-left / logo-right. */
+  .site-nav__toggle {
+    display: flex;
+    order: -1;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(75%, 320px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3rem;
+    padding: 1.5rem 1.5rem 2rem;
+    border-radius: 0 20px 20px 0;
+    /* Light neutral drawer fill from the design. */
+    background: #e6e6e6;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
+    overflow-y: auto;
+    /* visibility (not display) so the panel can transition, and so a closed
+       drawer stays out of the tab order. */
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.28s ease, visibility 0.28s ease;
+  }
+
+  .site-nav--open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .site-nav__close {
+    display: inline-flex;
+  }
+
+  /* Gap scaled with the label size to keep the drawer's approved rhythm
+     (~3.4x the label height between items). */
+  .site-nav__menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3.25rem;
+  }
+
+  /* 24px on mobile, per spec — and 24px on tablet too. This read
+     --fs-heading-md until that token was raised to 32px on mobile for the
+     solutions heading; --fs-heading-sm is 24px at BOTH narrow tiers, so the swap
+     kept the spec'd mobile size AND closed the open question about the drawer
+     rendering 32px on tablet. */
+  .site-nav__link {
+    font-size: var(--fs-heading-sm);
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  /* Nested items sit inline in the drawer — there is no hover on touch. */
+  .site-nav__submenu {
+    position: static;
+    display: flex;
+    min-width: 0;
+    margin: 1rem 0 0 1rem;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* The reference mobile design shows no CTA in the drawer. */
+  .site-nav__cta {
+    display: none;
+  }
+
+  .site-nav__scrim {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .site-nav__scrim--open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styles from './PartnersSection.module.css';
+import './PartnersSection.css';
 
 // The partners section is a single `partners` metaobject with:
 //   - `title`        : the section heading
@@ -93,7 +93,7 @@ function emphasizedTitle(title) {
   for (const match of title.matchAll(EMPHASIS)) {
     if (match.index > cursor) parts.push(title.slice(cursor, match.index));
     parts.push(
-      <strong key={match.index} className={styles.emphasis}>
+      <strong key={match.index} className="partners__emphasis">
         {match[2]}
       </strong>
     );
@@ -112,11 +112,11 @@ export default function PartnersSection({ section }) {
   if (!items.length) return null;
 
   return (
-    <section className={styles.partners}>
-      <div className={styles.inner}>
-        {title && <h2 className={styles.title}>{emphasizedTitle(title)}</h2>}
+    <section className="partners">
+      <div className="partners__inner">
+        {title && <h2 className="partners__title">{emphasizedTitle(title)}</h2>}
 
-        <ul className={styles.grid}>
+        <ul className="partners__grid">
           {items.map((item) => {
             const name =
               fieldValue(item, 'name', 'title', 'button_text') ?? item.handle;
@@ -129,19 +129,19 @@ export default function PartnersSection({ section }) {
                 alt={logo.altText ?? name ?? ''}
                 width={logo.width ?? 200}
                 height={logo.height ?? 100}
-                className={styles.logo}
+                className="partners__logo"
                 unoptimized={/\.svg(\?|$)/i.test(logo.url)}
               />
             ) : (
-              <span className={styles.name}>{name}</span>
+              <span className="partners__name">{name}</span>
             );
 
             return (
-              <li key={item.id} className={styles.item}>
+              <li key={item.id} className="partners__item">
                 {url ? (
                   <a
                     href={url}
-                    className={styles.link}
+                    className="partners__link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

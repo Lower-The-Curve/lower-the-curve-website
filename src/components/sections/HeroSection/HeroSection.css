@@ -1,4 +1,4 @@
-/* Hero section. Full-bleed artwork filling the first screen, a centred headline
+/* Hero section — the `hero` BEM block. Full-bleed artwork filling the first screen, a centred headline
    with two accented words, and the scroll cue sitting low in the section.
 
    Sizes come from the type scale in src/app/typography.css and colours from the
@@ -6,10 +6,10 @@
 
    FULL-BLEED: the section is a direct child of the page's `main`, which adds no
    max-width of its own (sections own their measure), so .hero spans the viewport
-   and .content re-applies --max-width for the text. */
+   and .hero__content re-applies --max-width for the text. */
 .hero {
   position: relative;
-  /* Own stacking context, so .backdrop's z-index: -1 stays inside the section
+  /* Own stacking context, so .hero__backdrop's z-index: -1 stays inside the section
      and can never slide behind the page background. .hero itself keeps z-index
      auto, which is what lets the header (z-index: 100) paint over the artwork. */
   isolation: isolate;
@@ -23,7 +23,7 @@
      THIS SUBTRACTION IS LOAD-BEARING, INCLUDING ON MOBILE. The header is
      `position: relative`, so it sits in flow and takes --header-height above this
      section; the hero's own box gets the remainder, and the two together are
-     exactly one screen. The hero still READS as full-screen because .backdrop is
+     exactly one screen. The hero still READS as full-screen because .hero__backdrop is
      pulled up under the transparent header, so the artwork does span the whole
      viewport — only the text box stops short.
 
@@ -54,7 +54,7 @@
    through it as they do in the design. Only this layer is offset — the section's
    own box stays in flow, so no negative margins leak into the page layout.
    ---------------------------------------------------------------------- */
-.backdrop {
+.hero__backdrop {
   position: absolute;
   top: calc(-1 * var(--header-height));
   right: 0;
@@ -67,13 +67,13 @@
 /* `cover` rather than `contain`: the artwork is a soft gradient wash with no
    detail to protect, so filling the screen matters more than showing all of it.
    Anchored to the top, which is where the blobs that frame the header live. */
-.backdropImage {
+.hero__image {
   object-fit: cover;
   object-position: center top;
 }
 
 /* --- CONTENT ------------------------------------------------------------ */
-.content {
+.hero__content {
   grid-row: 1;
   align-self: center;
   width: 100%;
@@ -86,7 +86,7 @@
 
 /* Regular weight, unlike the other headings on the site — the emphasis in this
    headline comes from the accented words below, which are the only bold part. */
-.title {
+.hero__title {
   font-size: var(--fs-heading-xl);
   font-weight: 400;
   line-height: 1.2;
@@ -97,20 +97,20 @@
   max-width: 13ch;
 }
 
-/* The accented runs in the headline. The weight lives on .accent rather than on
+/* The accented runs in the headline. The weight lives on .hero__accent rather than on
    each colour, so "the accented words are the bold ones" is stated once and a
    third colour can't be added without it. */
-.accent {
+.hero__accent {
   font-weight: 700;
 }
 
 /* Flat fills first, so the words are always readable. The gradient below only
    replaces them where clipping a background to the glyphs actually works. */
-.green {
+.hero__accent--green {
   color: var(--color-accent-green);
 }
 
-.blue {
+.hero__accent--blue {
   color: var(--color-brand);
 }
 
@@ -127,15 +127,15 @@
    carry the right colours. */
 @supports ((background-clip: text) or (-webkit-background-clip: text)) and
   (-webkit-text-fill-color: transparent) {
-  .green,
-  .blue {
+  .hero__accent--green,
+  .hero__accent--blue {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
   }
 
-  .green {
+  .hero__accent--green {
     background-image: linear-gradient(
       135deg,
       var(--color-accent-green-dark),
@@ -149,7 +149,7 @@
      135deg the FIRST stop is the top-left end, which is the only reason the
      order differs from the `--color-brand-dark, --color-brand` written in
      DESIGN-SYSTEM.md — same colours, same angle, mirrored. */
-  .blue {
+  .hero__accent--blue {
     background-image: linear-gradient(
       135deg,
       var(--color-brand),
@@ -158,9 +158,9 @@
   }
 }
 
-/* The `p` element itself carries the size — a font-size on .content would never
+/* The `p` element itself carries the size — a font-size on .hero__content would never
    reach it, because the global `p` rule matches directly. See DESIGN-SYSTEM.md. */
-.description {
+.hero__description {
   margin: 0;
   font-size: var(--fs-body-xl);
   color: var(--color-text-muted);
@@ -170,7 +170,7 @@
 }
 
 /* --- SCROLL CUE --------------------------------------------------------- */
-.scroll {
+.hero__scroll {
   grid-row: 2;
   width: 100%;
   max-width: var(--max-width);
@@ -184,17 +184,17 @@
   color: var(--color-brand);
 }
 
-.scrollText {
+.hero__scroll-text {
   font-size: var(--fs-body-xs);
   font-weight: 600;
   line-height: 1.3;
   text-align: center;
   /* Breaks "Scroll down to Explore more" onto the design's two lines. Same
-     reasoning as .title's measure — in `ch`, so it survives the tier changes. */
+     reasoning as .hero__title's measure — in `ch`, so it survives the tier changes. */
   max-width: 14ch;
 }
 
-.scrollIcon {
+.hero__scroll-icon {
   display: block;
 }
 
@@ -202,20 +202,20 @@
    Driven by the metaobject's `content_align` field. The measure wrappers stay
    centred on the page either way; only the text inside them moves.
    ---------------------------------------------------------------------- */
-.alignCenter .content,
-.alignCenter .scroll {
+.hero--align-center .hero__content,
+.hero--align-center .hero__scroll {
   align-items: center;
   text-align: center;
 }
 
-.alignLeft .content,
-.alignLeft .scroll {
+.hero--align-left .hero__content,
+.hero--align-left .hero__scroll {
   align-items: flex-start;
   text-align: left;
 }
 
-.alignRight .content,
-.alignRight .scroll {
+.hero--align-right .hero__content,
+.hero--align-right .hero__scroll {
   align-items: flex-end;
   text-align: right;
 }
@@ -256,9 +256,9 @@
    happen in CSS. `next/image` has no <picture>/<source> form, and this
    two-element swap is the documented way to art-direct with it.
 
-   These classes are only applied when a mobile image is actually authored — with
-   one image it carries every width and neither rule matches, so the hero can
-   never end up with both hidden.
+   These MODIFIERS are only applied when a mobile image is actually authored —
+   with one image it carries a bare .hero__image, neither rule below matches, and
+   the hero can never end up with both images hidden.
 
    575px is the site's mobile tier, matching SolutionsSection and GetInTouch. If
    the landscape desktop artwork also reads badly on a tablet, move both rules to
@@ -273,16 +273,16 @@
    priority images, and it is why a second asset should only be added when it
    genuinely improves the composition.
    ---------------------------------------------------------------------- */
-.narrow {
+.hero__image--narrow {
   display: none;
 }
 
 @media (max-width: 575px) {
-  .wide {
+  .hero__image--wide {
     display: none;
   }
 
-  .narrow {
+  .hero__image--narrow {
     display: block;
   }
 }
