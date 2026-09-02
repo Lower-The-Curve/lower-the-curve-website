@@ -1,0 +1,9 @@
+/* The home page — the `home-page` BEM block, on the <main> element.
+
+   Every section owns its own measure (`max-width: var(--max-width)` plus
+   gutters) and its own vertical rhythm, so this deliberately adds neither.
+   That's what lets a full-bleed section — the hero's background artwork —
+   reach the viewport edges instead of being capped at --max-width. */
+.home-page {
+  display: block;
+}

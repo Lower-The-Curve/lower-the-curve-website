@@ -1,0 +1,161 @@
+/* Pill button. Sizes come from the type scale in src/app/typography.css — never
+   hardcode a font-size here. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625em;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* --- SIZES ---------------------------------------------------------------
+   Padding is in `em`, so it scales with the label size automatically.
+   ---------------------------------------------------------------------- */
+.btn--md {
+  font-size: var(--fs-body-sm); /* 16px desktop */
+  padding: 0.875em 1.75em;
+}
+
+.btn--sm {
+  font-size: var(--fs-body-xs); /* 14px desktop */
+  padding: 0.8em 1.5em;
+}
+
+/* --- VARIANTS ----------------------------------------------------------- */
+.btn--primary {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-dark),
+    var(--color-brand)
+  );
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.btn--primary:hover {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-darker),
+    var(--color-brand-dark)
+  );
+}
+
+/* Flat fill, no gradient. Both colours are overridable per instance through the
+   --btn-bg / --btn-fg custom properties, so a CMS-authored colour can drive the
+   button without a bespoke class. Hover darkens whatever fill it was given. */
+.btn--solid {
+  background-color: var(--btn-bg, var(--color-brand));
+  color: var(--btn-fg, #ffffff);
+  border-color: transparent;
+}
+
+.btn--solid:hover {
+  filter: brightness(0.9);
+}
+
+/* White pill for use ON a brand-coloured surface — the footer's get-in-touch
+   band. `secondary` is the same white fill and blue label, but its hover inverts
+   to a solid brand fill, which over a blue background would make the button
+   vanish into it. This one has no border and stays light on hover instead.
+   --color-brand-tint's only consumer, now that secondary stopped using it. */
+.btn--inverse {
+  background-color: #ffffff;
+  color: var(--color-brand);
+  border-color: transparent;
+}
+
+.btn--inverse:hover {
+  background-color: var(--color-brand-tint);
+}
+
+.btn--secondary {
+  background-color: #ffffff;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+/* An outlined pill needs a hover you can actually see. This was
+   `background-color: var(--color-brand-tint)` — #ffffff to #eef4ff, a ~3%
+   luminance step that read as nothing, especially on the frosted white cards in
+   SolutionsSection. Confirmed in-browser that it fired; it just wasn't visible.
+   Inverting to the brand fill is unmistakable and reuses tokens already here. */
+.btn--secondary:hover {
+  background-color: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+}
+
+/* The secondary arrow is stroked with the brand GRADIENT, which would vanish on
+   the blue fill above. A CSS `stroke` beats the SVG's stroke="url(#...)"
+   presentation attribute, so this repaints it white — for the hovered button only.
+   NOT done by recolouring the gradient's stops: every arrow on the page ships the
+   same `ltcArrowGradient` id, so url(#...) resolves to the FIRST definition in the
+   document and one button's hover would repaint every arrow on the page. */
+.btn--secondary:hover .btn__arrow path {
+  stroke: #ffffff;
+}
+
+/* --- LABEL -------------------------------------------------------------- */
+/* No rules of its own — the pill's flex layout and the type token on .btn--md /
+   .btn--sm already size and place it. It exists so the label is nameable from the
+   markup rather than being an anonymous <span>. */
+
+/* --- ARROW --------------------------------------------------------------
+   ONE element class plus a direction modifier. .btn__arrow is always present, so
+   the shared rules below are written once and each modifier only states what it
+   changes — which is why `--rise` needs no rest-state rule at all: straight at
+   rest IS the base.
+   ---------------------------------------------------------------------- */
+.btn__arrow {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* So the secondary arrow's repaint eases in with the fill rather than snapping. */
+.btn__arrow path {
+  transition: stroke 0.2s ease;
+}
+
+/* ↗ same SVG, rotated. Negative angle because the SVG's Y axis points down. */
+.btn__arrow--diagonal {
+  transform: rotate(-45deg);
+}
+
+.btn:hover .btn__arrow {
+  transform: translateX(3px);
+}
+
+/* `rise` is straight at rest and swings up to the diagonal on hover, so from here
+   on it behaves exactly like `diagonal` — hence the shared selector. It stays its
+   own value rather than becoming a change to `right`'s hover, because `right` is
+   what the header CTA uses and it should keep pointing where it points. The nudge
+   is composed AFTER the rotation, so it travels along the arrow's new axis (up and
+   to the right) instead of sideways.
+
+   Both of these are (0,3,0) like the rule above and come after it, so they win. */
+.btn:hover .btn__arrow--diagonal,
+.btn:hover .btn__arrow--rise {
+  transform: rotate(-45deg) translateX(3px);
+}

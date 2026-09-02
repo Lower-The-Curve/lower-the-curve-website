@@ -1,0 +1,288 @@
+/* Hero section — the `hero` BEM block. Full-bleed artwork filling the first screen, a centred headline
+   with two accented words, and the scroll cue sitting low in the section.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   FULL-BLEED: the section is a direct child of the page's `main`, which adds no
+   max-width of its own (sections own their measure), so .hero spans the viewport
+   and .hero__content re-applies --max-width for the text. */
+.hero {
+  position: relative;
+  /* Own stacking context, so .hero__backdrop's z-index: -1 stays inside the section
+     and can never slide behind the page background. .hero itself keeps z-index
+     auto, which is what lets the header (z-index: 100) paint over the artwork. */
+  isolation: isolate;
+  /* CMS-authored spacing (margin_top / margin_bottom, in px). Defaults cover a
+     section rendered without the fields set at all. */
+  margin-top: var(--hero-margin-top, 0px);
+  margin-bottom: var(--hero-margin-bottom, 0px);
+  /* The artwork reaches up under the header, so the section only needs the rest
+     of the first screen. svh keeps mobile browser chrome from adding a scroll.
+
+     THIS SUBTRACTION IS LOAD-BEARING, INCLUDING ON MOBILE. The header is
+     `position: relative`, so it sits in flow and takes --header-height above this
+     section; the hero's own box gets the remainder, and the two together are
+     exactly one screen. The hero still READS as full-screen because .hero__backdrop is
+     pulled up under the transparent header, so the artwork does span the whole
+     viewport — only the text box stops short.
+
+     A plain `min-height: 100svh` here was tried and reverted: measured in Chrome
+     at 375x667, 390x844 and 320x568, it put the section's bottom edge 93px past
+     the fold at every size and pushed the scroll cue out of view on load (its
+     bottom landed at 712 against a 667 viewport). Header height cannot be
+     reclaimed by making this taller — only by taking the header out of flow.
+
+     --hero-fold-gutter is slack subtracted from that height. Zero on desktop,
+     where the viewport is static and the section can land exactly on the fold;
+     see the mobile block for why a phone cannot. */
+  --hero-fold-gutter: 0px;
+  min-height: calc(100vh - var(--header-height) - var(--hero-fold-gutter));
+  min-height: calc(100svh - var(--header-height) - var(--hero-fold-gutter));
+  display: grid;
+  /* Two rows: the headline block takes the slack and centres in it, the scroll
+     cue sits at the bottom. This is what puts the cue low in the section without
+     taking it out of flow, so it can never overlap the headline on a short
+     viewport. */
+  grid-template-rows: 1fr auto;
+  padding: 0 var(--space) 3rem;
+}
+
+/* --- BACKDROP -----------------------------------------------------------
+   Pulled up by exactly the header's height so the artwork's top edge lands at
+   the very top of the page. The header's fill is translucent, so the blobs read
+   through it as they do in the design. Only this layer is offset — the section's
+   own box stays in flow, so no negative margins leak into the page layout.
+   ---------------------------------------------------------------------- */
+.hero__backdrop {
+  position: absolute;
+  top: calc(-1 * var(--header-height));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* `cover` rather than `contain`: the artwork is a soft gradient wash with no
+   detail to protect, so filling the screen matters more than showing all of it.
+   Anchored to the top, which is where the blobs that frame the header live. */
+.hero__image {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* --- CONTENT ------------------------------------------------------------ */
+.hero__content {
+  grid-row: 1;
+  align-self: center;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Regular weight, unlike the other headings on the site — the emphasis in this
+   headline comes from the accented words below, which are the only bold part. */
+.hero__title {
+  font-size: var(--fs-heading-xl);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  /* A measure, not a fixed width. `ch` scales with the heading token, so the
+     design's three-line break ("Let’s Launch a / Shopify Store / with us")
+     holds at 64px, 52px and 40px without a media query. */
+  max-width: 13ch;
+}
+
+/* The accented runs in the headline. The weight lives on .hero__accent rather than on
+   each colour, so "the accented words are the bold ones" is stated once and a
+   third colour can't be added without it. */
+.hero__accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradient below only
+   replaces them where clipping a background to the glyphs actually works. */
+.hero__accent--green {
+  color: var(--color-accent-green);
+}
+
+.hero__accent--blue {
+  color: var(--color-brand);
+}
+
+/* The metafield names these classes `green-gradient` / `blue-gradient`, so the
+   accents are gradient-filled rather than flat: paint the brand gradient as a
+   background and clip it to the letterforms.
+
+   Guarded, because the trick needs BOTH background-clip: text and
+   text-fill-color — without the second one, `color: transparent` would render
+   invisible words. -webkit- prefixes stay: background-clip is unprefixed now,
+   but text-fill-color never was.
+
+   To go back to flat colour, delete this whole block — the rules above already
+   carry the right colours. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .hero__accent--green,
+  .hero__accent--blue {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+
+  /* The brand gradient's two blues on the design's 135deg diagonal, but with the
+     stops in the reverse order to the buttons: bright at the top-left, dark at
+     the bottom-right, so the darker blue lands on the right of the word. At
+     135deg the FIRST stop is the top-left end, which is the only reason the
+     order differs from the `--color-brand-dark, --color-brand` written in
+     DESIGN-SYSTEM.md — same colours, same angle, mirrored. */
+  .hero__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+}
+
+/* The `p` element itself carries the size — a font-size on .hero__content would never
+   reach it, because the global `p` rule matches directly. See DESIGN-SYSTEM.md. */
+.hero__description {
+  margin: 0;
+  font-size: var(--fs-body-xl);
+  color: var(--color-text-muted);
+  max-width: 48ch;
+  /* multi_line_text_field: authored line breaks are meaningful. */
+  white-space: pre-line;
+}
+
+/* --- SCROLL CUE --------------------------------------------------------- */
+.hero__scroll {
+  grid-row: 2;
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  /* Colours the label only — the chevrons below carry their own brand gradient
+     rather than inheriting currentColor. */
+  color: var(--color-brand);
+}
+
+.hero__scroll-text {
+  font-size: var(--fs-body-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  /* Breaks "Scroll down to Explore more" onto the design's two lines. Same
+     reasoning as .hero__title's measure — in `ch`, so it survives the tier changes. */
+  max-width: 14ch;
+}
+
+.hero__scroll-icon {
+  display: block;
+}
+
+/* --- CONTENT ALIGNMENT --------------------------------------------------
+   Driven by the metaobject's `content_align` field. The measure wrappers stay
+   centred on the page either way; only the text inside them moves.
+   ---------------------------------------------------------------------- */
+.hero--align-center .hero__content,
+.hero--align-center .hero__scroll {
+  align-items: center;
+  text-align: center;
+}
+
+.hero--align-left .hero__content,
+.hero--align-left .hero__scroll {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero--align-right .hero__content,
+.hero--align-right .hero__scroll {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* --- MOBILE (<= 575px) --------------------------------------------------
+   The section ends clear of the fold instead of exactly on it.
+
+   Measured in Chrome across 320x568 through 575x800, `100svh - header` puts the
+   section's bottom edge at EXACTLY the fold — 0px of slack — and the header
+   token matches the rendered header to the pixel at every one of those sizes. So
+   the arithmetic is right, and on a static viewport nothing is cut off.
+
+   A phone's viewport is not static. The visible area moves as browser chrome
+   shows and hides, iOS Safari's bottom bar and the home indicator eat into it,
+   in-app browsers add their own furniture, and anything below iOS 15.4 has no
+   `svh` at all and falls back to the `vh` line — where 100vh is measured against
+   the LARGEST viewport and is taller than what you can see. Every one of those
+   costs a handful of pixels, and against 0px of slack every one of them turns
+   into "scroll a little to see the bottom of the section".
+
+   So the fold gutter buys tolerance. It also leaves a sliver of the next section
+   showing, which reads as a deliberate hint that the page continues rather than
+   as a gap. Raise it if the section still crowds the fold on a real device; it is
+   the one value to touch.
+   ---------------------------------------------------------------------- */
+@media (max-width: 575px) {
+  .hero {
+    --hero-fold-gutter: 2rem;
+    /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
+       tight under the headline — this gives the gutter back to the content. */
+    padding-bottom: 2rem;
+  }
+}
+
+/* --- ART DIRECTION (mobile artwork) -------------------------------------
+   Both backdrop images are rendered and one is hidden, because HeroSection is a
+   Server Component: there is no viewport at render time, so the swap has to
+   happen in CSS. `next/image` has no <picture>/<source> form, and this
+   two-element swap is the documented way to art-direct with it.
+
+   These MODIFIERS are only applied when a mobile image is actually authored —
+   with one image it carries a bare .hero__image, neither rule below matches, and
+   the hero can never end up with both images hidden.
+
+   575px is the site's mobile tier, matching SolutionsSection and GetInTouch. If
+   the landscape desktop artwork also reads badly on a tablet, move both rules to
+   1024px — it is a one-value change, but it is a design call, so it is not made
+   here.
+
+   `display: none` and not `visibility`/opacity: the point is to stop the browser
+   fetching the artwork that is not in use. Next's lazy loader would normally do
+   that, but both images carry `priority` (this is the LCP element), so they are
+   preloaded eagerly — display:none is what keeps the unused one out of the way
+   visually. Both do get fetched; that is the cost of art direction with two
+   priority images, and it is why a second asset should only be added when it
+   genuinely improves the composition.
+   ---------------------------------------------------------------------- */
+.hero__image--narrow {
+  display: none;
+}
+
+@media (max-width: 575px) {
+  .hero__image--wide {
+    display: none;
+  }
+
+  .hero__image--narrow {
+    display: block;
+  }
+}

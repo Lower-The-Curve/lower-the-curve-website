@@ -1,0 +1,8 @@
+/* The services page — the `services-page` BEM block, on the <main> element.
+
+   Same as the home page: sections own their measure and spacing, so this is a
+   plain full-width flow container and a full-bleed section (the hero) can reach
+   the viewport edges. */
+.services-page {
+  display: block;
+}

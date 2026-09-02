@@ -7,7 +7,8 @@
 import {
   getHomePageQuery,
   getServicesPageQuery,
-  getPartnersQuery,
+  getHeaderQuery,
+  getFooterQuery,
 } from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
@@ -157,8 +158,14 @@ const getMenuQuery = /* GraphQL */ `
 function toRelativePath(url) {
   if (!url) return '/';
   try {
-    const { pathname, search, hash } = new URL(url);
-    return `${pathname}${search}${hash}`;
+    const parsed = new URL(url);
+
+    // Only web URLs have a path worth relativizing. mailto: and tel: would
+    // otherwise be shredded — `new URL('mailto:a@b.com').pathname` is
+    // "a@b.com", which as an href is a broken relative link, not an email.
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return url;
+
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
   } catch {
     // Already a relative path (or unparseable) — return as-is.
     return url;
@@ -190,6 +197,40 @@ export async function getMenu(handle = 'main-menu') {
       path: toRelativePath(sub.url),
     })),
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Site chrome — header
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch the `header` metaobject (logo, menu handle, CTA link + colours).
+ * There is a single header entry, so we return the first node.
+ *
+ * @returns {Promise<object|null>} The header node, or null if none exists.
+ */
+export async function getHeader() {
+  const { body } = await shopifyFetch({
+    query: getHeaderQuery,
+    variables: { first: 1 },
+  });
+
+  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
+}
+
+/**
+ * Fetch the `footer` metaobject (logo, three column titles, three menu handles).
+ * There is a single footer entry, so we return the first node.
+ *
+ * @returns {Promise<object|null>} The footer node, or null if none exists.
+ */
+export async function getFooter() {
+  const { body } = await shopifyFetch({
+    query: getFooterQuery,
+    variables: { first: 1 },
+  });
+
+  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -284,21 +325,6 @@ export async function getHomePage() {
   });
 
   return body?.data?.metaobject ?? null;
-}
-
-/**
- * Fetch the `partners` section metaobject (holds a title + a list of partner
- * items). There is a single partners section, so we return the first node.
- *
- * @returns {Promise<object|null>} The partners section node, or null if none.
- */
-export async function getPartners() {
-  const { body } = await shopifyFetch({
-    query: getPartnersQuery,
-    variables: { first: 1 },
-  });
-
-  return body?.data?.metaobjects?.edges?.[0]?.node ?? null;
 }
 
 /**

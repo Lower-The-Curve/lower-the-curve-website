@@ -1,16 +1,61 @@
 :root {
   --color-bg: #ffffff;
   --color-text: #1a1a1a;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-  --max-width: 72rem;
+  /* Near-black used for navigation / high-contrast UI labels in the design.
+     Deliberately darker than --color-text. */
+  --color-ink: #010101;
+  /* Muted body grey — the lede under a headline and the supporting copy in a
+     card, which the design sets lighter than --color-text. Promoted to a token
+     on its second consumer (the hero lede and the solutions copy). 8.6:1 on
+     white, so it is safe at any size. */
+  --color-text-muted: #4a4a4a;
+
+  /* Brand blues, taken from the button/arrow gradient in the design. */
+  --color-brand: #106cfd;
+  --color-brand-dark: #004bc9;
+  --color-brand-darker: #003a9e;
+  --color-brand-tint: #eef4ff;
+
+  /* Secondary accent, the green half of the brand pair (the hero's green blobs,
+     the green word in the hero headline). Derived from the hue of the hero
+     artwork's green gradient, darkened until it clears 3:1 on white — the
+     large-text contrast floor, which is all it's used for. --color-brand sits at
+     4.58:1, so this is the looser of the two; do not use it for body copy.
+     See DESIGN-SYSTEM.md. */
+  --color-accent-green: #3ba952;
+  /* Dark end of the green gradient, the counterpart of --color-brand-dark. Same
+     hue and saturation as --color-accent-green, darkened to 5.5:1 so the
+     gradient reads as a gradient while every pixel of it stays above the 3:1
+     large-text floor. */
+  --color-accent-green-dark: #2a773a;
+
+  --font-sans: var(--font-poppins), sans-serif;
+  /* The page measure, site-wide: 78rem = 1248px. Every section, the header
+     capsule and the footer all read this one value, so the page has a single
+     edge that everything lines up to. */
+  --max-width: 78rem;
   --space: 1rem;
+
+  /* Rendered height of the site header: 0.75rem padding top and bottom around
+     an 80px capsule. The header enforces it (Header.css sets the capsule's
+     min-height from this token), and full-bleed sections read it to slide their
+     artwork up under the transparent header. */
+  --header-height: 104px;
+}
+
+/* The header's logo box shrinks on phones (33px tall against 50px), so the row
+   is shorter here. Mirrors the <= 575px block in Header.css. */
+@media (max-width: 575px) {
+  :root {
+    --header-height: 93px;
+  }
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  font-family: var(--font-sans);
 }
 
 html,
@@ -25,6 +70,14 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
+  font-size: inherit;
 }
 
 a {

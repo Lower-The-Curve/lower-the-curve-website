@@ -1,0 +1,175 @@
+/* The get-in-touch band — the `get-in-touch` BEM block: a full-bleed piece of artwork with a centred headline,
+   lede and CTA over it. Sits at the top of the footer, so it is on every page.
+
+   Its two type sizes are OFF the main scale and have their own tokens,
+   --fs-cta-title (46/38/30) and --fs-cta-body (24/18/14) — see the note in
+   typography.css for why they could not be points on it.
+
+   THE ARTWORK IS TRANSPARENT. It is three blurred shapes — two grey (#BFBFBF) at
+   the sides, one brand-blue at the bottom centre — sitting mostly BELOW its own
+   viewBox, with no background fill of any kind. So this band has to paint its own
+   white base: without it the footer's blue gradient (this is inside <footer>)
+   shows straight through and the whole band reads solid blue.
+
+   That base is why the headline is dark and the lede is white — they sit on
+   opposite halves of the result. Both colours are fixed to the artwork, not to a
+   theme. */
+.get-in-touch {
+  position: relative;
+  background-color: var(--color-bg);
+  /* Own stacking context, so .get-in-touch__backdrop's z-index: -1 stays inside the band and
+     cannot slide behind the footer's own gradient. */
+  isolation: isolate;
+  overflow: clip;
+  display: grid;
+  place-items: center;
+  /* 5rem either side puts the band at ~450px tall at 1440, against a 1440x523
+     artwork — so it sits close to 1:1 and the slight vertical compression is not
+     readable. Nothing is cropped at any width either, because
+     `preserveAspectRatio="none"` lets the artwork stretch to whatever box the band
+     is. The band's height is driven by its content, not by the artwork. */
+  padding: 5rem var(--space);
+  text-align: center;
+}
+
+/* Fills the band exactly. The SVG carries preserveAspectRatio="none", so it
+   STRETCHES rather than cropping — which is the whole point at desktop widths: an
+   `object-fit: cover` raster pushed the artwork's top out of the band on any
+   viewport wider than 1440 and left a hard grey seam against the white page above.
+   See BookACallBackdrop.js, and the mobile block at the foot of this file for why
+   the narrow tier does the opposite. */
+.get-in-touch__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.get-in-touch__content {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Overrides the h2 default (--fs-heading-lg). Regular weight like the site's
+   other headlines — the accented run is the only bold part. Dark, because it
+   sits on the pale top half of the artwork. */
+.get-in-touch__title {
+  font-size: var(--fs-cta-title);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--color-text);
+  /* A measure, not a fixed width: it is what puts the accented word on its own
+     second line, as the reference does. MEASURED at both tiers, and one value
+     satisfies both because `ch` scales with the token:
+       desktop needs 485-630px ("Let's build something" fits, "... Great" does not)
+       mobile  needs 317-410px
+     19ch is 551px at 46px and 361px at 30px — inside both windows. */
+  max-width: 19ch;
+}
+
+.get-in-touch__accent {
+  font-weight: 700;
+}
+
+/* Flat fills first, so the words are always readable. The gradients below only
+   replace them where clipping a background to the glyphs actually works. */
+.get-in-touch__accent--blue {
+  color: var(--color-brand);
+}
+
+.get-in-touch__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .get-in-touch__accent--blue,
+  .get-in-touch__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .get-in-touch__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .get-in-touch__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+/* White, because this half of the artwork is brand blue. The size is carried by
+   the `p` itself — a font-size on .get-in-touch__content would never reach it, since the
+   global `p` rule matches directly. See DESIGN-SYSTEM.md §2. */
+.get-in-touch__description {
+  font-size: var(--fs-cta-body);
+  line-height: 1.4;
+  color: #ffffff;
+  /* multi_line_text_field: the two-line break in the reference is authored. */
+  white-space: pre-line;
+}
+
+.get-in-touch__button {
+  margin-top: 0.5rem;
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+@media (max-width: 575px) {
+  .get-in-touch {
+    padding: 4rem var(--space);
+  }
+
+  /* COVER AND CENTRED, instead of the stretch the wider tiers use. A 1440x523
+     artwork squeezed into a ~375px-wide band is a 4x horizontal crush: the side
+     glows collapse onto the edges and the blue ellipse turns into a narrow
+     vertical smear. Keeping the aspect ratio and cropping the sides is the right
+     trade at this width.
+
+     WHY NOT `object-fit: cover`. It has no effect here — object-fit applies to
+     REPLACED elements (<img>, <video>, <canvas>), and this is an inline <svg>,
+     which is not one. The SVG equivalent is `preserveAspectRatio="xMidYMid slice"`
+     — but that is an attribute, not a CSS property, so a media query cannot reach
+     it, and this is a Server Component with no viewport to branch on at render
+     time. Swapping it would mean shipping the artwork twice.
+
+     So the box does the work instead: give the element the ARTWORK'S OWN aspect
+     ratio and let it overflow. `preserveAspectRatio="none"` then stretches it into
+     a box that is already correctly proportioned, which is no distortion at all —
+     the same picture `cover` would produce. Sized by height so it fills the band
+     vertically and spills horizontally; centred with the usual left/translate
+     pair, which keeps the blue glow (cx 705 of 1440, so dead centre) in frame
+     while the grey side glows crop away. .get-in-touch's `overflow: clip` trims the
+     spill.
+
+     `min-width: 100%` is the safety net: if the band were ever short enough that
+     the height-driven width no longer reached both edges, this pins it to full
+     width and the aspect ratio drops out — degrading to the stretch the wider
+     tiers use rather than leaving a gap. */
+  .get-in-touch__backdrop {
+    right: auto;
+    bottom: auto;
+    width: auto;
+    min-width: 100%;
+    aspect-ratio: 1440 / 523;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
