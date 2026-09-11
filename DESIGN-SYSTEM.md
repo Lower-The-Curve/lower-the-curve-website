@@ -86,26 +86,58 @@ block overrides the wider one. **Keep that order.**
 |---|---|---|---|---|
 | `--fs-heading-xl` | 64px | 52px | 40px | Hero / large page headline (one per page) |
 | `--fs-heading-lg` | 48px | 40px | 32px | Major section headings |
-| `--fs-heading-md` | 40px | 32px | **32px** | Sub-section headings |
-| `--fs-heading-sm` | 32px | 24px | 24px | Card titles, smallest heading |
+| `--fs-heading-ml` | **40px** | 32px | 32px | 40px display type (the solutions stats) |
+| `--fs-heading-md` | **32px** | 32px | 32px | Sub-section headings |
+| `--fs-heading-sm` | **24px** | 24px | 24px | Card titles, smallest heading |
+
+**Five heading steps, not four**, and `ml` is the odd one: it sits between `lg`
+and `md`, and it is the only heading token **no element defaults to** — ask for it
+explicitly. It exists because lowering `md` to 32px left the scale with no 40px
+step at any tier, and `.solutions__stat-value` is specified at 40px.
+
+The two smallest heading steps are **flat across all three tiers**. `md` was
+40/32/32 and `sm` 32/24/24 until their desktop values were lowered to 32px and
+24px; they are restated in every tier block anyway, per the rule below. Two
+consequences to know: `--fs-heading-lg` and `--fs-heading-md` are both 32px on
+mobile (they already were), and every section heading that reads `--fs-heading-md`
+— solutions, testimonials, case studies — now renders 32px on desktop rather
+than the 40px those sections were originally specified at.
 
 ### Paragraph / body
 
 | Token | Desktop | Tablet | Mobile | Use for |
 |---|---|---|---|---|
 | `--fs-body-xl` | 24px | 20px | **18px** | Lede / intro paragraph under a headline |
-| `--fs-body-lg` | 22px | 18px | 16px | Emphasised body copy |
-| `--fs-body-base` | 18px | 16px | 16px | **Default** — `p` and `body`, long-form copy |
+| `--fs-body-lg` | **18px** | 18px | 16px | Emphasised body copy |
+| `--fs-body-base` | **16px** | 16px | 16px | **Default** — `p` and `body`, long-form copy |
 | `--fs-body-sm` | 16px | 16px | 14px | UI text: nav labels, button labels |
 | `--fs-body-xs` | 14px | 14px | 12px | Captions, legal, meta text |
 
+**`base` and `sm` render the same size on desktop and tablet** (16px), splitting
+only on mobile (16 vs 14). `base` was 18px on desktop until it was lowered; the
+overlap is accepted rather than resolved, so **choose between them by meaning,
+not by the number**:
+
+| Use | Token |
+|---|---|
+| Prose — paragraphs, long-form copy, anything a `p` holds | `--fs-body-base` |
+| UI text — button and nav labels, controls, chrome | `--fs-body-sm` |
+
+Sizing a button off `base` because "it's 16px anyway" is the trap: it breaks the
+day the UI scale moves without the prose scale.
+
 ### Element defaults
-`h1`–`h4` and `p` already map to their token (`h1 → --fs-heading-xl`, …, `p →
+`h1`–`h4` and `p` already map to their token (`h1 → --fs-heading-xl`, `h2 →
+--fs-heading-lg`, `h3 → --fs-heading-md`, `h4 → --fs-heading-sm`, `p →
 --fs-body-base`). **Semantic markup needs no font-size CSS at all.** Only
 override when the design genuinely differs from the element's default.
 
-`body` resolves to `--fs-body-base` too, so prose is 18px on desktop whether or
-not it sits in a `<p>`.
+Note the gap: there are five heading tokens and four heading elements, so
+**`--fs-heading-ml` is not an element default** — nothing renders at 40px unless
+it writes `font-size: var(--fs-heading-ml)`.
+
+`body` resolves to `--fs-body-base` too, so prose is 16px at every tier whether
+or not it sits in a `<p>`.
 
 **Inheritance trap — read this before sizing a text block from its wrapper.**
 The global `p` rule matches paragraphs *directly*, and a directly-matching
@@ -114,7 +146,7 @@ specificity. So this does **not** work:
 
 ```css
 .legal   { font-size: var(--fs-body-xs); }  /* never reaches the <p> */
-.legal p { margin: 0; }                     /* p keeps --fs-body-base = 18px */
+.legal p { margin: 0; }                     /* p keeps --fs-body-base = 16px */
 ```
 
 To size prose smaller (or larger) than the default, put the token on the
@@ -130,7 +162,7 @@ instead of its intended 14px.
 | `--fs-cta-body` | 24px | 18px | 14px | the footer CTA band's lede |
 
 These are **not points on the scale, and could not be**: 46px sits between
-`--fs-heading-lg` (48) and `--fs-heading-md` (40); 30px between `--fs-heading-md`
+`--fs-heading-lg` (48) and `--fs-heading-md` (32); 30px between `--fs-heading-md`
 (32) and `--fs-heading-sm` (24); and while 24px is `--fs-body-xl` on desktop,
 that token is 18px on mobile — nothing on the body scale pairs 24 with 14.
 Snapping to 48/32 and 24/18 was the alternative; the specified numbers were used
@@ -149,8 +181,8 @@ above. The footer stops being a compact three-column strip and becomes the
 primary stacked navigation on a phone, and the design sizes it for thumbs.
 
 They are separate tokens rather than points on the scale because **no scale
-token can express an inverted pair**: 18px desktop is `--fs-body-base`, but that
-is 16px on mobile, not 24px; 14px desktop is `--fs-body-xs`, but that is 12px on
+token can express an inverted pair**: no body token is even 18px on desktop any
+more (`base` is 16px), and 14px desktop is `--fs-body-xs`, which is 12px on
 mobile, not 18px. Forcing it would have meant a font-size media query inside
 `Footer.css`, which rule 2 below forbids.
 
@@ -166,11 +198,13 @@ grows on mobile is a second inverted pair and its own decision.
 ### Rules
 - **No raw `px`/`rem` font-size in a component stylesheet. Ever.** Use a token.
 - **No font-size media queries in components.** The tokens already respond.
-- Naming asymmetry to be aware of: headings run `xl → lg → md → sm` (4 steps),
-  body runs `xl → lg → base → sm → xs` (5 steps). **There is no `--fs-body-md`
-  and no `--fs-heading-base`/`--fs-heading-xs`** — the two scales share only
-  `xl`, `lg` and `sm`, and `--fs-heading-sm` (3rd of 4) sits at a different
-  position than `--fs-body-sm` (4th of 5). Same suffix ≠ same position.
+- Naming asymmetry to be aware of: headings run `xl → lg → ml → md → sm`,
+  body runs `xl → lg → base → sm → xs` — five steps each, sharing only `xl`,
+  `lg` and `sm`. **There is no `--fs-body-ml`, no `--fs-heading-base` and no
+  `--fs-heading-xs`**, and matching suffixes do not mean matching positions:
+  `--fs-heading-sm` is the 5th heading step, `--fs-body-sm` the 4th body one.
+  `ml` ("medium-large") exists only on the heading scale, as the step between
+  `md` and `lg`.
 - Adding a token means adding it to **all three tier blocks**. A token defined
   in only one block silently breaks at the other two.
 - A design asking for a size that isn't on the scale (e.g. 20px body on desktop)
@@ -477,13 +511,16 @@ before relying on them as final:
   were **not** touched by the rename itself — it was behaviour-preserving, and
   every consumer was updated in the same change. Net visual effect of the whole
   18px request: paragraphs went **16px → 18px on desktop and 14px → 16px on
-  mobile**; tablet stayed at 16px.
+  mobile**; tablet stayed at 16px. **Superseded on desktop** — `base` is 16px
+  again there, see *Type scale change: `--fs-body-base` → 16px* below. The
+  `base`/`sm`/`xs` names stand.
 - **`--fs-body-base` was raised to 16px on mobile** (from the 14px it inherited
   as the old `md`). Requested explicitly. It's the only token whose mobile value
   was changed, so `sm` (14px) and `xs` (12px) still sit below it and the scale
   stays monotonic at every tier — but see the 5-steps-to-3 note above for the
   lede/body collision this creates on mobile.
-- **`body` was repointed from the 16px token to `--fs-body-base` (18px)** so it
+- **`body` was repointed from the 16px token to `--fs-body-base`** (18px at the
+  time, 16px now) so it
   agrees with `p`. Only one thing in the codebase actually inherits its size from
   `body` — the `<span>{name}</span>` logo-less fallback in `PartnersSection` — so
   this moved that span 16px → 18px and nothing else. Every other text node is
@@ -500,7 +537,9 @@ before relying on them as final:
   distinguishable from body copy by size. **The hero's lede reads the same token,
   so it moved 16px → 18px on mobile too.**
 - ~~**`PartnersSection` heading was snapped 24px → `--fs-heading-sm`**~~
-  **CONFIRMED.** `--fs-heading-sm` is the intended desktop size (32px).
+  **CONFIRMED.** `--fs-heading-sm` is the intended step. It now renders **24px on
+  desktop** too, since the token's desktop value was lowered from 32px — see
+  *Type scale change: heading `md`/`sm` flattened* below.
 - **`HeroSection` title lost its fluid `clamp()`** in favour of the three-tier
   token, so it now steps rather than scaling continuously.
 - The light ring around the blue buttons in the design was read as background
@@ -511,7 +550,7 @@ before relying on them as final:
   (#1a1a1a). The design specified #010101 for nav labels. If the two were meant
   to be the same colour, delete `--color-ink` and point the header at
   `--color-text`.
-- **Nav labels use `--fs-body-base`** (18px desktop). They were `--fs-body-xl`
+- **Nav labels use `--fs-body-base`** (18px desktop then, **16px now**). They were `--fs-body-xl`
   (24px, per the original design) until this was changed on request. Only the
   desktop tier is affected: the `<= 1024px` block overrides `.link` with
   `--fs-heading-md` for the drawer, so narrow widths are untouched.
@@ -640,6 +679,108 @@ before relying on them as final:
 - Nothing on desktop or tablet moved: the section heading is still 40/32, the
   card titles 24/20, and every paragraph 18/16.
 
+### Type scale change: heading `md`/`sm` flattened
+Requested directly: **`--fs-heading-md` is 32px and `--fs-heading-sm` is 24px.**
+Only the desktop tier moved (`md` 40 → 32, `sm` 32 → 24); tablet and mobile were
+already those values, so both tokens are now **flat across all three tiers** and
+nothing below 1025px changed.
+
+What moved on desktop:
+- **Section headings drop 40px → 32px** — `.solutions__title`,
+  `.testimonials__title`, `.case-studies__title` and the `h3` default all read
+  `--fs-heading-md`. Those sections were originally specified at 40px desktop;
+  this overrides that spec on purpose.
+- ~~**`.solutions__stat-value` drops 40px → 32px**, as it shares
+  `--fs-heading-md` with the section heading.~~ **REVERTED — it is 40px again**,
+  on the new `--fs-heading-ml` step (see below). It no longer shares a token with
+  the section heading, so the two now move independently.
+- **`.partners__title` drops 32px → 24px**, and so does the `h4` default — both
+  read `--fs-heading-sm`.
+
+Worth knowing: this left the desktop heading scale at 64 / 48 / 32 / 24 with no
+40px step anywhere, which the stats card immediately needed back — hence the
+addition below.
+
+### Type scale addition: `--fs-heading-ml` (40px)
+`.solutions__stat-value` is specified at **40px**, and after `md` was lowered to
+32px nothing on the scale was 40px at any tier. Rather than a raw `font-size:
+40px` beside the scale, or reverting `md`, a **fifth heading step** was added:
+`--fs-heading-ml` at **40 / 32 / 32** — exactly the triplet `md` used to carry,
+so the stat value renders as it did before the flatten at every breakpoint.
+
+Chosen deliberately over the alternatives:
+- **A one-off `--fs-stat-value` token** (like the footer and CTA pairs) would
+  have said "40px belongs to one component". It doesn't — 40px is a general
+  display size, and the next 40px thing would either reuse a stat-named token or
+  add a second one.
+- **Renumbering to `xl/lg/md/sm/xs`** is the natural 5-step naming, but it would
+  have redefined `md` (32 → 40) and `sm` (24 → 32) right after they were set,
+  and silently jumped every component reading them up a step.
+
+Two things to carry forward:
+- **`ml` has no element default.** `h1`–`h4` take `xl/lg/md/sm`; a 40px heading
+  must write `font-size: var(--fs-heading-ml)` itself.
+- **`lg`, `ml` and `md` are all 32px on mobile.** Three steps, one rendered size
+  below 576px — choose between them by the **desktop** size you want, because
+  that is the only tier that distinguishes them.
+
+### Type scale change: `--fs-body-base` → 16px
+Requested directly. Only the desktop tier moved (**18px → 16px**); tablet and
+mobile were already 16px, so the token is now **flat at 16px across all three
+tiers** and nothing below 1025px changed.
+
+What moved on desktop — everything that reads the `p`/`body` default, which is
+most of the site's prose:
+- **Every paragraph drops 18px → 16px**: `.solutions__description`,
+  `.case-studies__paragraph`, `.testimonials__description`, and any other `p`.
+- **`.testimonials__name` / `.testimonials__company`** (spans carrying the token)
+  drop 18px → 16px, against a specified 18px.
+- **`.site-nav__link`** (desktop nav labels) and **`.site-header__brand-text`**
+  drop 18px → 16px.
+- **`.partners__name`** (the logo-less fallback) drops 18px → 16px.
+
+**The collision, accepted not resolved:** `--fs-body-sm` is 16px on desktop and
+tablet, so `base` and `sm` now render identically at both tiers and split only on
+mobile (16 vs 14). Two tokens at one size is exactly how a scale rots, so the
+distinction was moved from the number to the meaning — **`base` = prose,
+`sm` = UI text** — and written into §2 and `typography.css`. The alternatives
+were shifting `sm`/`xs` down to 14/12 (which would have dropped every button
+label to 14px) or deleting `sm` outright (which would have merged UI text into
+prose and pushed mobile button labels 14px → 16px); both were rejected in favour
+of keeping the overlap and the naming rule.
+
+Worth knowing: **no body token is 18px on desktop any more.** A desktop 18px
+request has nothing to snap to — that is now a genuine conflict to surface, not a
+token lookup. It also strengthens why `--fs-footer-heading` (18/24/24) has to be
+its own token.
+
+One loose end left alone deliberately: **`.site-nav__link` reads `--fs-body-base`
+but is UI text**, which the new rule says should be `--fs-body-sm`. Repointing it
+would render identically today (both 16px on desktop; the drawer overrides with
+`--fs-heading-sm` below 1025px anyway), but it is a call-site change nobody asked
+for — flagged here rather than made.
+
+### Type scale change: `--fs-body-lg` → 18px
+Requested for `.testimonials__quote`, which is specified at **18px** and was
+rendering 22px on desktop. After `--fs-body-base` was lowered, **no body token
+was 18px on desktop**, so this could not be a token swap.
+
+Lowering the token's desktop value (**22px → 18px**) was chosen because
+**`.testimonials__quote` is `--fs-body-lg`'s only call site in the repo** — so
+the change reaches exactly the element that asked for it and nothing else. Tablet
+(18px) and mobile (16px) were already right and did not move. The alternative —
+a new `--fs-body-md` step at 18px — would have left `--fs-body-lg` with zero
+consumers, and a token nothing uses is its own kind of rot.
+
+Two consequences:
+- **`--fs-body-lg` is 18px on desktop AND tablet**, holding its size until
+  mobile. Like `--fs-heading-ml`/`md`, it is a step that no longer shrinks at
+  every tier.
+- **Emphasised body copy now sits 2px above prose on desktop** (18 vs `base`'s
+  16), where the gap used to be 6px. Weight and colour carry that distinction
+  now more than size does. If something needs emphasis that reads at a glance,
+  `--fs-body-xl` (24) is the step above — don't reintroduce 22px as a one-off.
+
 ### Case Studies (added with the case-studies build)
 - **The live `case_studies` entry** sits in home's Component 4 with `title`,
   `description`, `image` and `button`.
@@ -661,8 +802,8 @@ before relying on them as final:
   that carries meaning.
 - **It adds no tokens.** Both specified sizes were already on the scale:
   40px/32px is `--fs-heading-md` (40/32/32 — the pair the solutions build had just
-  produced) and 18px/16px is the `p` default `--fs-body-base` (18/16/16), so the
-  paragraphs carry no font-size at all.
+  produced) and 18px/16px was the `p` default `--fs-body-base` (18/16/16, **now
+  16px flat**), so the paragraphs carry no font-size at all.
 - **`.title`'s 21ch is measured.** The reference breaks it "Case Studies that
   speak / for themselves", which needs a measure that fits "Case Studies that
   speak" (**490px**, with "Case Studies" bold) but not "…that speak for"
@@ -718,10 +859,11 @@ before relying on them as final:
   them today — dragged the NAME out past the card's left edge and clipped it.
   Putting it on the plate means the row is unaffected when there is no plate.
 - **It adds no tokens.** Every specified size was already on the scale: heading
-  `--fs-heading-md` (40), lede the `p` default `--fs-body-base` (18), quote
-  `--fs-body-lg` (22), name and company `--fs-body-base` (18). The name is
-  separated from the company by weight and colour, not size, because the design
-  gives both 18px.
+  `--fs-heading-md` (40 then, **32 now**), lede the `p` default `--fs-body-base`
+  (18 then, **16 now**), quote `--fs-body-lg` (22 then, **18 now** — lowered for
+  this quote, see *Type scale change: `--fs-body-lg` → 18px*), name and company
+  `--fs-body-base`. The name is separated from the company by weight and colour,
+  not size, because the design gives both the same size.
 - **The site's second Client Component**, after `HeaderNav`'s mobile drawer — and
   the first *section* that is one. The carousel needs state and a scroll listener,
   which is the one case the conventions allow `'use client'` for.
@@ -883,10 +1025,12 @@ before relying on them as final:
   turn for the closing pair.
 
 ### Solutions (added with the solutions build)
-- **The solution card title is the one real type conflict here.** The design
-  specifies **24px**, and the heading scale has no 24px desktop step
-  (`--fs-heading-sm` is 32px). `--fs-body-xl` is the only token that is 24px on
-  desktop, so `.itemTitle` is an `<h3>` reading a **body** token. Consequences:
+- **The solution card title reads a body token on an `<h3>`.** The design
+  specifies **24px**, and when this was built the heading scale had no 24px
+  desktop step. `--fs-heading-sm` is **now 24px**, so the step exists — but it is
+  24px at *every* tier, and this title is specified to shrink to 18px on a phone,
+  which only `--fs-body-xl` (24/20/18) does. It stays on the body token
+  deliberately. Consequences:
   it drops to **20px on tablet and 16px on mobile**, where it lands on exactly
   the same size as the copy beneath it and is separated by weight (700) alone.
   If the card title should stay visibly above body copy at every tier, that is a
@@ -895,8 +1039,8 @@ before relying on them as final:
 - Every other size on the section is a straight token: heading
   `--fs-heading-md` (40px, overriding the `h2` default), stat value
   `--fs-heading-md`, and the lede, solution copy and stat labels all take the
-  **global `p` default** (`--fs-body-base`, 18px) with no font-size written in
-  the module at all.
+  **global `p` default** (`--fs-body-base`, 18px then, **16px now**) with no
+  font-size written in the module at all.
 - **`--color-text-muted` was added** — see §3. `HeroSection.css` was
   repointed at it in the same change, so there is no `#4a4a4a` left in `src/`.
 - **`use_stats` picks a whole LAYOUT, not just whether a card shows.**
@@ -1319,7 +1463,8 @@ before relying on them as final:
   `1fr` columns put About Us ~5% too far right; content sizing lands every
   column within ~2% of the design.
 - **The link list carries the font-size, not just the link.** The `li` would
-  otherwise keep the inherited body metrics (18px/1.5) and, because `.link` is an
+  otherwise keep the inherited body metrics (the `body` default, 18px at the time
+  and 16px now, at 1.5) and, because `.link` is an
   inline-flex child, the row height comes from the li's line box — which made
   every link gap ~8px too large at both tiers. Sizing `.menu` fixes desktop and
   mobile at once.
