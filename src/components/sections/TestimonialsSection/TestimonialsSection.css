@@ -4,9 +4,16 @@
    with the controls below the cards.
 
    Sizes come from the type scale in src/app/typography.css — no raw font-sizes
-   here. Specified: heading 40px (--fs-heading-md), lede 18px (the `p` default,
-   --fs-body-base), quote 22px (--fs-body-lg), name and company 18px. Every one
-   was already on the scale, so this section adds no tokens. */
+   here. Every one is a token, so this section adds none of its own:
+     heading          --fs-heading-md  32px at every tier (was 40px on desktop
+                                       before the scale was flattened)
+     lede             --fs-body-base   the `p` default, 16px at every tier
+                                       (was 18px on desktop)
+     quote            --fs-body-lg     18px desktop and tablet, 16px mobile —
+                                       this is the token's only call site, and
+                                       its desktop value was lowered 22px -> 18px
+                                       for it
+     name, company    --fs-body-base   the same `p` default, carried on spans */
 .testimonials {
   position: relative;
   isolation: isolate;
@@ -61,8 +68,8 @@
   gap: 1.5rem;
 }
 
-/* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
-   which is --fs-heading-md. Regular weight like the site's other headings; the
+/* Overrides the h2 default (--fs-heading-lg, 48px) — the section heading step is
+   --fs-heading-md, now 32px at every tier. Regular weight like the site's other headings; the
    accented runs are the only bold part. */
 .testimonials__title {
   font-size: var(--fs-heading-md);
@@ -111,8 +118,8 @@
   }
 }
 
-/* 18px desktop / 16px mobile is the global `p` rule (--fs-body-base) — no
-   font-size needed, and one on .testimonials__intro would never reach the paragraph anyway. */
+/* 16px at every tier from the global `p` rule (--fs-body-base) — no font-size
+   needed, and one on .testimonials__intro would never reach the paragraph anyway. */
 .testimonials__description {
   color: var(--color-text-muted);
   max-width: 42ch;
@@ -256,7 +263,10 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 2.5rem 2.5rem 2rem;
+  /* 5px top, requested — against 2.5rem (40px) on the sides. Note the clip path's
+     top corners arc over roughly the first 24px, so the quote's first line now
+     starts inside that curve. The ≤575px block below keeps its own 1.75rem top. */
+  padding: 0.3125rem 2.5rem 2rem;
   background: rgba(255, 255, 255, 0.9);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
@@ -325,13 +335,19 @@
    Positioned against .testimonials__card-wrap, which shares the card's box. */
 .testimonials__quote-mark--close {
   position: absolute;
-  right: 2.5rem;
-  bottom: 2rem;
+  /* 10px from each edge, requested. It is positioned against .testimonials__card-wrap,
+     which is NOT clipped — only the card is — so at this inset the mark still sits
+     inside the bottom-right corner arc the clip path cuts away (~24px), and reads
+     as overhanging the card's outline rather than tucked inside it. */
+  right: 0.625rem;
+  bottom: 0.625rem;
   transform: rotate(180deg);
 }
 
-/* 22px desktop / 18px tablet / 16px mobile. A blockquote, so it needs the token
-   explicitly — only `p` gets one by default. */
+/* 18px desktop and tablet / 16px mobile — per the design. A blockquote, so it
+   needs the token explicitly; only `p` gets one by default. This quote is
+   --fs-body-lg's ONLY call site, which is why lowering its desktop value from
+   22px to 18px was the cheap way to get there — see typography.css. */
 .testimonials__quote {
   margin: 0;
   font-size: var(--fs-body-lg);
@@ -380,8 +396,9 @@
   min-width: 0;
 }
 
-/* Both 18px, per the design — the name is separated by weight and colour, not
-   size. --fs-body-base is the `p` default but these are spans, so they carry it. */
+/* Both take the prose size — the name is separated by weight and colour, not
+   size. --fs-body-base is the `p` default but these are spans, so they carry it.
+   Specified at 18px; the token is 16px since its desktop value was lowered. */
 .testimonials__name {
   font-size: var(--fs-body-base);
   font-weight: 600;

@@ -5,9 +5,11 @@
    Sizes come from the type scale in src/app/typography.css and colours from the
    tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
 
-   Specified type: heading 40px (--fs-heading-md), lede 18px (the `p` default,
-   --fs-body-base), solution title 24px (--fs-body-xl — see the note on
-   .solutions__item-title), solution copy 18px, stat value 40px, stat label 18px. */
+   Specified type: heading --fs-heading-md (32px at every tier — it was 40px on
+   desktop until the token was flattened), lede the `p` default --fs-body-base
+   (16px at every tier — it was 18px on desktop), solution title 24px (--fs-body-xl — see the note on
+   .solutions__item-title), solution copy 18px, stat value 40px
+   (--fs-heading-ml), stat label 18px. */
 /* FULL-BLEED: the measure and the padding live on .solutions__inner, so the section box
    itself spans the viewport and the swoosh can reach both edges. Geometry is
    unchanged from putting them here — everything is border-box, so
@@ -265,9 +267,9 @@
   gap: 1.5rem;
 }
 
-/* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
-   which is --fs-heading-md. Regular weight, like the hero headline: the emphasis
-   comes from the accented run, which is the only bold part. */
+/* Overrides the h2 default (--fs-heading-lg, 48px) — the section heading step is
+   --fs-heading-md, now 32px at every tier. Regular weight, like the hero
+   headline: the emphasis comes from the accented run, the only bold part. */
 .solutions__title {
   font-size: var(--fs-heading-md);
   font-weight: 400;
@@ -327,7 +329,7 @@
   }
 }
 
-/* 18px comes from the global `p` rule (--fs-body-base) — no font-size needed
+/* 16px comes from the global `p` rule (--fs-body-base) — no font-size needed
    here, and one on .solutions__intro would never reach the paragraph anyway (a directly
    matching rule beats an inherited one; see DESIGN-SYSTEM.md §2). */
 .solutions__description {
@@ -381,9 +383,12 @@
 }
 
 /* Not a heading — a display number — so it carries the size itself rather than
-   relying on an element default. 40px desktop, per the design. */
+   relying on an element default. 40px desktop, per the design: that is
+   --fs-heading-ml, the scale step added for exactly this (no element defaults to
+   it). It no longer tracks the section heading above it — that is
+   --fs-heading-md, 32px — so the two move independently now. */
 .solutions__stat-value {
-  font-size: var(--fs-heading-md);
+  font-size: var(--fs-heading-ml);
   font-weight: 700;
   line-height: 1.1;
 }
@@ -434,11 +439,16 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  /* Zero, per design: the frosted cards stack flush and their own padding is the
-     only thing separating one row's copy from the next (2rem + 2rem = 4rem on
-     desktop). Nothing to override at the narrow tiers — the padding shrinks
-     there and takes the spacing with it. */
-  gap: 0;
+  /* 15px between cards, requested — it was 0 (the cards stacked flush and their
+     own padding did all the separating). The card padding still carries most of
+     the distance between one row's copy and the next; this adds 15px of page
+     showing through between the frosted surfaces, so the stack now reads as
+     separate cards rather than one panel with rules.
+
+     It applies at every tier — the narrow blocks shrink the card padding but do
+     not touch this. It is also the COLUMN gap in the `--no-stats` layout, where
+     the list becomes a two-up grid and a single `gap` feeds both axes. */
+  gap: 0.9375rem;
 }
 
 /* Each solution is a frosted card. Near-opaque white, so it is invisible where
@@ -461,7 +471,11 @@
      the reference's ~307px title-to-title pitch. */
   padding: 2.5rem;
   border-radius: 25px;
-  background: rgba(255, 255, 255, 0.9);
+  /* #f9f9f9 at 90%, not white — an off-white tint, so the card reads as a surface
+     against the white page even where no swoosh passes behind it. This is the one
+     thing that differs from the testimonials card's otherwise identical frosted
+     treatment (same 25px radius, same 12.5px blur), which stays on white. */
+  background: rgba(249, 249, 249, 0.9);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
 }
@@ -483,11 +497,12 @@
   gap: 0.75rem;
 }
 
-/* CONFLICT WORTH KNOWING: the design asks for 24px here, and the heading scale
-   has no 24px desktop step (--fs-heading-sm is 32px). --fs-body-xl is the only
-   token that is 24px on desktop, so an h3 reads a body token. Consequence: this
-   drops to 20px on tablet and 16px on mobile, where it lands on the same size as
-   the copy underneath it and is told apart by weight alone. See DESIGN-SYSTEM.md. */
+/* WORTH KNOWING: the design asks for 24px here and this reads --fs-body-xl, a
+   body token on an h3. That was forced when the heading scale had no 24px
+   desktop step; --fs-heading-sm is now 24px, so the step exists — but it is 24px
+   at EVERY tier, and this title is specified to shrink (18px on a phone), which
+   only --fs-body-xl (24/20/18) does. Kept deliberately. Consequence: on mobile it
+   lands on the copy's size and is told apart by weight. See DESIGN-SYSTEM.md. */
 .solutions__item-title {
   font-size: var(--fs-body-xl);
   font-weight: 700;
