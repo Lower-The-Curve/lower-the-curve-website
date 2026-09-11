@@ -36,7 +36,7 @@
   display: inline-block;
   /* Desktop only — the <= 1024px block below overrides this with
      --fs-heading-sm for the drawer. */
-  font-size: var(--fs-body-base); /* 18px desktop */
+  font-size: var(--fs-body-base); /* 16px — prose size, see the base/sm note in typography.css */
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-ink);
@@ -206,8 +206,8 @@
 
   /* 24px on mobile, per spec — and 24px on tablet too. This read
      --fs-heading-md until that token was raised to 32px on mobile for the
-     solutions heading; --fs-heading-sm is 24px at BOTH narrow tiers, so the swap
-     kept the spec'd mobile size AND closed the open question about the drawer
+     solutions heading; --fs-heading-sm is 24px at every tier, so the swap kept
+     the spec'd mobile size AND closed the open question about the drawer
      rendering 32px on tablet. */
   .site-nav__link {
     font-size: var(--fs-heading-sm);

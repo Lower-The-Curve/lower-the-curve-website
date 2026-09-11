@@ -4,10 +4,10 @@
    Sizes come from the type scale in src/app/typography.css and colours from the
    tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
 
-   Specified type: heading 40px desktop / 32px mobile (--fs-heading-md, which is
-   40/32/32 and lands on both), body 18px / 16px (the `p` default,
-   --fs-body-base, which is 18/16/16). Both requested sizes are already on the
-   scale, so this section adds no tokens. */
+   Specified type: heading --fs-heading-md (32px at every tier — it was 40/32/32
+   until the token was flattened), body the `p` default --fs-body-base, now 16px
+   at every tier (it was 18/16/16). Both sizes are on the scale, so this section
+   adds no tokens. */
 .case-studies {
   position: relative;
   /* Own stacking context, so any future decorative layer's z-index: -1 stays
@@ -55,8 +55,8 @@
   gap: 1.5rem;
 }
 
-/* Overrides the h2 default (--fs-heading-lg, 48px) — the design specifies 40px,
-   which is --fs-heading-md. Regular weight like the other section headings: the
+/* Overrides the h2 default (--fs-heading-lg, 48px) — the section heading step is
+   --fs-heading-md, now 32px at every tier. Regular weight like the other section headings: the
    emphasis comes from the accented runs, which are the only bold part. */
 .case-studies__title {
   font-size: var(--fs-heading-md);
@@ -129,7 +129,7 @@
   gap: 1.5rem;
 }
 
-/* 18px desktop / 16px mobile comes from the global `p` rule (--fs-body-base) —
+/* 16px at every tier, from the global `p` rule (--fs-body-base) —
    no font-size needed here, and one on .case-studies__copy would never reach the paragraphs
    anyway (a directly matching rule beats an inherited one; DESIGN-SYSTEM.md §2). */
 .case-studies__paragraph {

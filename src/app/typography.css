@@ -27,18 +27,20 @@
    ========================================================================== */
 
 /* --- DESKTOP (>= 1025px) --------------------------------------------------
-   HEADINGS  (maps to h1 -> h4 in that order)
+   HEADINGS  (h1 -> h4 default to xl, lg, md, sm — note that ml is NOT an
+              element default; it is opt-in via font-size, see the note below)
      Token              Desktop  Tablet  Mobile   Use for
      --fs-heading-xl    64px     52px    40px     Hero / large page headline (one per page)
      --fs-heading-lg    48px     40px    32px     Major section headings
-     --fs-heading-md    40px     32px    32px     Sub-section headings
-     --fs-heading-sm    32px     24px    24px     Card titles, smallest heading
+     --fs-heading-ml    40px     32px    32px     40px display type (the solutions stats)
+     --fs-heading-md    32px     32px    32px     Sub-section headings
+     --fs-heading-sm    24px     24px    24px     Card titles, smallest heading
 
    PARAGRAPH / BODY
      Token              Desktop  Tablet  Mobile   Use for
      --fs-body-xl     24px     20px    18px     Lede / intro paragraph under a headline
-     --fs-body-lg     22px     18px    16px     Emphasised body copy
-     --fs-body-base   18px     16px    16px     DEFAULT — `p` and `body`, long-form copy
+     --fs-body-lg     18px     18px    16px     Emphasised body copy (the testimonial quote)
+     --fs-body-base   16px     16px    16px     DEFAULT — `p` and `body`, long-form copy
      --fs-body-sm     16px     16px    14px     UI text: nav labels, button labels
      --fs-body-xs     14px     14px    12px     Captions, legal, meta text
 
@@ -47,11 +49,27 @@
      --fs-cta-body    24px     18px    14px     the band's lede
 
    Notes on the collapsing steps:
+   - --fs-heading-ml, --fs-heading-md and --fs-heading-lg all collapse onto 32px
+     on mobile — three steps, one size. Deliberate: 32px is as large as a heading
+     that is not the hero gets on a phone. Pick between them by what the size
+     should be on DESKTOP, because that is the only tier that tells them apart.
    - Headings shrink at every tier; large display type is what actually breaks
      on narrow screens, so it gets the most reduction (xl loses 24px total).
    - --fs-body-sm and --fs-body-xs are unchanged on tablet. 16px body copy
      reads fine on a tablet; shrinking it only hurts legibility.
-   - Mobile has 4 body sizes against desktop's 5: lg and base merge on 16px,
+   - --fs-body-lg is 18px on desktop AND tablet — it stops shrinking until
+     mobile. It was 22px on desktop; the testimonial quote, its only consumer,
+     is specified at 18px, and no token was 18px on desktop after base was
+     lowered. Consequence: emphasised body copy now sits just 2px above prose on
+     desktop (18 vs 16), so weight and colour do more of that work than size.
+   - --fs-body-base is 16px at EVERY tier, which makes it the same rendered size
+     as --fs-body-sm on desktop and tablet; they split only on mobile (16 vs 14).
+     Two tokens, one size, on purpose — so choose by MEANING, not by the number:
+       --fs-body-base  prose. Paragraphs, long-form copy, anything a `p` holds.
+       --fs-body-sm    UI text. Button and nav labels, controls, chrome.
+     Sizing a button off `base` because "it's 16px anyway" breaks the day the UI
+     scale moves without the prose scale.
+   - Mobile has 3 body sizes against desktop's 4: lg and base merge on 16px,
      while xl keeps its own value. Intentional — mobile does not need five
      distinct body sizes, but it does need the lede to read above body copy.
    - --fs-body-xl was 16px on mobile until the solutions card titles needed 18px
@@ -62,12 +80,17 @@
 :root {
   --fs-heading-xl: 64px;
   --fs-heading-lg: 48px;
-  --fs-heading-md: 40px;
-  --fs-heading-sm: 32px;
+  /* The 3rd of FIVE heading steps, between lg and md. 'ml' reads as the step
+     between md and lg — the scale had no 40px step after md was lowered to
+     32px, and the solutions stats card is specified at 40px. See the naming
+     note in DESIGN-SYSTEM.md §2: headings now run xl/lg/ml/md/sm. */
+  --fs-heading-ml: 40px;
+  --fs-heading-md: 32px;
+  --fs-heading-sm: 24px;
 
   --fs-body-xl: 24px;
-  --fs-body-lg: 22px;
-  --fs-body-base: 18px;
+  --fs-body-lg: 18px;
+  --fs-body-base: 16px;
   --fs-body-sm: 16px;
   --fs-body-xs: 14px;
 
@@ -92,7 +115,7 @@
   /* --- THE GET-IN-TOUCH BAND ---------------------------------------------
      Its two sizes are OFF THE SCALE in both directions, which is why they are
      their own tokens rather than points on it:
-       46px desktop sits between --fs-heading-lg (48) and --fs-heading-md (40);
+       46px desktop sits between --fs-heading-lg (48) and --fs-heading-ml (40);
        30px mobile between --fs-heading-md (32) and --fs-heading-sm (24);
        24px/14px body is --fs-body-xl on desktop but --fs-body-xl is 18px on
        mobile, and nothing on the body scale pairs 24 with 14.
@@ -108,6 +131,7 @@
   :root {
     --fs-heading-xl: 52px;
     --fs-heading-lg: 40px;
+    --fs-heading-ml: 32px;
     --fs-heading-md: 32px;
     --fs-heading-sm: 24px;
 
@@ -137,6 +161,7 @@
   :root {
     --fs-heading-xl: 40px;
     --fs-heading-lg: 32px;
+    --fs-heading-ml: 32px;
     /* 32px, not the 24px it was — the solutions section heading is specified at
        40px desktop / 32px mobile, and no other token spans that pair. Raising it
        here also un-collapses the two smallest heading steps: md and sm were BOTH
@@ -187,8 +212,11 @@ h1 { font-size: var(--fs-heading-xl); }
 h2 { font-size: var(--fs-heading-lg); }
 h3 { font-size: var(--fs-heading-md); }
 h4 { font-size: var(--fs-heading-sm); }
+/* There are FIVE heading tokens and four heading elements, so --fs-heading-ml
+   (40px desktop) is the one step with no element default. Anything that wants it
+   asks for it — `font-size: var(--fs-heading-ml)`. */
 
-/* `p` and `body` both resolve to --fs-body-base (18px desktop), so prose is the
+/* `p` and `body` both resolve to --fs-body-base (16px at every tier), so prose is the
    right size in or out of a paragraph. Still an explicit rule, because `p` also
    needs margin: 0 and its own line-height.
 
