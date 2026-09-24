@@ -15,10 +15,13 @@ import TestimonialsSection, {
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
+import BannerSection, {
+  BANNER_TYPE,
+} from '@/components/sections/BannerSection/BannerSection';
 import './page.css';
 
 // The home `content` entry's component slots, in the order the admin shows them
-// (Component 1 … Component 5). The query aliases the live field keys onto these
+// (Component 1 … Component 6). The query aliases the live field keys onto these
 // names — see queries/home.js for why the keys don't match their labels.
 const COMPONENT_SLOTS = [
   'component1',
@@ -26,6 +29,7 @@ const COMPONENT_SLOTS = [
   'component3',
   'component4',
   'component5',
+  'component6',
 ];
 
 // A slot may hold a single section reference or a list of them. Empty slots
@@ -64,6 +68,8 @@ export default async function HomePage() {
             return <TestimonialsSection key={section.id} section={section} />;
           case CASE_STUDIES_TYPE:
             return <CaseStudiesSection key={section.id} section={section} />;
+          case BANNER_TYPE:
+            return <BannerSection key={section.id} section={section} />;
           default:
             return null;
         }
