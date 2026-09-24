@@ -13,11 +13,16 @@ import {
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
+// Also tolerate a full URL ("https://lower-the-curve.myshopify.com/") — strip
+// the scheme, any path, and the trailing slash before building the endpoint.
 const rawDomain = process.env.SHOPIFY_STORE_DOMAIN;
-const domain = rawDomain
-  ? rawDomain.includes('.')
-    ? rawDomain
-    : `${rawDomain}.myshopify.com`
+const storeHost = rawDomain
+  ? rawDomain.trim().replace(/^https?:\/\//i, '').split('/')[0]
+  : null;
+const domain = storeHost
+  ? storeHost.includes('.')
+    ? storeHost
+    : `${storeHost}.myshopify.com`
   : null;
 const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 const apiVersion = process.env.SHOPIFY_STOREFRONT_API_VERSION || '2025-01';
