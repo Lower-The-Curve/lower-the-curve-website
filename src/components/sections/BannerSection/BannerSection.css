@@ -1,0 +1,301 @@
+/* Banner section — the `banner` BEM block. A full-bleed brand-blue spotlight
+   banner: the client collage on the left, heading + copy + icon highlights + CTA
+   on the right. The background artwork is CMS-authored and painted from the
+   --banner-bg-image custom property (set inline on .banner), with the flat brand
+   colour underneath as the fallback for an entry with no image.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here. */
+.banner {
+  position: relative;
+  /* Above the following section, so the collage's bottom overhang (below)
+     paints over it rather than being hidden behind it. */
+  z-index: 1;
+  /* Own stacking context, so any future decorative layer's z-index: -1 stays
+     inside the section. Same arrangement as SolutionsSection / CaseStudies. */
+  isolation: isolate;
+  /* The collage bleeds past the left edge, so horizontal overflow is clipped.
+     Vertically it is left VISIBLE: the artwork spills out of the background at
+     the bottom, as the reference shows. The two axes are stated separately for
+     exactly that reason (`overflow: clip` would cut it at the bottom). */
+  overflow-x: clip;
+  overflow-y: visible;
+  /* Fallback only — the artwork layer below covers it whenever an image is set. */
+  background-color: var(--color-brand);
+  color: #ffffff;
+  /* The artwork's content ratio (2880x1006 at 2x, the transparent export bands
+     excluded). The section keeps the artwork's proportions, so the whole frame
+     — the diagonal stripes and the wave lines at the bottom — is visible at
+     every width, and the collage's bottom overhang stays the same share of the
+     section as it is in the reference. Content taller than the ratio (tablet
+     and phone, where the layout stacks) grows the section; the artwork simply
+     covers the extra. */
+  display: grid;
+  aspect-ratio: 2880 / 1006;
+}
+
+/* The artwork sits on its own layer, oversized and clipped back to the section.
+   The exported frame carries a ~2.6% transparent band at its top and bottom
+   (the Figma frame's padding); at `cover` those bands would otherwise let the
+   fallback colour show through on tall viewports. Oversizing forces `cover` to
+   scale past the bands, so the image alone paints the background. */
+.banner::before {
+  content: '';
+  position: absolute;
+  inset: -4% 0;
+  clip-path: inset(3.75% 0);
+  z-index: -1;
+  background-image: var(--banner-bg-image, none);
+  background-size: cover;
+  background-position: center;
+}
+
+.banner__inner {
+  /* Sections own their measure and their rhythm; the page's `main` adds neither.
+     See DESIGN-SYSTEM.md §5. */
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  /* Horizontal gutters only on desktop: the section's height comes from the
+     artwork's ratio and the copy is centred inside it. Padding-block returns on
+     the tiers where the content drives the height (below). */
+  padding: 0 var(--space);
+  display: grid;
+  /* A fixed 29rem collage column, measured off the reference: the copy column
+     then lands on the reference's ~712px and the heading's and body's line
+     breaks hold at every desktop width (they need 702-733px). */
+  grid-template-columns: minmax(0, 29rem) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+/* --- MEDIA -------------------------------------------------------------- */
+/* On desktop the collage bleeds to the viewport's left edge, as the reference
+   shows: the artwork hangs off the page edge while the copy stays on the
+   measure. The negative margin widens the item by exactly the amount it is
+   pulled, so the image runs from the viewport edge to its column's right side.
+   Below desktop the layout stacks and the media sits inside the measure
+   instead. */
+.banner__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 1025px) {
+  /* No collage -> no media column. Without this the copy would be squeezed into
+     the empty 29rem media track with the rest of the measure left blank, so a
+     title+description-only banner reads across the full measure instead. */
+  .banner--no-media .banner__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .banner__media {
+    /* min() clamps the pull: below the page's max-width there is no centring
+       margin to cancel, and a bare negative calc would push the media right
+       instead of pulling it to the viewport edge. */
+    margin-left: min(0px, calc((100vw - var(--max-width)) / -2 - var(--space)));
+    /* Top-align with the row: the inner has no padding-block on desktop, so the
+       media box starts at the section's top edge and the image can too. */
+    align-self: start;
+    position: relative;
+  }
+
+  /* The artwork is out of flow, so it does NOT set the section's height — the
+     copy column does — and it is allowed to spill past the section's bottom
+     edge, as the reference shows. 40vw is the reference's collage share (576px
+     at 1440) and keeps the overhang the same share of the section at every
+     width; min() keeps the image inside its widened column on narrow desktops. */
+  .banner__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(100%, 40vw);
+    height: auto;
+  }
+}
+
+/* --- CONTENT ------------------------------------------------------------ */
+.banner__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* The reference's rhythm: heading -> copy -> highlights -> CTA are each one
+     2.5rem step apart. */
+  gap: 2.5rem;
+}
+
+/* The display heading step, one above the sub-section headings. Regular weight
+   like the other section headings: the emphasis comes from the accented runs,
+   which are the only bold part. */
+.banner__title {
+  font-size: var(--fs-heading-ml);
+  font-weight: 400;
+  /* Poppins' normal line box, as the reference sets it: the two lines sit 56px
+     apart at 40px. */
+  line-height: 1.4;
+  margin: 0;
+  /* MEASURED for the reference's break. Line 2 ("E-Commerce to the Next
+     Level") needs ~601px at 40px, while line 1 plus the accent needs ~778px —
+     26ch is ~653px at this size, inside that window, so the accent moves whole
+     onto line 2 and never dangles after its hyphen. (The 29rem + 1fr grid
+     above produces the same break on its own; the cap only keeps it stable if
+     the copy column ever grows.) */
+  max-width: 26ch;
+}
+
+/* The accented runs. Flat white rather than a gradient — the house
+   blue/green-gradient words would vanish against this blue background, so the
+   emphasis here is weight alone.
+   nowrap keeps a hyphenated accent ("E-Commerce") on one line — without it the
+   browser breaks after the hyphen and leaves a dangling "E-". */
+.banner__accent {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Body copy at the `p` default (--fs-body-base) — no font-size here, which also
+   avoids the inheritance trap: a rule on a wrapper never reaches the <p>. The
+   colour is inherited from .banner (flat white, as the reference sets it) and
+   the line box is Poppins' normal, like the heading's. */
+.banner__description {
+  line-height: 1.4;
+}
+
+/* --- HIGHLIGHTS ---------------------------------------------------------- */
+/* Three columns of icon+label items, reading left to right, as the reference
+   shows (six items become two rows of three). The label is the thing that must
+   stay legible, so the grid reflows (below) rather than squeezing the columns. */
+.banner__highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* Content-sized columns, not equal thirds: a `nowrap` label takes exactly the
+     width it needs, so it can never spill into the next column. The columns are
+     shared across both rows, so row 1 and row 2 stay aligned. space-between
+     spreads them across the full copy measure, so the row reaches the right
+     edge like the reference. */
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.banner__highlight {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+/* The icon keeps its own aspect ratio (width fixed, height auto): the assets are
+   not square — the storefront bag is 24x26, the integrations link 24x11 — and a
+   square box would letterbox the tall ones smaller than the reference's. */
+.banner__highlight-icon {
+  width: 1.5rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* The UI text step: 16px on desktop/tablet, 14px on phones — the reference's
+   phone layout keeps two columns, and 16px would not fit a nowrap label in
+   half the screen. One line always: the design never wraps these. */
+.banner__highlight-label {
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The reference's CTA is the compact white pill (204x37 at 1440), not the
+   Button's default --md box: the label step stays --fs-body-sm and only the
+   padding tightens, scoped here so no other section's button changes. */
+.banner__button {
+  padding: 0.65em 1.25em;
+}
+
+/* --- STACKED (<= 1024px) ------------------------------------------------
+   One column, collage on top. The media is first in the DOM, so the stack order
+   needs no `order` property, and the desktop left bleed no longer applies.
+
+   Tablet and phone share ONE presentation: the collage runs edge to edge and
+   flush with the section's top, and the copy below it is centred on the same
+   measure with the same rhythm. Splitting this across two tiers is what let the
+   tablet tier keep its 4.5rem top padding — a band of background above the
+   collage — while the phone tier didn't, so the two disagreed right at the
+   boundary. The desktop layout (>= 1025px) is untouched.
+   ---------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  /* The stacked content is always far taller than the artwork's ratio, so the
+     ratio is dropped here and the section's height comes from its content
+     alone. That is also what pins the collage to the section's top edge at
+     every width: nothing depends on aspect-ratio, grid stretching or a fixed
+     height any more — the media is simply the first block in normal flow. */
+  .banner {
+    aspect-ratio: auto;
+  }
+
+  .banner__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    /* No top padding: the artwork sits flush with the section's top edge. */
+    padding: 0 var(--space) 3rem;
+  }
+
+  /* With no collage there is no artwork to sit flush, so the copy needs its top
+     gutter back. */
+  .banner--no-media .banner__inner {
+    padding-top: 3rem;
+  }
+
+  .banner__media {
+    /* Edge to edge, and top-aligned whatever the row's height turns out to be —
+       the wrapper must not add any space above the image. */
+    margin-inline: calc(var(--space) * -1);
+    align-self: start;
+  }
+
+  .banner__content {
+    align-items: center;
+  }
+
+  .banner__title {
+    text-align: center;
+    /* A long unbroken CMS word can never push past the section's gutters. */
+    overflow-wrap: break-word;
+  }
+
+  /* Centred, and capped at a comfortable measure so a tablet does not run the
+     copy the full width of the section. */
+  .banner__description {
+    max-width: 70ch;
+    text-align: center;
+  }
+
+  .banner__highlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem 1rem;
+  }
+
+  .banner__highlight {
+    gap: 0.5rem;
+    /* Icon and first line of a wrapped label line up, so the icons stay on a
+       common baseline across both columns. */
+    align-items: flex-start;
+  }
+
+  /* Half the measure is narrower than the longest label, so the two columns
+     only hold if the label wraps. `nowrap` let the text run into the
+     neighbouring column and off the section's edge, where overflow-x: clip cut
+     it off. The label is the part that gives: the icon keeps its size, the text
+     wraps. */
+  .banner__highlight-label {
+    white-space: normal;
+    min-width: 0;
+  }
+
+  .banner__highlight-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
