@@ -42,20 +42,36 @@ function imageFrom(node, ...keys) {
   return null;
 }
 
-export default function ProjectRouteTabs({ section }) {
-  const [active, setActive] = useState(0);
+function intFrom(node, key, fallback) {
+  const parsed = Number.parseInt(fieldValue(node, key) ?? "", 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
 
-  if (!section) return null;
+function boolFrom(node, key, fallback) {
+  const value = fieldValue(node, key);
+  if (value == null) return fallback;
+  return value === "true";
+}
+
+export default function ProjectRouteTabs({ section }) {
+  const steps = section ? referencesFrom(section, "steps") : [];
+  const columns = Math.min(4, Math.max(2, intFrom(section, "columns", 2)));
+  const showTabs = boolFrom(section, "show_tabs", true);
+  const requested = intFrom(section, "default_tab", 1) - 1;
+  const initial = steps.length
+    ? Math.min(steps.length - 1, Math.max(0, requested))
+    : 0;
+
+  const [active, setActive] = useState(initial);
+
+  if (!section || !steps.length) return null;
 
   const title = fieldValue(section, "title");
   const description = fieldValue(section, "description");
   const grayGlow = imageFrom(section, "gray_bubble", "gray_glow");
   const greenGlow = imageFrom(section, "green_bubble", "green_glow");
-  const steps = referencesFrom(section, "steps");
   const current = steps[active] ?? steps[0];
   const cards = current ? referencesFrom(current, "cards") : [];
-
-  if (!steps.length) return null;
 
   return (
     <section className="project-route">
@@ -82,31 +98,37 @@ export default function ProjectRouteTabs({ section }) {
           <p className="project-route__description">{description}</p>
         )}
 
-        <div className="project-route__tabs" role="tablist">
-          {steps.map((step, index) => {
-            const label = fieldValue(step, "title");
-            const isActive = index === active;
+        {showTabs && (
+          <div className="project-route__tabs" role="tablist">
+            {steps.map((step, index) => {
+              const label = fieldValue(step, "title");
+              const isActive = index === active;
 
-            return (
-              <button
-                key={step.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={
-                  isActive
-                    ? "project-route__tab project-route__tab--active"
-                    : "project-route__tab"
-                }
-                onClick={() => setActive(index)}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={
+                    isActive
+                      ? "project-route__tab project-route__tab--active"
+                      : "project-route__tab"
+                  }
+                  onClick={() => setActive(index)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        <ul className="project-route__cards" role="tabpanel">
+        <ul
+          className="project-route__cards"
+          role="tabpanel"
+          style={{ "--project-route-columns": columns }}
+        >
           {cards.map((card, index) => {
             const cardTitle = fieldValue(card, "title");
             const cardDescription = fieldValue(card, "description");

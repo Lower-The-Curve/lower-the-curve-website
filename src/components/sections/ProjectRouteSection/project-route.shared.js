@@ -3,7 +3,8 @@
 // module into its graph.
 //
 // Live Admin / Storefront keys (verified in Postman):
-//   project_route       title, description, steps, gray_bubble, green_bubble
+//   project_route       title, description, steps, columns, default_tab,
+//                       show_tabs, gray_bubble, green_bubble
 //   project_route_step  title, cards
 //   project_route_card  title, description, icon (file_reference → MediaImage)
 //
