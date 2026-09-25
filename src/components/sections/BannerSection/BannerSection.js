@@ -177,7 +177,7 @@ export default function BannerSection({ section }) {
                 width={image.width ?? 1000}
                 height={image.height ?? 1000}
                 className="banner__image"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 40vw"
                 unoptimized={/\.svg(\?|$)/i.test(image.url)}
               />
             ))}
@@ -213,10 +213,14 @@ export default function BannerSection({ section }) {
             </ul>
           )}
 
+          {/* `inverse` — the white pill for a brand-coloured surface (see
+              Button.css): the reference's CTA has no border and must not flip
+              to a blue fill on hover, which `secondary` would do on this
+              background. */}
           {button?.text && button?.url && (
             <Button
               href={button.url}
-              variant="secondary"
+              variant="inverse"
               arrow="rise"
               className="banner__button"
             >
