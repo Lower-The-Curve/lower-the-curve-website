@@ -83,6 +83,13 @@
 }
 
 @media (min-width: 1025px) {
+  /* No collage -> no media column. Without this the copy would be squeezed into
+     the empty 29rem media track with the rest of the measure left blank, so a
+     title+description-only banner reads across the full measure instead. */
+  .banner--no-media .banner__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .banner__media {
     /* min() clamps the pull: below the page's max-width there is no centring
        margin to cancel, and a bare negative calc would push the media right
@@ -207,45 +214,61 @@
   padding: 0.65em 1.25em;
 }
 
-/* --- TABLET (<= 1024px) -------------------------------------------------
+/* --- STACKED (<= 1024px) ------------------------------------------------
    One column, collage on top. The media is first in the DOM, so the stack order
-   needs no `order` property, and the left bleed above no longer applies.
+   needs no `order` property, and the desktop left bleed no longer applies.
+
+   Tablet and phone share ONE presentation: the collage runs edge to edge and
+   flush with the section's top, and the copy below it is centred on the same
+   measure with the same rhythm. Splitting this across two tiers is what let the
+   tablet tier keep its 4.5rem top padding — a band of background above the
+   collage — while the phone tier didn't, so the two disagreed right at the
+   boundary. The desktop layout (>= 1025px) is untouched.
    ---------------------------------------------------------------------- */
 @media (max-width: 1024px) {
+  /* The stacked content is always far taller than the artwork's ratio, so the
+     ratio is dropped here and the section's height comes from its content
+     alone. That is also what pins the collage to the section's top edge at
+     every width: nothing depends on aspect-ratio, grid stretching or a fixed
+     height any more — the media is simply the first block in normal flow. */
+  .banner {
+    aspect-ratio: auto;
+  }
+
   .banner__inner {
     grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-    /* Stacked, the content drives the section's height, so the vertical rhythm
-       comes back as padding. */
-    padding-block: 4.5rem;
-  }
-
-  .banner__description {
-    max-width: 70ch;
-  }
-}
-
-/* --- MOBILE (<= 575px) ---------------------------------------------------
-   The reference's phone layout: the collage runs edge to edge and flush with
-   the section's top, the copy is centred, and the highlights keep two columns.
-   ---------------------------------------------------------------------- */
-@media (max-width: 575px) {
-  .banner__inner {
+    gap: 2rem;
     /* No top padding: the artwork sits flush with the section's top edge. */
     padding: 0 var(--space) 3rem;
-    gap: 2rem;
+  }
+
+  /* With no collage there is no artwork to sit flush, so the copy needs its top
+     gutter back. */
+  .banner--no-media .banner__inner {
+    padding-top: 3rem;
   }
 
   .banner__media {
+    /* Edge to edge, and top-aligned whatever the row's height turns out to be —
+       the wrapper must not add any space above the image. */
     margin-inline: calc(var(--space) * -1);
+    align-self: start;
   }
 
   .banner__content {
     align-items: center;
   }
 
-  .banner__title,
+  .banner__title {
+    text-align: center;
+    /* A long unbroken CMS word can never push past the section's gutters. */
+    overflow-wrap: break-word;
+  }
+
+  /* Centred, and capped at a comfortable measure so a tablet does not run the
+     copy the full width of the section. */
   .banner__description {
+    max-width: 70ch;
     text-align: center;
   }
 
@@ -256,6 +279,19 @@
 
   .banner__highlight {
     gap: 0.5rem;
+    /* Icon and first line of a wrapped label line up, so the icons stay on a
+       common baseline across both columns. */
+    align-items: flex-start;
+  }
+
+  /* Half the measure is narrower than the longest label, so the two columns
+     only hold if the label wraps. `nowrap` let the text run into the
+     neighbouring column and off the section's edge, where overflow-x: clip cut
+     it off. The label is the part that gives: the icon keeps its size, the text
+     wraps. */
+  .banner__highlight-label {
+    white-space: normal;
+    min-width: 0;
   }
 
   .banner__highlight-icon {

@@ -15,10 +15,17 @@ import './BannerSection.css';
 //                          each a `banner_highlight` entry carrying `label` and
 //                          `icon`.
 //   - `button`           : link -> { text, url } for the CTA.
+//   - `show_highlights`  : boolean, hides the highlight list without deleting
+//                          it. ABSENT means shown — see toggledOn.
+//   - `show_button`      : boolean, hides the CTA without deleting it. Same
+//                          absent-means-shown rule.
 //
 // Nothing here is tied to one client: the background, collage, copy, highlight
 // items and CTA all come from the entry, and the highlight list's LENGTH is the
-// number of items rendered while its ORDER is the render order.
+// number of items rendered while its ORDER is the render order. Every block is
+// independently optional, so an entry with only `heading` + `description` is a
+// complete banner — the `banner--no-media` modifier collapses the collage
+// column for it.
 export const BANNER_TYPE = 'banner';
 
 // Colocated GraphQL fragment. Same shape as the other sections': the page query
@@ -91,6 +98,14 @@ function fieldValue(node, ...keys) {
   return null;
 }
 
+// A `boolean` field arrives as the string "true"/"false". ABSENT or empty means
+// ON: the toggles exist to hide content without deleting it, so an entry
+// authored before the field existed keeps rendering as it did — adding the field
+// in the admin never blanks a live banner. Only an explicit "false" turns off.
+function toggledOn(node, ...keys) {
+  return fieldValue(node, ...keys) !== 'false';
+}
+
 function imageFrom(node, ...keys) {
   for (const key of keys) {
     const image = field(node, key)?.reference?.image;
@@ -159,15 +174,25 @@ export default function BannerSection({ section }) {
   const description = fieldValue(section, 'description', 'text');
   const background = imageFrom(section, 'background_image', 'background');
   const collage = collageImages(section);
-  const items = highlightItems(section);
-  const button = linkFrom(section, 'button', 'link');
+  // Toggled off, the field's content stays in the CMS and the reader returns an
+  // empty list — the downstream length check is what hides the block.
+  const items = toggledOn(section, 'show_highlights')
+    ? highlightItems(section)
+    : [];
+  const button = toggledOn(section, 'show_button')
+    ? linkFrom(section, 'button', 'link')
+    : null;
+  const hasMedia = collage.length > 0;
 
   return (
-    <section className="banner" style={backgroundStyle(background)}>
+    <section
+      className={hasMedia ? 'banner' : 'banner banner--no-media'}
+      style={backgroundStyle(background)}
+    >
       <div className="banner__inner">
         {/* First in the DOM, so it stacks ABOVE the copy when the grid collapses
             at the narrow breakpoints — no `order` needed. */}
-        {collage.length > 0 && (
+        {hasMedia && (
           <div className="banner__media">
             {collage.map((image, i) => (
               <Image
