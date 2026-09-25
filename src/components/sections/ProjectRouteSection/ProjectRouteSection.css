@@ -16,8 +16,18 @@
 
 .project-route__glow {
   position: absolute;
-  top: 8.5rem;
+  top: 0;
   right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Mobile-only. Sits beside the first card's icon, not on the section edge. */
+.project-route__green-glow {
+  display: none;
+  position: absolute;
+  top: -1.25rem;
+  left: 2.5rem;
   z-index: 0;
   pointer-events: none;
 }
@@ -131,6 +141,7 @@
 }
 
 .project-route__card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,6 +177,17 @@
 }
 
 @media (max-width: 575px) {
+  /* Mobile Figma: sits at the top of the section (top half visible) and
+     hangs off the right so overflow: clip cuts that side only. */
+  .project-route__glow {
+    top: -2rem;
+    right: -2.5rem;
+  }
+
+  .project-route__green-glow {
+    display: block;
+  }
+
   .project-route__inner {
     padding: 3rem var(--space);
     gap: 1.25rem;

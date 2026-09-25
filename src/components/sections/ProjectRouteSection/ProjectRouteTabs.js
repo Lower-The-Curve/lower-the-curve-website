@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
 import ProjectRouteGlow from './ProjectRouteGlow';
+import ProjectRouteGreenGlow from './ProjectRouteGreenGlow';
 import './ProjectRouteSection.css';
 
 function field(node, key) {
@@ -88,13 +89,16 @@ export default function ProjectRouteTabs({ section }) {
         </div>
 
         <ul className="project-route__cards" role="tabpanel">
-          {cards.map((card) => {
+          {cards.map((card, index) => {
             const cardTitle = fieldValue(card, 'title');
             const cardDescription = fieldValue(card, 'description');
             const icon = imageFrom(card, 'icon', 'image');
 
             return (
               <li key={card.id} className="project-route__card">
+                {index === 0 && (
+                  <ProjectRouteGreenGlow className="project-route__green-glow" />
+                )}
                 {icon && (
                   <Image
                     src={icon.url}
