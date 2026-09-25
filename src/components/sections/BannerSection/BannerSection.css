@@ -23,6 +23,15 @@
   /* Fallback only — the artwork layer below covers it whenever an image is set. */
   background-color: var(--color-brand);
   color: #ffffff;
+  /* The artwork's content ratio (2880x1006 at 2x, the transparent export bands
+     excluded). The section keeps the artwork's proportions, so the whole frame
+     — the diagonal stripes and the wave lines at the bottom — is visible at
+     every width, and the collage's bottom overhang stays the same share of the
+     section as it is in the reference. Content taller than the ratio (tablet
+     and phone, where the layout stacks) grows the section; the artwork simply
+     covers the extra. */
+  display: grid;
+  aspect-ratio: 2880 / 1006;
 }
 
 /* The artwork sits on its own layer, oversized and clipped back to the section.
@@ -44,15 +53,19 @@
 .banner__inner {
   /* Sections own their measure and their rhythm; the page's `main` adds neither.
      See DESIGN-SYSTEM.md §5. */
+  width: 100%;
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4.5rem var(--space);
+  /* Horizontal gutters only on desktop: the section's height comes from the
+     artwork's ratio and the copy is centred inside it. Padding-block returns on
+     the tiers where the content drives the height (below). */
+  padding: 0 var(--space);
   display: grid;
-  /* ~1/3 to ~2/3, measured off the reference: the collage column is narrower
-     than the copy column, which gives the three highlight labels room to sit on
-     one line each. */
-  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-  gap: 3.5rem;
+  /* A fixed 29rem collage column, measured off the reference: the copy column
+     then lands on the reference's ~712px and the heading's and body's line
+     breaks hold at every desktop width (they need 702-733px). */
+  grid-template-columns: minmax(0, 29rem) minmax(0, 1fr);
+  gap: 2.5rem;
   align-items: center;
 }
 
@@ -75,23 +88,22 @@
        margin to cancel, and a bare negative calc would push the media right
        instead of pulling it to the viewport edge. */
     margin-left: min(0px, calc((100vw - var(--max-width)) / -2 - var(--space)));
-    /* Top-align with the row and cancel the inner padding, so the artwork
-       starts at the exact edge the background does. Keep in step with
-       .banner__inner's padding-block. */
+    /* Top-align with the row: the inner has no padding-block on desktop, so the
+       media box starts at the section's top edge and the image can too. */
     align-self: start;
     position: relative;
-    top: -4.5rem;
   }
 
   /* The artwork is out of flow, so it does NOT set the section's height — the
      copy column does — and it is allowed to spill past the section's bottom
-     edge, as the reference shows. The width cap keeps it from ballooning on
-     very wide viewports. */
+     edge, as the reference shows. 40vw is the reference's collage share (576px
+     at 1440) and keeps the overhang the same share of the section at every
+     width; min() keeps the image inside its widened column on narrow desktops. */
   .banner__image {
     position: absolute;
     top: 0;
     left: 0;
-    width: min(100%, 38rem);
+    width: min(100%, 40vw);
     height: auto;
   }
 }
@@ -101,7 +113,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  /* The reference's rhythm: heading -> copy -> highlights -> CTA are each one
+     2.5rem step apart. */
+  gap: 2.5rem;
 }
 
 /* The display heading step, one above the sub-section headings. Regular weight
@@ -110,12 +124,16 @@
 .banner__title {
   font-size: var(--fs-heading-ml);
   font-weight: 400;
-  line-height: 1.2;
+  /* Poppins' normal line box, as the reference sets it: the two lines sit 56px
+     apart at 40px. */
+  line-height: 1.4;
   margin: 0;
   /* MEASURED for the reference's break. Line 2 ("E-Commerce to the Next
-     Level") needs ~570px at 40px, while line 1 plus the accent needs ~700px —
-     26ch is ~624px at this size, inside that window, so the accent moves whole
-     onto line 2 and never dangles after its hyphen. */
+     Level") needs ~601px at 40px, while line 1 plus the accent needs ~778px —
+     26ch is ~653px at this size, inside that window, so the accent moves whole
+     onto line 2 and never dangles after its hyphen. (The 29rem + 1fr grid
+     above produces the same break on its own; the cap only keeps it stable if
+     the copy column ever grows.) */
   max-width: 26ch;
 }
 
@@ -130,9 +148,11 @@
 }
 
 /* Body copy at the `p` default (--fs-body-base) — no font-size here, which also
-   avoids the inheritance trap: a rule on a wrapper never reaches the <p>. */
+   avoids the inheritance trap: a rule on a wrapper never reaches the <p>. The
+   colour is inherited from .banner (flat white, as the reference sets it) and
+   the line box is Poppins' normal, like the heading's. */
 .banner__description {
-  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.4;
 }
 
 /* --- HIGHLIGHTS ---------------------------------------------------------- */
@@ -151,20 +171,23 @@
      edge like the reference. */
   grid-template-columns: repeat(3, auto);
   justify-content: space-between;
-  gap: 0.875rem 2rem;
+  gap: 1rem;
   width: 100%;
 }
 
 .banner__highlight {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.625rem;
   min-width: 0;
 }
 
+/* The icon keeps its own aspect ratio (width fixed, height auto): the assets are
+   not square — the storefront bag is 24x26, the integrations link 24x11 — and a
+   square box would letterbox the tall ones smaller than the reference's. */
 .banner__highlight-icon {
   width: 1.5rem;
-  height: 1.5rem;
+  height: auto;
   flex-shrink: 0;
 }
 
@@ -177,8 +200,11 @@
   white-space: nowrap;
 }
 
+/* The reference's CTA is the compact white pill (204x37 at 1440), not the
+   Button's default --md box: the label step stays --fs-body-sm and only the
+   padding tightens, scoped here so no other section's button changes. */
 .banner__button {
-  margin-top: 0.5rem;
+  padding: 0.65em 1.25em;
 }
 
 /* --- TABLET (<= 1024px) -------------------------------------------------
@@ -189,6 +215,9 @@
   .banner__inner {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
+    /* Stacked, the content drives the section's height, so the vertical rhythm
+       comes back as padding. */
+    padding-block: 4.5rem;
   }
 
   .banner__description {
