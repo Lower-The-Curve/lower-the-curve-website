@@ -53,8 +53,11 @@ function boolFrom(node, key, fallback) {
   return value === "true";
 }
 
-export default function ProjectRouteTabs({ section, variant }) {
-  const isShopifyApps = variant === "shopify-apps";
+export default function ProjectRouteTabs({ section }) {
+  const glowLayout = (fieldValue(section, "glow_layout") ?? "default")
+    .trim()
+    .toLowerCase();
+  const isSplit = glowLayout === "split";
   const steps = section ? referencesFrom(section, "steps") : [];
   const columns = Math.min(4, Math.max(2, intFrom(section, "columns", 2)));
   const showTabs = boolFrom(section, "show_tabs", true);
@@ -77,9 +80,7 @@ export default function ProjectRouteTabs({ section, variant }) {
   return (
     <section
       className={
-        isShopifyApps
-          ? "project-route project-route--shopify-apps"
-          : "project-route"
+        isSplit ? "project-route project-route--split" : "project-route"
       }
     >
       {grayGlow && (
@@ -92,7 +93,7 @@ export default function ProjectRouteTabs({ section, variant }) {
           unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
         />
       )}
-      {isShopifyApps && greenGlow && (
+      {isSplit && greenGlow && (
         <Image
           src={greenGlow.url}
           alt={greenGlow.altText ?? ""}
@@ -153,7 +154,7 @@ export default function ProjectRouteTabs({ section, variant }) {
 
             return (
               <li key={card.id} className="project-route__card">
-                {isShopifyApps && index === 1 && grayGlow && (
+                {isSplit && index === 1 && grayGlow && (
                   <Image
                     src={grayGlow.url}
                     alt={grayGlow.altText ?? ""}
@@ -163,7 +164,7 @@ export default function ProjectRouteTabs({ section, variant }) {
                     unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
                   />
                 )}
-                {!isShopifyApps && index === 0 && greenGlow && (
+                {!isSplit && index === 0 && greenGlow && (
                   <Image
                     src={greenGlow.url}
                     alt={greenGlow.altText ?? ""}

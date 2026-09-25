@@ -34,13 +34,7 @@ export default async function ShopifyAppsPage() {
           case HERO_SECTION_TYPE:
             return <HeroSection key={section.id} section={section} />;
           case PROJECT_ROUTE_TYPE:
-            return (
-              <ProjectRouteSection
-                key={section.id}
-                section={section}
-                variant="shopify-apps"
-              />
-            );
+            return <ProjectRouteSection key={section.id} section={section} />;
           default:
             return null;
         }
