@@ -8,10 +8,23 @@
    tab labels --fs-body-sm, card title --fs-heading-sm, card copy the p default
    --fs-body-base. */
 .project-route {
+  position: relative;
   isolation: isolate;
+  /* Clip the right-edge glow so a blurred disc cannot open a horizontal scroll. */
+  overflow: clip;
+}
+
+.project-route__glow {
+  position: absolute;
+  top: 8.5rem;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .project-route__inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--max-width);
   margin-inline: auto;
   padding: 4rem var(--space);

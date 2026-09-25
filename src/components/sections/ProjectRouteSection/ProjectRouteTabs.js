@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
+import ProjectRouteGlow from './ProjectRouteGlow';
 import './ProjectRouteSection.css';
 
 function field(node, key) {
@@ -48,6 +49,7 @@ export default function ProjectRouteTabs({ section }) {
 
   return (
     <section className="project-route">
+      <ProjectRouteGlow className="project-route__glow" />
       <div className="project-route__inner">
         {title && (
           <h2 className="project-route__title">
