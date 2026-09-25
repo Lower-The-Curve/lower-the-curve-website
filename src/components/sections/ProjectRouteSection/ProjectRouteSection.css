@@ -22,7 +22,8 @@
   pointer-events: none;
 }
 
-/* Mobile-only. Sits beside the first card's icon, not on the section edge. */
+/* Mobile-only on Services. Sits beside the first card's icon, not on the
+   section edge. Shopify Apps repositions this via --shopify-apps. */
 .project-route__green-glow {
   display: none;
   position: absolute;
@@ -30,6 +31,34 @@
   left: 2.5rem;
   z-index: 0;
   pointer-events: none;
+}
+
+/* Shopify Apps Figma: gray half-cut mid-right; green on the seam with the
+   section above, half-cut on the left. overflow-y stays visible so the green
+   disc can bleed upward (same overflow-x: clip pairing as .testimonials). */
+.project-route--shopify-apps {
+  overflow: visible;
+  overflow-x: clip;
+}
+
+.project-route--shopify-apps .project-route__glow {
+  top: 50%;
+  transform: translate(50%, -50%);
+}
+
+.project-route--shopify-apps .project-route__green-glow {
+  display: block;
+  top: 0;
+  left: 0;
+  width: 14rem;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+/* Mobile-only copy, parked on the second card. Hidden until the phone
+   breakpoint so desktop keeps the section-level mid-right disc. */
+.project-route__glow--card {
+  display: none;
 }
 
 .project-route__inner {
@@ -180,8 +209,8 @@
 }
 
 @media (max-width: 575px) {
-  /* Mobile Figma: sits at the top of the section (top half visible) and
-     hangs off the right so overflow: clip cuts that side only. */
+  /* Mobile Figma (Services): sits at the top of the section (top half visible)
+     and hangs off the right so overflow: clip cuts that side only. */
   .project-route__glow {
     top: -2rem;
     right: -2.5rem;
@@ -189,6 +218,23 @@
 
   .project-route__green-glow {
     display: block;
+  }
+
+  /* Shopify Apps mobile: gray sits on the second card icon and hangs off
+     the right; the section-level disc would otherwise stay mid-page. */
+  .project-route--shopify-apps .project-route__glow {
+    display: none;
+  }
+
+  .project-route--shopify-apps .project-route__glow--card {
+    display: block;
+    top: -1.5rem;
+    right: -3rem;
+    transform: none;
+  }
+
+  .project-route--shopify-apps .project-route__green-glow {
+    width: 6rem;
   }
 
   .project-route__inner {

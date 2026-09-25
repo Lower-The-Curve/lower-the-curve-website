@@ -7,6 +7,7 @@
 import {
   getHomePageQuery,
   getServicesPageQuery,
+  getShopifyAppsPageQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -337,6 +338,21 @@ export async function getServicesPage() {
   const { body } = await shopifyFetch({
     query: getServicesPageQuery,
     variables: { handle: { type: 'content', handle: 'services' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "shopify-apps" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "shopify-apps" doesn't exist.
+ */
+export async function getShopifyAppsPage() {
+  const { body } = await shopifyFetch({
+    query: getShopifyAppsPageQuery,
+    variables: { handle: { type: 'content', handle: 'shopify-apps' } },
   });
 
   return body?.data?.metaobject ?? null;

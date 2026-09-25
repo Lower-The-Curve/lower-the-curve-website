@@ -53,7 +53,8 @@ function boolFrom(node, key, fallback) {
   return value === "true";
 }
 
-export default function ProjectRouteTabs({ section }) {
+export default function ProjectRouteTabs({ section, variant }) {
+  const isShopifyApps = variant === "shopify-apps";
   const steps = section ? referencesFrom(section, "steps") : [];
   const columns = Math.min(4, Math.max(2, intFrom(section, "columns", 2)));
   const showTabs = boolFrom(section, "show_tabs", true);
@@ -74,7 +75,13 @@ export default function ProjectRouteTabs({ section }) {
   const cards = current ? referencesFrom(current, "cards") : [];
 
   return (
-    <section className="project-route">
+    <section
+      className={
+        isShopifyApps
+          ? "project-route project-route--shopify-apps"
+          : "project-route"
+      }
+    >
       {grayGlow && (
         <Image
           src={grayGlow.url}
@@ -83,6 +90,16 @@ export default function ProjectRouteTabs({ section }) {
           height={grayGlow.height ?? 157}
           className="project-route__glow"
           unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
+        />
+      )}
+      {isShopifyApps && greenGlow && (
+        <Image
+          src={greenGlow.url}
+          alt={greenGlow.altText ?? ""}
+          width={greenGlow.width ?? 220}
+          height={greenGlow.height ?? 220}
+          className="project-route__green-glow"
+          unoptimized={/\.svg(\?|$)/i.test(greenGlow.url)}
         />
       )}
       <div className="project-route__inner">
@@ -136,7 +153,17 @@ export default function ProjectRouteTabs({ section }) {
 
             return (
               <li key={card.id} className="project-route__card">
-                {index === 0 && greenGlow && (
+                {isShopifyApps && index === 1 && grayGlow && (
+                  <Image
+                    src={grayGlow.url}
+                    alt={grayGlow.altText ?? ""}
+                    width={grayGlow.width ?? 130}
+                    height={grayGlow.height ?? 157}
+                    className="project-route__glow project-route__glow--card"
+                    unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
+                  />
+                )}
+                {!isShopifyApps && index === 0 && greenGlow && (
                   <Image
                     src={greenGlow.url}
                     alt={greenGlow.altText ?? ""}
