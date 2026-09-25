@@ -1,11 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import accentedTitle from '@/components/ui/accentedTitle';
-import ProjectRouteGlow from './ProjectRouteGlow';
-import ProjectRouteGreenGlow from './ProjectRouteGreenGlow';
-import './ProjectRouteSection.css';
+import { useState } from "react";
+import Image from "next/image";
+import accentedTitle from "@/components/ui/accentedTitle";
+import "./ProjectRouteSection.css";
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;
@@ -29,8 +27,17 @@ function referencesFrom(node, ...keys) {
 
 function imageFrom(node, ...keys) {
   for (const key of keys) {
-    const image = field(node, key)?.reference?.image;
-    if (image) return image;
+    const ref = field(node, key)?.reference;
+    if (!ref) continue;
+    if (ref.image) return ref.image;
+    if (ref.url) {
+      return {
+        url: ref.url,
+        altText: ref.alt ?? "",
+        width: null,
+        height: null,
+      };
+    }
   }
   return null;
 }
@@ -40,23 +47,34 @@ export default function ProjectRouteTabs({ section }) {
 
   if (!section) return null;
 
-  const title = fieldValue(section, 'title');
-  const description = fieldValue(section, 'description');
-  const steps = referencesFrom(section, 'steps');
+  const title = fieldValue(section, "title");
+  const description = fieldValue(section, "description");
+  const grayGlow = imageFrom(section, "gray_bubble", "gray_glow");
+  const greenGlow = imageFrom(section, "green_bubble", "green_glow");
+  const steps = referencesFrom(section, "steps");
   const current = steps[active] ?? steps[0];
-  const cards = current ? referencesFrom(current, 'cards') : [];
+  const cards = current ? referencesFrom(current, "cards") : [];
 
   if (!steps.length) return null;
 
   return (
     <section className="project-route">
-      <ProjectRouteGlow className="project-route__glow" />
+      {grayGlow && (
+        <Image
+          src={grayGlow.url}
+          alt={grayGlow.altText ?? ""}
+          width={grayGlow.width ?? 130}
+          height={grayGlow.height ?? 157}
+          className="project-route__glow"
+          unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
+        />
+      )}
       <div className="project-route__inner">
         {title && (
           <h2 className="project-route__title">
             {accentedTitle(title, {
-              accent: 'project-route__accent',
-              blue: 'project-route__accent--blue',
+              accent: "project-route__accent",
+              blue: "project-route__accent--blue",
             })}
           </h2>
         )}
@@ -66,7 +84,7 @@ export default function ProjectRouteTabs({ section }) {
 
         <div className="project-route__tabs" role="tablist">
           {steps.map((step, index) => {
-            const label = fieldValue(step, 'title');
+            const label = fieldValue(step, "title");
             const isActive = index === active;
 
             return (
@@ -77,8 +95,8 @@ export default function ProjectRouteTabs({ section }) {
                 aria-selected={isActive}
                 className={
                   isActive
-                    ? 'project-route__tab project-route__tab--active'
-                    : 'project-route__tab'
+                    ? "project-route__tab project-route__tab--active"
+                    : "project-route__tab"
                 }
                 onClick={() => setActive(index)}
               >
@@ -90,19 +108,26 @@ export default function ProjectRouteTabs({ section }) {
 
         <ul className="project-route__cards" role="tabpanel">
           {cards.map((card, index) => {
-            const cardTitle = fieldValue(card, 'title');
-            const cardDescription = fieldValue(card, 'description');
-            const icon = imageFrom(card, 'icon', 'image');
+            const cardTitle = fieldValue(card, "title");
+            const cardDescription = fieldValue(card, "description");
+            const icon = imageFrom(card, "icon", "image");
 
             return (
               <li key={card.id} className="project-route__card">
-                {index === 0 && (
-                  <ProjectRouteGreenGlow className="project-route__green-glow" />
+                {index === 0 && greenGlow && (
+                  <Image
+                    src={greenGlow.url}
+                    alt={greenGlow.altText ?? ""}
+                    width={greenGlow.width ?? 30}
+                    height={greenGlow.height ?? 30}
+                    className="project-route__green-glow"
+                    unoptimized={/\.svg(\?|$)/i.test(greenGlow.url)}
+                  />
                 )}
                 {icon && (
                   <Image
                     src={icon.url}
-                    alt={icon.altText ?? ''}
+                    alt={icon.altText ?? ""}
                     width={icon.width ?? 85}
                     height={icon.height ?? 85}
                     className="project-route__icon"
