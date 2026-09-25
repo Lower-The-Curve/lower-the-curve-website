@@ -3,5 +3,6 @@
 // '@/lib/shopify/queries' or './queries'.
 export * from './home';
 export * from './services';
+export * from './shopify-apps';
 export * from './header';
 export * from './footer';

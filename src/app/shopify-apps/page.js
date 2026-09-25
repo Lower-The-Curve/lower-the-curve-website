@@ -1,4 +1,4 @@
-import { getServicesPage } from "@/lib/shopify";
+import { getShopifyAppsPage } from "@/lib/shopify";
 import HeroSection, {
   HERO_SECTION_TYPE,
 } from "@/components/sections/HeroSection/HeroSection";
@@ -8,7 +8,7 @@ import ProjectRouteSection, {
 import "./page.css";
 
 export const metadata = {
-  title: "Services",
+  title: "Shopify Apps",
 };
 
 const COMPONENT_SLOTS = ["sections", "component6"];
@@ -22,13 +22,13 @@ function sectionsIn(slot) {
   return slot.reference ? [slot.reference] : [];
 }
 
-export default async function ServicesPage() {
-  const page = await getServicesPage();
+export default async function ShopifyAppsPage() {
+  const page = await getShopifyAppsPage();
 
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
-    <main className="services-page">
+    <main className="shopify-apps-page">
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
