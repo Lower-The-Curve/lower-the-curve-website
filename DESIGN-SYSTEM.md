@@ -867,11 +867,12 @@ Two consequences:
 - **The site's second Client Component**, after `HeaderNav`'s mobile drawer — and
   the first *section* that is one. The carousel needs state and a scroll listener,
   which is the one case the conventions allow `'use client'` for.
-  - Because of that the **type constant and the GraphQL fragment live in
-    `testimonials.shared.js`**, not in the component: the page query imports the
-    fragment, and a server-side query module must not pull a client module into
-    its graph. `TestimonialsSection.js` is a two-line barrel that re-exports both
-    sides, so the page still imports from one path like every other section.
+  - Because of that the **type constants live in `TestimonialsSection.js`**, not
+    in the carousel: the page is a Server Component and needs the plain strings
+    to dispatch on, so they stay out of the client module. `TestimonialsSection.js`
+    also re-exports the carousel as its default, so the page still imports from
+    one path like every other section. The GraphQL fragment lives in
+    `lib/shopify/queries/sections/testimonials.js`, like every section's.
   - The carousel is a **native scroll container with CSS scroll-snap**, not a
     JS-driven slider — it works by swipe, trackpad, keyboard and screen reader
     before any of the JS runs. The arrows and the progress bar are enhancements

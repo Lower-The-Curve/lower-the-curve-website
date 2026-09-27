@@ -4,16 +4,9 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 
 // The metaobject type this component renders. Used to dispatch sections to the
 // right component at render time.
-export const HERO_SECTION_TYPE = 'hero_section';
-
-// Colocated GraphQL fragment: this component declares exactly what it needs
-// from a `hero_section` metaobject. The page queries spread this fragment in, so
-// adding/removing fields here is all that's required — the query stays generic.
 //
-// Metaobjects share the generic `Metaobject` type in the Storefront API, so the
-// fragment selects the `fields` list and the component reads fields by key.
-//
-// Every field on the definition comes through this one selection:
+// Its GraphQL fragment lives in lib/shopify/queries/sections/hero.js. Every
+// field on the definition comes through that one selection:
 //   title                -> single_line_text_field, the headline
 //   description          -> multi_line_text_field, optional lede under it
 //   image                -> file_reference, the full-bleed background artwork
@@ -24,29 +17,7 @@ export const HERO_SECTION_TYPE = 'hero_section';
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
-export const heroSectionFragment = /* GraphQL */ `
-  fragment HeroSectionFields on Metaobject {
-    id
-    type
-    handle
-    fields {
-      key
-      type
-      value
-      reference {
-        __typename
-        ... on MediaImage {
-          image {
-            url
-            altText
-            width
-            height
-          }
-        }
-      }
-    }
-  }
-`;
+export const HERO_SECTION_TYPE = 'hero_section';
 
 // Read a single field by key from a metaobject node.
 function field(section, key) {
