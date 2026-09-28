@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
+import richTextBody from '@/components/ui/richTextBody';
 import './RichTextWithStatsSection.css';
 
 
@@ -33,45 +34,19 @@ function referencesFrom(node, ...keys) {
   return [];
 }
 
-function plainParagraphsFromBody(raw) {
-  if (!raw) return [];
-
-  try {
-    const doc = JSON.parse(raw);
-    const paragraphs = [];
-
-    function textFrom(node) {
-      if (!node) return '';
-      if (node.type === 'text') return node.value ?? '';
-      return (node.children ?? []).map(textFrom).join('');
-    }
-
-    for (const child of doc.children ?? []) {
-      if (child.type === 'paragraph') {
-        const text = textFrom(child).trim();
-        if (text) paragraphs.push(text);
-      }
-    }
-
-    return paragraphs;
-  } catch {
-    return [raw.trim()].filter(Boolean);
-  }
-}
-
 export default function RichTextWithStatsSection({ section }) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
   const image = imageFrom(section, 'image', 'media');
-  const bodyParagraphs = plainParagraphsFromBody(fieldValue(section, 'body'));
+  const bodyContent = richTextBody(fieldValue(section, 'body'));
   const stats =
     fieldValue(section, 'use_stats') === 'true'
       ? referencesFrom(section, 'stats')
       : [];
   const hasStats = stats.length > 0;
 
-  if (!title && !image && !bodyParagraphs.length && !hasStats) return null;
+  if (!title && !image && !bodyContent && !hasStats) return null;
 
   return (
     <section
@@ -105,14 +80,8 @@ export default function RichTextWithStatsSection({ section }) {
             </h2>
           )}
 
-          {bodyParagraphs.length > 0 && (
-            <div className="rich-text-with-stats__copy">
-              {bodyParagraphs.map((text, i) => (
-                <p key={i} className="rich-text-with-stats__paragraph">
-                  {text}
-                </p>
-              ))}
-            </div>
+          {bodyContent && (
+            <div className="rich-text-with-stats__copy">{bodyContent}</div>
           )}
         </div>
 

@@ -97,14 +97,7 @@
 }
 
 .rich-text-with-stats__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.rich-text-with-stats__paragraph {
-  color: var(--color-text-muted);
-  white-space: pre-line;
+  width: 100%;
 }
 
 .rich-text-with-stats__stats {
@@ -147,7 +140,7 @@
     text-align: center;
   }
 
-  .rich-text-with-stats__paragraph {
+  .rich-text-with-stats__copy .rich-text-body {
     max-width: 60ch;
   }
 
@@ -162,7 +155,4 @@
     gap: 2rem;
   }
 
-  .rich-text-with-stats__copy {
-    gap: 1.25rem;
-  }
 }
