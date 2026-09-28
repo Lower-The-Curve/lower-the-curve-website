@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import accentedTitle from "@/components/ui/accentedTitle";
 import "./ProjectRouteSection.css";
@@ -67,6 +67,33 @@ export default function ProjectRouteTabs({ section }) {
     : 0;
 
   const [active, setActive] = useState(initial);
+  const scrollerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const tab = scroller.querySelector('[aria-selected="true"]');
+    if (!tab) return;
+
+    const tabs = tab.closest(".project-route__tabs");
+    const indicator = tabs?.querySelector(".project-route__indicator");
+    if (tabs && indicator) {
+      const tabsBox = tabs.getBoundingClientRect();
+      const tabBox = tab.getBoundingClientRect();
+      const center = tabBox.left - tabsBox.left + tabBox.width / 2;
+      const pill = parseFloat(getComputedStyle(indicator).width);
+      tabs.style.setProperty("--indicator-left", `${center - pill / 2}px`);
+    }
+
+    const tabLeft = tab.offsetLeft;
+    const tabRight = tabLeft + tab.offsetWidth;
+    const viewLeft = scroller.scrollLeft;
+    const viewRight = viewLeft + scroller.clientWidth;
+    if (tabLeft >= viewLeft && tabRight <= viewRight) return;
+
+    const left = tabLeft - (scroller.clientWidth - tab.offsetWidth) / 2;
+    scroller.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [active]);
 
   if (!section || !steps.length) return null;
 
@@ -76,6 +103,16 @@ export default function ProjectRouteTabs({ section }) {
   const greenGlow = imageFrom(section, "green_bubble", "green_glow");
   const current = steps[active] ?? steps[0];
   const cards = current ? referencesFrom(current, "cards") : [];
+
+  function onTabsKeyDown(event) {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    event.preventDefault();
+    const delta = event.key === "ArrowRight" ? 1 : -1;
+    const next = (active + delta + steps.length) % steps.length;
+    setActive(next);
+    const tabs = scrollerRef.current?.querySelectorAll('[role="tab"]');
+    tabs?.[next]?.focus();
+  }
 
   return (
     <section
@@ -104,41 +141,57 @@ export default function ProjectRouteTabs({ section }) {
         />
       )}
       <div className="project-route__inner">
-        {title && (
-          <h2 className="project-route__title">
-            {accentedTitle(title, {
-              accent: "project-route__accent",
-              blue: "project-route__accent--blue",
-            })}
-          </h2>
-        )}
-        {description && (
-          <p className="project-route__description">{description}</p>
+        {(title || description) && (
+          <div className="project-route__heading">
+            {title && (
+              <h2 className="project-route__title">
+                {accentedTitle(title, {
+                  accent: "project-route__accent",
+                  blue: "project-route__accent--blue",
+                })}
+              </h2>
+            )}
+            {description && (
+              <p className="project-route__description">{description}</p>
+            )}
+          </div>
         )}
 
         {showTabs && (
-          <div className="project-route__tabs" role="tablist">
-            {steps.map((step, index) => {
-              const label = fieldValue(step, "title");
-              const isActive = index === active;
+          <div className="project-route__scroller" ref={scrollerRef}>
+            <div
+              className="project-route__tabs"
+              role="tablist"
+              style={{
+                "--tab-index": active,
+                "--tab-count": steps.length,
+              }}
+              onKeyDown={onTabsKeyDown}
+            >
+              <span className="project-route__indicator" aria-hidden="true" />
+              {steps.map((step, index) => {
+                const label = fieldValue(step, "title");
+                const isActive = index === active;
 
-              return (
-                <button
-                  key={step.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  className={
-                    isActive
-                      ? "project-route__tab project-route__tab--active"
-                      : "project-route__tab"
-                  }
-                  onClick={() => setActive(index)}
-                >
-                  {label}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    tabIndex={isActive ? 0 : -1}
+                    className={
+                      isActive
+                        ? "project-route__tab project-route__tab--active"
+                        : "project-route__tab"
+                    }
+                    onClick={() => setActive(index)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
