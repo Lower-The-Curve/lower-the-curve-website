@@ -12,6 +12,7 @@ export * from './partners';
 export * from './solutions';
 export * from './testimonials';
 export * from './caseStudies';
+export * from './banner';
 export * from './projectRoute';
 export * from './header';
 export * from './footer';
