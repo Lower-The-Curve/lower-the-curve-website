@@ -160,6 +160,50 @@
    the line box is Poppins' normal, like the heading's. */
 .banner__description {
   line-height: 1.4;
+  /* multi_line_text_field: single line breaks inside a paragraph are authored
+     and meaningful. Blank lines already became separate paragraphs. */
+  white-space: pre-line;
+}
+
+/* The body paragraphs, one <p> per blank-line block (see paragraphs() in
+   BannerSection.js). Gap rather than paragraph margins, because the global `p`
+   rule zeroes those. */
+.banner__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* --- STORY LAYOUT ---------------------------------------------------------
+   The banner's other face: no collage, no highlights, no CTA. The heading takes
+   the collage column and the copy the text column, so the same grid reads as a
+   heading + article layout. Picked by the `story_layout` boolean on the entry
+   (see BannerSection.js).
+   ---------------------------------------------------------------------- */
+.banner--story .banner__content {
+  display: grid;
+  grid-template-columns: minmax(0, 29rem) minmax(0, 1fr);
+  gap: 2.5rem;
+  /* Top-aligned, as the reference shows: the heading starts level with the
+     first paragraph rather than centring against the copy. */
+  align-items: start;
+}
+
+.banner--story .banner__title {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.banner--story .banner__copy,
+.banner--story .banner__highlights,
+.banner--story .banner__button {
+  grid-column: 2;
+}
+
+/* The accent is italic here — the reference's "Story" — where the spotlight
+   banner's accent is upright bold. */
+.banner--story .banner__accent {
+  font-style: italic;
 }
 
 /* --- HIGHLIGHTS ---------------------------------------------------------- */
@@ -257,6 +301,20 @@
 
   .banner__content {
     align-items: center;
+  }
+
+  /* The story layout stacks too: heading above the copy, one centred column,
+     matching the banner's stacked treatment. */
+  .banner--story .banner__content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .banner--story .banner__title,
+  .banner--story .banner__copy,
+  .banner--story .banner__highlights,
+  .banner--story .banner__button {
+    grid-column: 1;
   }
 
   .banner__title {

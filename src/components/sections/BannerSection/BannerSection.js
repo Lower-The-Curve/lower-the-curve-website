@@ -19,6 +19,10 @@ import './BannerSection.css';
 //                          it. ABSENT means shown — see toggledOn.
 //   - `show_button`      : boolean, hides the CTA without deleting it. Same
 //                          absent-means-shown rule.
+//   - `story_layout`     : boolean, picks the STORY layout — the heading takes
+//                          the collage column and the copy the text column, over
+//                          the same artwork (a collage is ignored). ABSENT/false
+//                          is the spotlight layout. See isStory below.
 //
 // Nothing here is tied to one client: the background, collage, copy, highlight
 // items and CTA all come from the entry, and the highlight list's LENGTH is the
@@ -26,6 +30,9 @@ import './BannerSection.css';
 // independently optional, so an entry with only `heading` + `description` is a
 // complete banner — the `banner--no-media` modifier collapses the collage
 // column for it.
+//
+// The `description` is not necessarily one block: blank lines split it into
+// paragraphs (see paragraphs below), as in the case-studies section.
 export const BANNER_TYPE = 'banner';
 
 function field(node, key) {
@@ -40,6 +47,17 @@ function fieldValue(node, ...keys) {
     if (value) return value;
   }
   return null;
+}
+
+// The description is one multi_line_text_field split on BLANK LINES rather
+// than several fields — so an editor adds or removes a paragraph by pressing
+// return twice, and single line breaks inside a paragraph are still honoured
+// (see the `white-space: pre-line` rule on .banner__description).
+function paragraphs(text) {
+  return text
+    .split(/\n\s*\n/)
+    .map((part) => part.trim())
+    .filter(Boolean);
 }
 
 // A `boolean` field arrives as the string "true"/"false". ABSENT or empty means
@@ -126,11 +144,19 @@ export default function BannerSection({ section }) {
   const button = toggledOn(section, 'show_button')
     ? linkFrom(section, 'button', 'link')
     : null;
-  const hasMedia = collage.length > 0;
+  // Picks a whole layout, like Solutions' `use_stats`: absent/false is the
+  // spotlight banner, "true" is the story layout.
+  const isStory = fieldValue(section, 'story_layout') === 'true';
+  // The story layout gives the collage column to the heading, so a collage is
+  // ignored there rather than fighting the title for the same track.
+  const hasMedia = !isStory && collage.length > 0;
+  const body = paragraphs(description ?? '');
 
   return (
     <section
-      className={hasMedia ? 'banner' : 'banner banner--no-media'}
+      className={`banner${hasMedia ? '' : ' banner--no-media'}${
+        isStory ? ' banner--story' : ''
+      }`}
       style={backgroundStyle(background)}
     >
       <div className="banner__inner">
@@ -160,7 +186,15 @@ export default function BannerSection({ section }) {
             </h2>
           )}
 
-          {description && <p className="banner__description">{description}</p>}
+          {body.length > 0 && (
+            <div className="banner__copy">
+              {body.map((text, i) => (
+                <p key={i} className="banner__description">
+                  {text}
+                </p>
+              ))}
+            </div>
+          )}
 
           {items.length > 0 && (
             <ul className="banner__highlights">
