@@ -13,6 +13,8 @@ export const metadata = {
 
 const COMPONENT_SLOTS = ["sections", "component6"];
 
+const RICH_TEXT_WITH_STATS_TYPE = "rich_text_with_stats";
+
 function sectionsIn(slot) {
   if (!slot) return [];
 
@@ -35,6 +37,9 @@ export default async function ServicesPage() {
             return <HeroSection key={section.id} section={section} />;
           case PROJECT_ROUTE_TYPE:
             return <ProjectRouteSection key={section.id} section={section} />;
+          case RICH_TEXT_WITH_STATS_TYPE:
+            // Step 4: RichTextWithStatsSection
+            return null;
           default:
             return null;
         }
