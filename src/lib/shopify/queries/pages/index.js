@@ -3,3 +3,4 @@
 // folder, so helpers still import from '@/lib/shopify/queries' or './queries'.
 export * from './home';
 export * from './services';
+export * from './shopify-apps';
