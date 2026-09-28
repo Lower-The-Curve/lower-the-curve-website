@@ -8,6 +8,7 @@ import {
   getHomePageQuery,
   getServicesPageQuery,
   getShopifyAppsPageQuery,
+  getCaseStudiesPageQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -358,6 +359,31 @@ export async function getShopifyAppsPage() {
   const { body } = await shopifyFetch({
     query: getShopifyAppsPageQuery,
     variables: { handle: { type: 'content', handle: 'shopify-apps' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "Case Studies" content metaobject and its resolved section
+ * references.
+ *
+ * The live handle is `content-hcmnjrrd` — Shopify generated it from the entry's
+ * page name. Renaming the handle in the admin is a one-line change here.
+ *
+ * NOTE: there is a second "Case Studies" content entry in the store with
+ * handle `content-o096zcnb`. It only references the Blackroll banner, so the
+ * page uses `content-hcmnjrrd`, which holds both the Blackroll and Our Story
+ * banners. Delete the stale entry in the admin, or point this handle at
+ * whichever entry is canonical.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with that handle doesn't exist.
+ */
+export async function getCaseStudiesPage() {
+  const { body } = await shopifyFetch({
+    query: getCaseStudiesPageQuery,
+    variables: { handle: { type: 'content', handle: 'content-hcmnjrrd' } },
   });
 
   return body?.data?.metaobject ?? null;
