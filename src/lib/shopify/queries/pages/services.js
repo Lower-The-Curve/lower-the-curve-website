@@ -1,4 +1,4 @@
-import { heroSectionFragment } from '../sections';
+import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
 
 // Services page content. Same shape as the home page: a `content` metaobject
 // (handle "services") with a `sections` field whose reference(s) are the
@@ -15,15 +15,34 @@ export const getServicesPageQuery = /* GraphQL */ `
         reference {
           __typename
           ...HeroSectionFields
+          ...ProjectRouteSectionFields
         }
         references(first: 20) {
           nodes {
             __typename
             ...HeroSectionFields
+            ...ProjectRouteSectionFields
+          }
+        }
+      }
+      component6: field(key: "component_6") {
+        key
+        value
+        reference {
+          __typename
+          ...HeroSectionFields
+          ...ProjectRouteSectionFields
+        }
+        references(first: 20) {
+          nodes {
+            __typename
+            ...HeroSectionFields
+            ...ProjectRouteSectionFields
           }
         }
       }
     }
   }
   ${heroSectionFragment}
+  ${projectRouteSectionFragment}
 `;
