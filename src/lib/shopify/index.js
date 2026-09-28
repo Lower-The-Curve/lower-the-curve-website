@@ -68,7 +68,17 @@ export async function shopifyFetch({
     cache,
   });
 
-  const body = await result.json();
+  const raw = await result.text();
+  let body;
+
+  try {
+    body = raw ? JSON.parse(raw) : {};
+  } catch {
+    const preview = raw.replace(/\s+/g, ' ').trim().slice(0, 200);
+    throw new Error(
+      `Shopify Storefront API returned non-JSON (HTTP ${result.status}): ${preview || '(empty body)'}`
+    );
+  }
 
   if (body.errors) {
     throw new Error(

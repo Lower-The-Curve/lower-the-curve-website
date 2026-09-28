@@ -58,14 +58,44 @@ function renderInlines(children, keyPrefix) {
   });
 }
 
+// Shopify often stores multiple paragraphs as one `paragraph` block with blank
+// lines in a single text node — split them so each block becomes its own <p>.
+function splitParagraphChildren(children) {
+  if (children?.length !== 1 || children[0].type !== 'text') {
+    return [children];
+  }
+
+  const value = children[0].value ?? '';
+  if (!/\n\s*\n/.test(value)) {
+    return [children];
+  }
+
+  return value
+    .split(/\n\s*\n/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => [{ ...children[0], value: part }]);
+}
+
 function renderBlock(node, key) {
   switch (node.type) {
-    case 'paragraph':
+    case 'paragraph': {
+      const segments = splitParagraphChildren(node.children);
+
+      if (segments.length > 1) {
+        return segments.map((segment, index) => (
+          <p key={`${key}-${index}`} className="rich-text-body__paragraph">
+            {renderInlines(segment, `${key}-${index}`)}
+          </p>
+        ));
+      }
+
       return (
         <p key={key} className="rich-text-body__paragraph">
           {renderInlines(node.children, key)}
         </p>
       );
+    }
     case 'heading': {
       const level = Math.min(6, Math.max(1, node.level ?? 2));
       const Tag = `h${level}`;
@@ -107,7 +137,11 @@ function renderDocument(doc) {
   const blocks = doc?.type === 'root' ? doc.children : doc?.children ?? [];
 
   return blocks
-    ?.map((node, index) => renderBlock(node, `block-${index}`))
+    ?.flatMap((node, index) => {
+      const rendered = renderBlock(node, `block-${index}`);
+      if (!rendered) return [];
+      return Array.isArray(rendered) ? rendered : [rendered];
+    })
     .filter(Boolean);
 }
 
