@@ -10,10 +10,14 @@
 // repeatable list — a fourth column would be a content-model change, not just
 // another entry.
 //
-// The fragment lives here rather than colocated in the component (the usual
-// section convention) because Footer fetches its own data: colocating it would
-// make Footer.js -> lib/shopify -> queries/footer.js -> Footer.js a cycle, and
-// the fragment would be read while still in its TDZ. Same reasoning as header.js.
+// The fragment lives here, not in the component: query modules never import
+// components. Colocating this one would also be a cycle — Footer fetches its
+// own data, so Footer.js -> lib/shopify -> queries/sections/footer.js ->
+// Footer.js, and the fragment would be read while still in its TDZ.
+//
+// Like the header, the footer isn't a slot in a page's `content` entry — it
+// fetches itself (getFooter), so this file carries its query as well as its
+// fragment.
 export const footerFragment = /* GraphQL */ `
   fragment FooterFields on Metaobject {
     id

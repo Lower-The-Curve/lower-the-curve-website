@@ -1,8 +1,5 @@
-// Barrel for per-page query modules. Add one file per page (home.js,
-// services.js, ...) and re-export it here so helpers can import from
-// '@/lib/shopify/queries' or './queries'.
-export * from './home';
-export * from './services';
-export * from './shopify-apps';
-export * from './header';
-export * from './footer';
+// Barrel for every query module: page queries live in pages/, section fragments
+// (plus the header and footer, with their own queries) in sections/. Helpers
+// import from '@/lib/shopify/queries' or './queries'.
+export * from './pages';
+export * from './sections';

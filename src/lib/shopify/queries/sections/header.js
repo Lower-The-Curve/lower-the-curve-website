@@ -5,10 +5,14 @@
 //   - `button_background_color` : color -> CTA fill
 //   - `button_color`            : color -> CTA label
 //
-// The fragment lives here rather than colocated in the component (the usual
-// section convention) because Header fetches its own data: colocating it would
-// make Header.js -> lib/shopify -> queries/header.js -> Header.js a cycle, and
-// the fragment would be read while still in its TDZ.
+// The fragment lives here, not in the component: query modules never import
+// components. Colocating this one would also be a cycle — Header fetches its
+// own data, so Header.js -> lib/shopify -> queries/sections/header.js ->
+// Header.js, and the fragment would be read while still in its TDZ.
+//
+// Unlike the page sections beside it, the header isn't a slot in a page's
+// `content` entry — it fetches itself (getHeader), so this file carries its
+// query as well as its fragment.
 export const headerFragment = /* GraphQL */ `
   fragment HeaderFields on Metaobject {
     id

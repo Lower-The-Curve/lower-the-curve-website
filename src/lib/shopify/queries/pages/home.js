@@ -1,8 +1,10 @@
-import { heroSectionFragment } from '@/components/sections/HeroSection/HeroSection';
-import { partnersSectionFragment } from '@/components/sections/PartnersSection/PartnersSection';
-import { solutionsSectionFragment } from '@/components/sections/SolutionsSection/SolutionsSection';
-import { testimonialsSectionFragment } from '@/components/sections/TestimonialsSection/testimonials.shared';
-import { caseStudiesSectionFragment } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
+import {
+  heroSectionFragment,
+  partnersSectionFragment,
+  solutionsSectionFragment,
+  testimonialsSectionFragment,
+  caseStudiesSectionFragment,
+} from '../sections';
 
 // Home page content. The `content` metaobject (handle "home") has one reference
 // field per component slot, and the ORDER OF THOSE SLOTS is the order the page
@@ -20,10 +22,10 @@ import { caseStudiesSectionFragment } from '@/components/sections/CaseStudiesSec
 // So this list is the single place the page's component order is declared. To
 // add a sixth slot, add the field in the admin and add one aliased line here.
 //
-// Section field selections are NOT hardcoded here — each section component
-// contributes its own colocated fragment, and all of them are spread onto every
-// slot, so any component type can go in any slot. Add a new section type by
-// importing its fragment and spreading it alongside the others.
+// Section field selections are NOT hardcoded here — each section type has its
+// own fragment in ../sections, and all of them are spread onto every slot, so
+// any component type can go in any slot. Add a new section type by importing
+// its fragment and spreading it alongside the others.
 //
 // Note: the Storefront API uses `metaobject(handle: ...)`. (`metaobjectByHandle`
 // only exists in the Admin API.)
@@ -62,6 +64,7 @@ export const getHomePageQuery = /* GraphQL */ `
       ...HeroSectionFields
       ...PartnersSectionFields
       ...SolutionsSectionFields
+      ...TestimonialsSectionFields
       ...CaseStudiesSectionFields
     }
     references(first: 20) {
@@ -70,6 +73,7 @@ export const getHomePageQuery = /* GraphQL */ `
         ...HeroSectionFields
         ...PartnersSectionFields
         ...SolutionsSectionFields
+        ...TestimonialsSectionFields
         ...CaseStudiesSectionFields
       }
     }
@@ -77,5 +81,6 @@ export const getHomePageQuery = /* GraphQL */ `
   ${heroSectionFragment}
   ${partnersSectionFragment}
   ${solutionsSectionFragment}
+  ${testimonialsSectionFragment}
   ${caseStudiesSectionFragment}
 `;

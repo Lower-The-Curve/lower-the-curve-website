@@ -16,33 +16,9 @@ import './CaseStudiesSection.css';
 // name was probed and none returned an entry. The section renders nothing until
 // it is created, which is why `if (!section) return null` is not a bug you are
 // seeing. See DESIGN-SYSTEM.md for the exact definition to add.
+//
+// Its GraphQL fragment lives in lib/shopify/queries/sections/caseStudies.js.
 export const CASE_STUDIES_TYPE = 'case_studies';
-
-// Colocated GraphQL fragment. Same shape as the other sections': the page query
-// spreads this and hardcodes no field selections of its own.
-export const caseStudiesSectionFragment = /* GraphQL */ `
-  fragment CaseStudiesSectionFields on Metaobject {
-    id
-    handle
-    type
-    fields {
-      key
-      type
-      value
-      reference {
-        __typename
-        ... on MediaImage {
-          image {
-            url
-            altText
-            width
-            height
-          }
-        }
-      }
-    }
-  }
-`;
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;

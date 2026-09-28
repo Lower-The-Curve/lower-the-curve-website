@@ -1,10 +1,9 @@
-import { heroSectionFragment } from "@/components/sections/HeroSection/HeroSection";
-import { projectRouteSectionFragment } from "@/components/sections/ProjectRouteSection/ProjectRouteSection";
+import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
 
 // Services page content. Same shape as the home page: a `content` metaobject
 // (handle "services") with a `sections` field whose reference(s) are the
 // individual section metaobjects. Section field selections come from each
-// section component's colocated fragment (see queries/home.js for the pattern).
+// section's fragment in ../sections (see home.js for the pattern).
 export const getServicesPageQuery = /* GraphQL */ `
   query GetServicesPage($handle: MetaobjectHandleInput!) {
     metaobject(handle: $handle) {
