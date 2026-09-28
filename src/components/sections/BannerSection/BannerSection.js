@@ -1,0 +1,237 @@
+import Image from 'next/image';
+import Button from '@/components/ui/Button/Button';
+import accentedTitle from '@/components/ui/accentedTitle';
+import './BannerSection.css';
+
+// The banner section is a single `banner` metaobject with:
+//   - `heading`          : single_line_text_field, the display heading. Carries
+//                          the accent markup — see accentedTitle.
+//   - `description`      : multi_line_text_field, the body paragraph.
+//   - `background_image` : file_reference -> the full-bleed background artwork.
+//   - `collage`          : file_reference -> the client collage. The reader
+//                          accepts the list shape too, so retyping the field to
+//                          a list needs no code change.
+//   - `highlights`       : list.metaobject_reference -> the icon+label items,
+//                          each a `banner_highlight` entry carrying `label` and
+//                          `icon`.
+//   - `button`           : link -> { text, url } for the CTA.
+//   - `show_highlights`  : boolean, hides the highlight list without deleting
+//                          it. ABSENT means shown — see toggledOn.
+//   - `show_button`      : boolean, hides the CTA without deleting it. Same
+//                          absent-means-shown rule.
+//   - `story_layout`     : boolean, picks the STORY layout — the heading takes
+//                          the collage column and the copy the text column, over
+//                          the same artwork (a collage is ignored). ABSENT/false
+//                          is the spotlight layout. See isStory below.
+//
+// Nothing here is tied to one client: the background, collage, copy, highlight
+// items and CTA all come from the entry, and the highlight list's LENGTH is the
+// number of items rendered while its ORDER is the render order. Every block is
+// independently optional, so an entry with only `heading` + `description` is a
+// complete banner — the `banner--no-media` modifier collapses the collage
+// column for it.
+//
+// The `description` is not necessarily one block: blank lines split it into
+// paragraphs (see paragraphs below), as in the case-studies section.
+export const BANNER_TYPE = 'banner';
+
+function field(node, key) {
+  return node?.fields?.find((f) => f.key === key) ?? null;
+}
+
+// First non-empty value across the given keys, so a rename in the Shopify admin
+// doesn't blank the section out.
+function fieldValue(node, ...keys) {
+  for (const key of keys) {
+    const value = field(node, key)?.value;
+    if (value) return value;
+  }
+  return null;
+}
+
+// The description is one multi_line_text_field split on BLANK LINES rather
+// than several fields — so an editor adds or removes a paragraph by pressing
+// return twice, and single line breaks inside a paragraph are still honoured
+// (see the `white-space: pre-line` rule on .banner__description).
+function paragraphs(text) {
+  return text
+    .split(/\n\s*\n/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+// A `boolean` field arrives as the string "true"/"false". ABSENT or empty means
+// ON: the toggles exist to hide content without deleting it, so an entry
+// authored before the field existed keeps rendering as it did — adding the field
+// in the admin never blanks a live banner. Only an explicit "false" turns off.
+function toggledOn(node, ...keys) {
+  return fieldValue(node, ...keys) !== 'false';
+}
+
+function imageFrom(node, ...keys) {
+  for (const key of keys) {
+    const image = field(node, key)?.reference?.image;
+    if (image) return image;
+  }
+  return null;
+}
+
+// The collage field is a single `file_reference` today, but the live shape may
+// become a list — both are read so the admin can be retyped without touching
+// this component.
+function collageImages(section) {
+  const collage = field(section, 'collage') ?? field(section, 'images');
+  if (!collage) return [];
+
+  const single = collage.reference?.image;
+  const list = (collage.references?.nodes ?? [])
+    .map((node) => node?.reference?.image)
+    .filter(Boolean);
+
+  return [single, ...list].filter(Boolean);
+}
+
+// The button field comes in two shapes and BOTH are handled: a `link` field
+// carries { text, url }, while a `url` field is a bare URL with no label. The
+// CTA label is editorial, so a link with no text renders no button rather than
+// a captionless one.
+function linkFrom(node, ...keys) {
+  const raw = fieldValue(node, ...keys);
+  if (!raw) return null;
+
+  try {
+    const { text, url } = JSON.parse(raw);
+    return url ? { text: text || null, url } : null;
+  } catch {
+    return { text: null, url: raw };
+  }
+}
+
+// The icon+label items, in authored order. Each is its own `banner_highlight`
+// entry — the list is what makes the count data-driven.
+function highlightItems(section) {
+  const highlights = field(section, 'highlights') ?? field(section, 'highlight');
+
+  return (highlights?.references?.nodes ?? [])
+    .filter(Boolean)
+    .map((node) => ({
+      id: node.id,
+      label: fieldValue(node, 'label', 'title', 'name'),
+      icon: imageFrom(node, 'icon', 'image'),
+    }))
+    .filter((item) => item.label);
+}
+
+// The background artwork is full-bleed, so it is set through a custom property
+// and painted by the stylesheet rather than rendered as an <img>. The flat brand
+// colour underneath is the fallback for an entry with no image.
+function backgroundStyle(image) {
+  return image ? { '--banner-bg-image': `url(${image.url})` } : undefined;
+}
+
+export default function BannerSection({ section }) {
+  if (!section) return null;
+
+  const heading = fieldValue(section, 'heading', 'title');
+  const description = fieldValue(section, 'description', 'text');
+  const background = imageFrom(section, 'background_image', 'background');
+  const collage = collageImages(section);
+  // Toggled off, the field's content stays in the CMS and the reader returns an
+  // empty list — the downstream length check is what hides the block.
+  const items = toggledOn(section, 'show_highlights')
+    ? highlightItems(section)
+    : [];
+  const button = toggledOn(section, 'show_button')
+    ? linkFrom(section, 'button', 'link')
+    : null;
+  // Picks a whole layout, like Solutions' `use_stats`: absent/false is the
+  // spotlight banner, "true" is the story layout.
+  const isStory = fieldValue(section, 'story_layout') === 'true';
+  // The story layout gives the collage column to the heading, so a collage is
+  // ignored there rather than fighting the title for the same track.
+  const hasMedia = !isStory && collage.length > 0;
+  const body = paragraphs(description ?? '');
+
+  return (
+    <section
+      className={`banner${hasMedia ? '' : ' banner--no-media'}${
+        isStory ? ' banner--story' : ''
+      }`}
+      style={backgroundStyle(background)}
+    >
+      <div className="banner__inner">
+        {/* First in the DOM, so it stacks ABOVE the copy when the grid collapses
+            at the narrow breakpoints — no `order` needed. */}
+        {hasMedia && (
+          <div className="banner__media">
+            {collage.map((image, i) => (
+              <Image
+                key={i}
+                src={image.url}
+                alt={image.altText ?? ''}
+                width={image.width ?? 1000}
+                height={image.height ?? 1000}
+                className="banner__image"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                unoptimized={/\.svg(\?|$)/i.test(image.url)}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="banner__content">
+          {heading && (
+            <h2 className="banner__title">
+              {accentedTitle(heading, { accent: 'banner__accent' })}
+            </h2>
+          )}
+
+          {body.length > 0 && (
+            <div className="banner__copy">
+              {body.map((text, i) => (
+                <p key={i} className="banner__description">
+                  {text}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {items.length > 0 && (
+            <ul className="banner__highlights">
+              {items.map((item) => (
+                <li key={item.id} className="banner__highlight">
+                  {item.icon && (
+                    <Image
+                      src={item.icon.url}
+                      alt=""
+                      width={item.icon.width ?? 32}
+                      height={item.icon.height ?? 32}
+                      className="banner__highlight-icon"
+                      unoptimized={/\.svg(\?|$)/i.test(item.icon.url)}
+                    />
+                  )}
+                  <span className="banner__highlight-label">{item.label}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* `inverse` — the white pill for a brand-coloured surface (see
+              Button.css): the reference's CTA has no border and must not flip
+              to a blue fill on hover, which `secondary` would do on this
+              background. */}
+          {button?.text && button?.url && (
+            <Button
+              href={button.url}
+              variant="inverse"
+              arrow="rise"
+              className="banner__button"
+            >
+              {button.text}
+            </Button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
