@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
+import BannerHighlights from './BannerHighlights';
 import './BannerSection.css';
 
 // The banner section is a single `banner` metaobject with:
@@ -39,20 +40,16 @@ function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;
 }
 
-// First non-empty value across the given keys, so a rename in the Shopify admin
-// doesn't blank the section out.
 function fieldValue(node, ...keys) {
   for (const key of keys) {
     const value = field(node, key)?.value;
+
     if (value) return value;
   }
+
   return null;
 }
 
-// The description is one multi_line_text_field split on BLANK LINES rather
-// than several fields — so an editor adds or removes a paragraph by pressing
-// return twice, and single line breaks inside a paragraph are still honoured
-// (see the `white-space: pre-line` rule on .banner__description).
 function paragraphs(text) {
   return text
     .split(/\n\s*\n/)
@@ -60,10 +57,6 @@ function paragraphs(text) {
     .filter(Boolean);
 }
 
-// A `boolean` field arrives as the string "true"/"false". ABSENT or empty means
-// ON: the toggles exist to hide content without deleting it, so an entry
-// authored before the field existed keeps rendering as it did — adding the field
-// in the admin never blanks a live banner. Only an explicit "false" turns off.
 function toggledOn(node, ...keys) {
   return fieldValue(node, ...keys) !== 'false';
 }
@@ -71,19 +64,20 @@ function toggledOn(node, ...keys) {
 function imageFrom(node, ...keys) {
   for (const key of keys) {
     const image = field(node, key)?.reference?.image;
+
     if (image) return image;
   }
+
   return null;
 }
 
-// The collage field is a single `file_reference` today, but the live shape may
-// become a list — both are read so the admin can be retyped without touching
-// this component.
 function collageImages(section) {
   const collage = field(section, 'collage') ?? field(section, 'images');
+
   if (!collage) return [];
 
   const single = collage.reference?.image;
+
   const list = (collage.references?.nodes ?? [])
     .map((node) => node?.reference?.image)
     .filter(Boolean);
@@ -91,24 +85,20 @@ function collageImages(section) {
   return [single, ...list].filter(Boolean);
 }
 
-// The button field comes in two shapes and BOTH are handled: a `link` field
-// carries { text, url }, while a `url` field is a bare URL with no label. The
-// CTA label is editorial, so a link with no text renders no button rather than
-// a captionless one.
 function linkFrom(node, ...keys) {
   const raw = fieldValue(node, ...keys);
+
   if (!raw) return null;
 
   try {
     const { text, url } = JSON.parse(raw);
+
     return url ? { text: text || null, url } : null;
   } catch {
     return { text: null, url: raw };
   }
 }
 
-// The icon+label items, in authored order. Each is its own `banner_highlight`
-// entry — the list is what makes the count data-driven.
 function highlightItems(section) {
   const highlights = field(section, 'highlights') ?? field(section, 'highlight');
 
@@ -122,9 +112,6 @@ function highlightItems(section) {
     .filter((item) => item.label);
 }
 
-// The background artwork is full-bleed, so it is set through a custom property
-// and painted by the stylesheet rather than rendered as an <img>. The flat brand
-// colour underneath is the fallback for an entry with no image.
 function backgroundStyle(image) {
   return image ? { '--banner-bg-image': `url(${image.url})` } : undefined;
 }
@@ -133,23 +120,25 @@ export default function BannerSection({ section }) {
   if (!section) return null;
 
   const heading = fieldValue(section, 'heading', 'title');
+
   const description = fieldValue(section, 'description', 'text');
+
   const background = imageFrom(section, 'background_image', 'background');
+
   const collage = collageImages(section);
-  // Toggled off, the field's content stays in the CMS and the reader returns an
-  // empty list — the downstream length check is what hides the block.
+
   const items = toggledOn(section, 'show_highlights')
     ? highlightItems(section)
     : [];
+
   const button = toggledOn(section, 'show_button')
     ? linkFrom(section, 'button', 'link')
     : null;
-  // Picks a whole layout, like Solutions' `use_stats`: absent/false is the
-  // spotlight banner, "true" is the story layout.
+
   const isStory = fieldValue(section, 'story_layout') === 'true';
-  // The story layout gives the collage column to the heading, so a collage is
-  // ignored there rather than fighting the title for the same track.
+
   const hasMedia = !isStory && collage.length > 0;
+
   const body = paragraphs(description ?? '');
 
   return (
@@ -160,8 +149,6 @@ export default function BannerSection({ section }) {
       style={backgroundStyle(background)}
     >
       <div className="banner__inner">
-        {/* First in the DOM, so it stacks ABOVE the copy when the grid collapses
-            at the narrow breakpoints — no `order` needed. */}
         {hasMedia && (
           <div className="banner__media">
             {collage.map((image, i) => (
@@ -196,30 +183,8 @@ export default function BannerSection({ section }) {
             </div>
           )}
 
-          {items.length > 0 && (
-            <ul className="banner__highlights">
-              {items.map((item) => (
-                <li key={item.id} className="banner__highlight">
-                  {item.icon && (
-                    <Image
-                      src={item.icon.url}
-                      alt=""
-                      width={item.icon.width ?? 32}
-                      height={item.icon.height ?? 32}
-                      className="banner__highlight-icon"
-                      unoptimized={/\.svg(\?|$)/i.test(item.icon.url)}
-                    />
-                  )}
-                  <span className="banner__highlight-label">{item.label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          {items.length > 0 && <BannerHighlights items={items} />}
 
-          {/* `inverse` — the white pill for a brand-coloured surface (see
-              Button.css): the reference's CTA has no border and must not flip
-              to a blue fill on hover, which `secondary` would do on this
-              background. */}
           {button?.text && button?.url && (
             <Button
               href={button.url}
