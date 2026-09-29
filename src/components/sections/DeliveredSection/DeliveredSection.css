@@ -10,7 +10,7 @@
 .delivered {
   position: relative;
   isolation: isolate;
-  overflow-x: clip;
+  overflow: visible;
 }
 
 .delivered__inner {
@@ -93,7 +93,6 @@
   width: 15rem;
   height: auto;
   pointer-events: none;
-  /* transform: rotate(155deg); */
 }
 
 /* --- GRID --------------------------------------------------------------- */
@@ -327,7 +326,7 @@
 
 @media (max-width: 575px) {
   .delivered__glow {
-    top: -2rem;
+    top: -1rem;
     right: -2rem;
     width: 5rem;
   }
