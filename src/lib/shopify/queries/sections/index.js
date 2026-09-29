@@ -15,5 +15,6 @@ export * from './caseStudies';
 export * from './banner';
 export * from './projectRoute';
 export * from './richTextWithStats';
+export * from './partnerDetail';
 export * from './header';
 export * from './footer';
