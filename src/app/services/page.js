@@ -14,7 +14,7 @@ export const metadata = {
   title: "Services",
 };
 
-const COMPONENT_SLOTS = ["sections", "component6"];
+const COMPONENT_SLOTS = ["sections", "component3", "component6"];
 
 function sectionsIn(slot) {
   if (!slot) return [];

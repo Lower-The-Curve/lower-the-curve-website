@@ -80,6 +80,10 @@
     grid-column: 1 / -1;
     grid-row: 2;
     margin-top: 2.5rem;
+    /* The arch is shifted down so its foot meets the bar. That shift is
+       taller than the bar, so the foot would paint into the next section.
+       The top stays open; only the bottom edge is clipped. */
+    clip-path: inset(-100vh -3rem 0 -3rem);
   }
 }
 

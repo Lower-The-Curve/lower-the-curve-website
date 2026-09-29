@@ -31,6 +31,24 @@ export const getServicesPageQuery = /* GraphQL */ `
           }
         }
       }
+      component3: field(key: "component_3") {
+        key
+        value
+        reference {
+          __typename
+          ...HeroSectionFields
+          ...ProjectRouteSectionFields
+          ...RichTextWithStatsSectionFields
+        }
+        references(first: 20) {
+          nodes {
+            __typename
+            ...HeroSectionFields
+            ...ProjectRouteSectionFields
+            ...RichTextWithStatsSectionFields
+          }
+        }
+      }
       component6: field(key: "component_6") {
         key
         value

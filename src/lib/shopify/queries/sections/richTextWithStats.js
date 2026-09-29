@@ -19,7 +19,7 @@ export const richTextWithStatsSectionFragment = `
           }
         }
       }
-      references(first: 50) {
+      references(first: 20) {
         nodes {
           __typename
           ... on Metaobject {
