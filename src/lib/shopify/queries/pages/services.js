@@ -1,4 +1,8 @@
-import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
+import {
+  heroSectionFragment,
+  projectRouteSectionFragment,
+  richTextWithStatsSectionFragment,
+} from '../sections';
 
 // Services page content. Same shape as the home page: a `content` metaobject
 // (handle "services") with a `sections` field whose reference(s) are the
@@ -16,12 +20,32 @@ export const getServicesPageQuery = /* GraphQL */ `
           __typename
           ...HeroSectionFields
           ...ProjectRouteSectionFields
+          ...RichTextWithStatsSectionFields
         }
         references(first: 20) {
           nodes {
             __typename
             ...HeroSectionFields
             ...ProjectRouteSectionFields
+            ...RichTextWithStatsSectionFields
+          }
+        }
+      }
+      component3: field(key: "component_3") {
+        key
+        value
+        reference {
+          __typename
+          ...HeroSectionFields
+          ...ProjectRouteSectionFields
+          ...RichTextWithStatsSectionFields
+        }
+        references(first: 20) {
+          nodes {
+            __typename
+            ...HeroSectionFields
+            ...ProjectRouteSectionFields
+            ...RichTextWithStatsSectionFields
           }
         }
       }
@@ -32,12 +56,14 @@ export const getServicesPageQuery = /* GraphQL */ `
           __typename
           ...HeroSectionFields
           ...ProjectRouteSectionFields
+          ...RichTextWithStatsSectionFields
         }
         references(first: 20) {
           nodes {
             __typename
             ...HeroSectionFields
             ...ProjectRouteSectionFields
+            ...RichTextWithStatsSectionFields
           }
         }
       }
@@ -45,4 +71,5 @@ export const getServicesPageQuery = /* GraphQL */ `
   }
   ${heroSectionFragment}
   ${projectRouteSectionFragment}
+  ${richTextWithStatsSectionFragment}
 `;

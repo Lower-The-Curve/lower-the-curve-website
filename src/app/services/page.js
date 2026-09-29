@@ -5,13 +5,16 @@ import HeroSection, {
 import ProjectRouteSection, {
   PROJECT_ROUTE_TYPE,
 } from "@/components/sections/ProjectRouteSection/ProjectRouteSection";
+import RichTextWithStatsSection, {
+  RICH_TEXT_WITH_STATS_TYPE,
+} from "@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection";
 import "./page.css";
 
 export const metadata = {
   title: "Services",
 };
 
-const COMPONENT_SLOTS = ["sections", "component6"];
+const COMPONENT_SLOTS = ["sections", "component3", "component6"];
 
 function sectionsIn(slot) {
   if (!slot) return [];
@@ -35,6 +38,10 @@ export default async function ServicesPage() {
             return <HeroSection key={section.id} section={section} />;
           case PROJECT_ROUTE_TYPE:
             return <ProjectRouteSection key={section.id} section={section} />;
+          case RICH_TEXT_WITH_STATS_TYPE:
+            return (
+              <RichTextWithStatsSection key={section.id} section={section} />
+            );
           default:
             return null;
         }
