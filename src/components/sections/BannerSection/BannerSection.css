@@ -121,7 +121,6 @@
   gap: 1rem;
   width: max-content;
   max-width: calc(100% + 0.5rem);
-  align-self: center;
 }
 
 .banner__highlight {
@@ -150,6 +149,19 @@
 
 .banner__highlights--two-line .banner__highlight-tail {
   display: block;
+}
+
+/* The narrow-desktop state. The copy column has not reached its 712px measure
+   yet and the 16px labels need ~717px, so the row would otherwise drop to two
+   lines across the whole 1180-1245px range. One line is the design at this size,
+   so the labels step down to the 14px UI token and cannot wrap; the columns are
+   content-sized, so the row is exactly as wide as the longest label needs and
+   sits flush with the copy column's left edge. BannerHighlights.js applies this
+   state only while it is the size that actually fits — at 1903px the labels
+   keep their 16px. */
+.banner__highlights--compact .banner__highlight-label {
+  white-space: nowrap;
+  font-size: var(--fs-body-xs);
 }
 
 .banner__button {
