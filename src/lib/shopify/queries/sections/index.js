@@ -17,3 +17,4 @@ export * from './projectRoute';
 export * from './richTextWithStats';
 export * from './header';
 export * from './footer';
+export * from './delivered';

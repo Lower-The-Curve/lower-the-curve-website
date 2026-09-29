@@ -1,0 +1,372 @@
+/* Delivered section — the `delivered` BEM block. Centred heading and lede over a
+   two-column grid of store-preview cards. On desktop (real hover pointer) the
+   card title, copy and shared pill are revealed only on hover / focus-within;
+   on tablet, mobile and touch they are always visible.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   Specified type: heading --fs-heading-md, lede the `p` default --fs-body-base,
+   card title --fs-heading-sm, card copy --fs-body-base, tags --fs-body-base. */
+.delivered {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+/* Decorative green glow on the right edge */
+.delivered::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 16rem;
+  right: -7rem;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 50%;
+  background: var(--color-accent-green);
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.delivered__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* --- INTRO -------------------------------------------------------------- */
+.delivered__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.delivered__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 40px;
+  text-align: center;
+  margin: 0;
+}
+
+.delivered__accent {
+  font-weight: 700;
+}
+
+.delivered__accent--blue {
+  color: var(--color-brand);
+}
+
+.delivered__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .delivered__accent--blue,
+  .delivered__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .delivered__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .delivered__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.delivered__lede {
+  color: var(--color-ink);
+  margin: 0;
+  max-width: 44rem;
+}
+
+/* --- GRID --------------------------------------------------------------- */
+.delivered__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3rem;
+  align-items: start;
+}
+
+.delivered__item {
+  min-width: 0;
+}
+
+.delivered__card {
+  display: flex;
+  flex-direction: column;
+
+  border: 5px solid transparent;
+  border-radius: 30px;
+
+  background-image:
+    linear-gradient(var(--color-bg), var(--color-bg)),
+    linear-gradient(90deg, #ffffff 0%, rgba(189, 189, 189, 0.5) 100%);
+
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+
+  overflow: hidden;
+
+  box-shadow: 0 6px 28px color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+.delivered__card--linked:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+/* --- PREVIEW ------------------------------------------------------------ */
+.delivered__preview {
+  position: relative;
+  aspect-ratio: 29 / 14;
+  overflow: hidden;
+}
+
+.delivered__preview::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+  pointer-events: none;
+}
+
+.delivered__tags {
+  z-index: 1;
+}
+
+.delivered__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.delivered__tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  max-width: calc(100% - 2.5rem);
+}
+
+.delivered__tag {
+  height: 34px;
+
+  border-radius: 80px;
+  padding: 2px 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  font-size: var(--fs-body-xs);
+  font-weight: 600;
+  line-height: 30px;
+
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* --- PANEL ---------------------------------------------------------------
+     Default (tablet / mobile / touch): always visible.
+     Desktop with a real pointer: hidden until the card is hovered or focused. */
+.delivered__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.delivered__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+@media (min-width: 1025px) and (hover: hover) {
+  .delivered__panel {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.28s ease,
+      opacity 0.28s ease,
+      visibility 0s linear 0.28s; /* hide after the collapse finishes */
+  }
+
+  .delivered__panel-inner {
+    padding-block: 0;
+    transition: padding-block 0.28s ease;
+  }
+
+  .delivered__card:hover .delivered__panel,
+  .delivered__card:focus-within .delivered__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .delivered__card:hover .delivered__panel-inner,
+  .delivered__card:focus-within .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+}
+
+.delivered__card-title {
+  font-size: var(--fs-body-base);
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.delivered__card-copy {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--fs-body-xs);
+  font-weight: 400;
+  line-height: 16px;
+}
+
+/* The pill is a <span> because the card itself is the link — Button always
+     renders a <button> or an <a>, which cannot nest here. The btn classes keep
+     the shared pill, type scale, and brand gradient. */
+.delivered__cta {
+  margin-top: 0.25rem;
+
+  background: transparent;
+  background-image: none;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.delivered__cta:hover {
+  background: var(--color-brand);
+  background-image: none;
+  color: var(--color-bg);
+  border-color: var(--color-brand);
+}
+
+.delivered__card:hover .delivered__cta .btn__arrow--rise,
+.delivered__card:focus-within .delivered__cta .btn__arrow--rise {
+  transform: rotate(-45deg) translateX(3px);
+}
+
+/* --- TABLET (<= 1024px) ------------------------------------------------- */
+@media (max-width: 1024px) {
+  .delivered__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .delivered__cta {
+    display: none;
+  }
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+@media (max-width: 575px) {
+  .delivered::before {
+    width: 9rem;
+    height: 9rem;
+    right: -5rem;
+  }
+
+  .delivered__inner {
+    padding: 3rem var(--space);
+    gap: 2rem;
+  }
+
+  .delivered__grid {
+    gap: 1.5rem;
+    justify-items: center;
+  }
+
+  .delivered__card {
+    width: 100%;
+    max-width: 357px;
+    height: 370px;
+    border-radius: 1.5rem;
+  }
+
+  .delivered__tags {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+
+    width: auto;
+    max-width: none;
+
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .delivered__tag {
+    width: fit-content;
+    min-width: 0;
+    flex: 0 1 auto;
+
+    height: 28px;
+
+    border-radius: 57.12px;
+    padding: 4px 14px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    font-size: var(--fs-body-xs);
+    font-weight: 600;
+    line-height: 20px;
+
+    white-space: nowrap;
+  }
+
+  .delivered__panel-inner {
+    padding-inline: 1.25rem;
+  }
+}
