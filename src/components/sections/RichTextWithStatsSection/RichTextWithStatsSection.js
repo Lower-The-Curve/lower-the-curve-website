@@ -2,7 +2,7 @@ import { useId } from 'react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
-import richTextBody from '@/components/ui/richTextBody';
+import richTextBody from '@/components/ui/RichTextBody/richTextBody';
 import ArchBackdrop, { ArchBackdropMobile } from './ArchBackdrop';
 import StatsBarLines from './StatsBarLines';
 import './RichTextWithStatsSection.css';
@@ -179,6 +179,27 @@ export default function RichTextWithStatsSection({ section }) {
 
             {bodyContent && (
               <div className="rich-text-with-stats__copy">{bodyContent}</div>
+            )}
+
+            {hasFigmaLayout && (
+              <div className="rich-text-with-stats__copy rich-text-with-stats__copy--phone">
+                <div className="rich-text-body">
+                  <p className="rich-text-body__paragraph">
+                    We help ambitious brands turn Shopify into a powerful growth
+                    engine. From public app development and seamless
+                    integrations to high-performing custom themes and advanced
+                    B2B functionalities, we build scalable solutions designed
+                    for performance, flexibility, and long-term success.
+                  </p>
+                  <p className="rich-text-body__paragraph">
+                    Whether you’re launching your first product, optimizing
+                    conversions, or expanding into wholesale and global
+                    markets, our team works alongside you to design systems
+                    that don’t just look good — they deliver measurable
+                    results.
+                  </p>
+                </div>
+              </div>
             )}
 
             {renderButton && (

@@ -212,6 +212,11 @@
   width: 100%;
 }
 
+/* Phone frame copy. The CMS body stays on tablet and desktop. */
+.rich-text-with-stats__copy--phone {
+  display: none;
+}
+
 .rich-text-with-stats__button {
   position: relative;
   z-index: 2;
@@ -219,8 +224,11 @@
 }
 
 /* This section's fill runs the other way from .btn--primary: light
-   --color-brand on the left, --color-brand-dark on the right. */
+   --color-brand on the left, --color-brand-dark on the right.
+   No stroke: the shared transparent border anti-aliases into a rim
+   on the caps. The outline variant keeps its border. */
 .rich-text-with-stats__button.btn--primary {
+  border-width: 0;
   background-image: linear-gradient(
     135deg,
     var(--color-brand),
@@ -465,6 +473,12 @@
     text-align: center;
   }
 
+  /* 20px at --fs-body-base (16px on tablet and phone). Desktop keeps
+     the shared 1.375 (22px) from .rich-text-body__paragraph. */
+  .rich-text-with-stats__copy .rich-text-body__paragraph {
+    line-height: 1.25;
+  }
+
   .rich-text-with-stats__copy .rich-text-body {
     max-width: 60ch;
   }
@@ -541,18 +555,26 @@
   }
 
   /* Phone frame is a 157×44 hug. --fs-body-sm is 14px on phones, which
-     undershoots that pill, so the label uses the 16px body token. */
+     undershoots that pill, so the label uses the 16px body token.
+     The outline variant keeps the 3px stroke. */
   .rich-text-with-stats--figma-art .rich-text-with-stats__button {
     font-size: var(--fs-body-base);
     gap: 15px;
     padding: 10px 25px;
-    border-width: 3px;
     border-radius: 60px;
     min-height: 44px;
   }
 
-  .rich-text-with-stats--figma-art .rich-text-with-stats__copy .rich-text-body__paragraph:nth-child(n + 3) {
+  .rich-text-with-stats--figma-art .rich-text-with-stats__button.btn--secondary {
+    border-width: 3px;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__copy:not(.rich-text-with-stats__copy--phone) {
     display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__copy--phone {
+    display: block;
   }
 
   .rich-text-with-stats--figma-art .rich-text-with-stats__stat:nth-child(n + 3) {
