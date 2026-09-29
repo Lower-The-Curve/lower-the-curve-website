@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
+import BannerHighlights from './BannerHighlights';
 import './BannerSection.css';
 
 // The banner section is a single `banner` metaobject with:
@@ -196,25 +197,10 @@ export default function BannerSection({ section }) {
             </div>
           )}
 
-          {items.length > 0 && (
-            <ul className="banner__highlights">
-              {items.map((item) => (
-                <li key={item.id} className="banner__highlight">
-                  {item.icon && (
-                    <Image
-                      src={item.icon.url}
-                      alt=""
-                      width={item.icon.width ?? 32}
-                      height={item.icon.height ?? 32}
-                      className="banner__highlight-icon"
-                      unoptimized={/\.svg(\?|$)/i.test(item.icon.url)}
-                    />
-                  )}
-                  <span className="banner__highlight-label">{item.label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          {/* The list is a Client Component: it measures whether the labels
+              still fit on one line and flips them all to two lines together.
+              See BannerHighlights.js. */}
+          {items.length > 0 && <BannerHighlights items={items} />}
 
           {/* `inverse` — the white pill for a brand-coloured surface (see
               Button.css): the reference's CTA has no border and must not flip
