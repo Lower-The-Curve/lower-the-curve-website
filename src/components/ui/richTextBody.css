@@ -6,7 +6,11 @@
 
 .rich-text-body__paragraph {
   margin: 0;
-  color: var(--color-text-muted);
+  font-weight: 400;
+  /* 22px at --fs-body-base (16px). The global `p` rule is 1.5 (24px). */
+  line-height: 1.375;
+  letter-spacing: 0;
+  color: var(--color-text);
 }
 
 .rich-text-body__heading {
