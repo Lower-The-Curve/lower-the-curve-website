@@ -1,7 +1,9 @@
 /* Delivered section — the `delivered` BEM block. Centred heading and lede over a
-   two-column grid of store-preview cards. On desktop (real hover pointer) the
-   card title, copy and shared pill are revealed only on hover / focus-within;
-   on tablet, mobile and touch they are always visible.
+   two-column layout of store-preview cards. Desktop columns are independent, so
+   an expanded card only pushes cards in its own column (same gap as the closed
+   stack). On desktop (real hover pointer) the card title, copy and shared pill
+   are revealed only on hover / focus-within; on tablet, mobile and touch they
+   are always visible.
 
    Sizes come from the type scale in src/app/typography.css and colours from the
    tokens in src/app/globals.css.
@@ -102,13 +104,20 @@
 /* --- GRID --------------------------------------------------------------- */
 
 .delivered__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 3rem;
+  align-items: start;
+}
+
+.delivered__column {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 3rem;
-  align-items: start;
+  min-width: 0;
 }
 
 .delivered__item {
@@ -153,6 +162,7 @@
 .delivered__preview {
   position: relative;
   aspect-ratio: 29 / 14;
+  flex: 0 0 auto;
   overflow: hidden;
 }
 
@@ -222,17 +232,11 @@
 /* --- DESKTOP HOVER ------------------------------------------------------ */
 
 @media (min-width: 1025px) and (hover: hover) {
-  /*
-   * Cards with a CTA expand to the full 580px design height.
-   */
   .delivered__card--has-cta:hover,
   .delivered__card--has-cta:focus-within {
     height: 580px;
   }
 
-  /*
-   * Cards without a CTA expand only as much as their content requires.
-   */
   .delivered__card--no-cta:hover,
   .delivered__card--no-cta:focus-within {
     height: auto;
@@ -319,6 +323,11 @@
 @media (max-width: 1024px) {
   .delivered__grid {
     grid-template-columns: minmax(0, 1fr);
+    row-gap: 3rem;
+  }
+
+  .delivered__column {
+    display: contents;
   }
 
   .delivered__cta {
@@ -340,7 +349,7 @@
     position: absolute;
     z-index: -1;
     left: -3.5rem;
-    top: 65%;
+    top: 72%;
     width: 10rem;
     height: auto;
     pointer-events: none;
@@ -352,7 +361,7 @@
   }
 
   .delivered__grid {
-    gap: 1.5rem;
+    row-gap: 1.5rem;
     justify-items: center;
   }
 

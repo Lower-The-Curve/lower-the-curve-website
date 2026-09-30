@@ -116,6 +116,80 @@ function CardShell({ href, hasCta, children }) {
   );
 }
 
+function DeliveredCardItem({ card, linkLabel, order }) {
+  const cardTitle = fieldValue(card, 'title');
+  const cardDescription = fieldValue(card, 'description');
+  const url = fieldValue(card, 'url', 'link');
+  const image = imageFrom(card, 'image');
+  const tags = tagsFrom(card);
+
+  return (
+    <li className='delivered__item' style={{ order }}>
+      <CardShell href={url} hasCta={Boolean(url && linkLabel)}>
+        <div className='delivered__preview'>
+          {image && (
+            <Image
+              src={image.url}
+              alt={image.altText ?? cardTitle ?? ''}
+              width={image.width ?? 1160}
+              height={image.height ?? 560}
+              className='delivered__image'
+              sizes='(max-width: 1024px) 100vw, 38vw'
+              unoptimized={/\.svg(\?|$)/i.test(image.url)}
+            />
+          )}
+
+          {tags.length > 0 && (
+            <ul className='delivered__tags'>
+              {tags.map((tag) => {
+                const label = fieldValue(tag, 'label');
+                if (!label) return null;
+
+                return (
+                  <li
+                    key={tag.id ?? tag.handle}
+                    className='delivered__tag'
+                    style={tagStyle(tag)}
+                  >
+                    {label}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
+        {(cardTitle || cardDescription || (url && linkLabel)) && (
+          <div className='delivered__panel'>
+            <div className='delivered__panel-inner'>
+              {cardTitle && (
+                <h3 className='delivered__card-title'>{cardTitle}</h3>
+              )}
+              {cardDescription && (
+                <p className='delivered__card-copy'>{cardDescription}</p>
+              )}
+              {url && linkLabel && (
+                <span className='btn btn--primary btn--sm delivered__cta'>
+                  <span className='btn__label'>{linkLabel}</span>
+                  <ArrowIcon className='btn__arrow btn__arrow--rise' />
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </CardShell>
+    </li>
+  );
+}
+
+function cardsByColumn(cards) {
+  const columns = [[], []];
+  cards.forEach((card, index) => {
+    columns[index % 2].push({ card, index });
+  });
+  return columns;
+}
+
 export default function DeliveredSection({ section }) {
   if (!section) return null;
 
@@ -167,75 +241,20 @@ export default function DeliveredSection({ section }) {
           </div>
         )}
 
-        <ul className='delivered__grid'>
-          {cards.map((card) => {
-            const cardTitle = fieldValue(card, 'title');
-            const cardDescription = fieldValue(card, 'description');
-            const url = fieldValue(card, 'url', 'link');
-            const image = imageFrom(card, 'image');
-            const tags = tagsFrom(card);
-
-            return (
-              <li key={card.id} className='delivered__item'>
-                <CardShell href={url} hasCta={Boolean(url && linkLabel)}>
-                  <div className='delivered__preview'>
-                    {image && (
-                      <Image
-                        src={image.url}
-                        alt={image.altText ?? cardTitle ?? ''}
-                        width={image.width ?? 1160}
-                        height={image.height ?? 560}
-                        className='delivered__image'
-                        sizes='(max-width: 1024px) 100vw, 38vw'
-                        unoptimized={/\.svg(\?|$)/i.test(image.url)}
-                      />
-                    )}
-
-                    {tags.length > 0 && (
-                      <ul className='delivered__tags'>
-                        {tags.map((tag) => {
-                          const label = fieldValue(tag, 'label');
-                          if (!label) return null;
-
-                          return (
-                            <li
-                              key={tag.id ?? tag.handle}
-                              className='delivered__tag'
-                              style={tagStyle(tag)}
-                            >
-                              {label}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-
-                  {(cardTitle || cardDescription || (url && linkLabel)) && (
-                    <div className='delivered__panel'>
-                      <div className='delivered__panel-inner'>
-                        {cardTitle && (
-                          <h3 className='delivered__card-title'>{cardTitle}</h3>
-                        )}
-                        {cardDescription && (
-                          <p className='delivered__card-copy'>
-                            {cardDescription}
-                          </p>
-                        )}
-                        {url && linkLabel && (
-                          <span className='btn btn--primary btn--sm delivered__cta'>
-                            <span className='btn__label'>{linkLabel}</span>
-                            <ArrowIcon className='btn__arrow btn__arrow--rise' />
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </CardShell>
-              </li>
-            );
-          })}
-        </ul>
+        <div className='delivered__grid'>
+          {cardsByColumn(cards).map((column, columnIndex) => (
+            <ul key={columnIndex} className='delivered__column'>
+              {column.map(({ card, index }) => (
+                <DeliveredCardItem
+                  key={card.id}
+                  card={card}
+                  linkLabel={linkLabel}
+                  order={index}
+                />
+              ))}
+            </ul>
+          ))}
+        </div>
       </div>
     </section>
   );
