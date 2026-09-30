@@ -1,0 +1,159 @@
+/* Feature cards section: centred heading over a two-up grid of value cards.
+   Values measured from Figma (node 600-2206). */
+.feature-cards {
+  position: relative;
+  isolation: isolate;
+  /* Clip the glow horizontally only; it hangs below the section on purpose. */
+  overflow-x: clip;
+  --icon-size: 56px;
+  --pad-bottom: 4rem;
+}
+
+.feature-cards__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space) var(--pad-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 42px;
+}
+
+/* Figma "Ellipse 9": top sits 10.5px above the last row of cards. */
+.feature-cards__glow {
+  position: absolute;
+  left: -138px;
+  bottom: calc(var(--pad-bottom) + 10.5px - 293px);
+  width: 293px;
+  height: 293px;
+  border-radius: 50%;
+  background: linear-gradient(264deg, #80ea71 19%, #298c6d 81%);
+  opacity: 0.9;
+  filter: blur(5.45px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.feature-cards__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-ink);
+  text-align: center;
+  margin: 0;
+}
+
+.feature-cards__accent {
+  font-weight: 700;
+}
+
+.feature-cards__accent--blue {
+  color: var(--color-brand-dark);
+}
+
+.feature-cards__accent--green {
+  color: var(--color-accent-green);
+}
+
+/* Grid items stretch by default, so cards in a row share the same height. */
+.feature-cards__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px 44px;
+}
+
+/* Padding includes the 3px border drawn by ::before. */
+.feature-cards__card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 29px 25px 28px;
+  border-radius: 23px;
+  background: rgba(250, 250, 250, 0.75);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+
+/* Gradient border (white left, grey right), masked to a 3px ring so it
+   doesn't show through the translucent fill. */
+.feature-cards__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffffff, rgba(189, 189, 189, 0.5));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* Fixed box so icons of different proportions line up and never shrink. */
+.feature-cards__icon {
+  flex-shrink: 0;
+  display: block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  object-fit: contain;
+}
+
+.feature-cards__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.feature-cards__card-title {
+  font-size: var(--fs-body-xl);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.feature-cards__description {
+  line-height: 1.375;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .feature-cards__inner {
+    gap: 2.5rem;
+  }
+
+  .feature-cards__list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .feature-cards {
+    --pad-bottom: 3rem;
+  }
+
+  .feature-cards__inner {
+    padding-top: 3rem;
+    gap: 2rem;
+  }
+
+  .feature-cards__list {
+    gap: 1rem;
+  }
+
+  .feature-cards__card {
+    padding: 23px 19px 22px;
+  }
+}
