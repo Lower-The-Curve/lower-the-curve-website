@@ -45,7 +45,11 @@
   /* Desktop column gap. Shared with the arch width below so the arch
      scales off the same column the laptop sits in. */
   --figma-col-gap: clamp(32px, 6.25vw, 90px);
-  --figma-mac-offset-x: -12px;
+  /* Figma nudges the laptop 12px left. It only spends the white space
+     outside the page measure, so the laptop never gets closer than the
+     16px gutter: 0 at or below 1248px wide, easing up to the full 12px
+     by 1272px. No new breakpoint needed. */
+  --figma-mac-offset-x: calc(-1 * clamp(0px, (100vw - 1248px) / 2, 12px));
   --figma-mac-offset-y: -52px;
   /* Arc underside meets the stats bar top (same idea as Solutions --swoosh-underside). */
   --rich-text-swoosh-join: 30%;
@@ -342,7 +346,12 @@
   z-index: 1;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  /* Crop, never stretch. The texture is a 1248×145 raster; `fill` squeezed
+     it on any bar narrower than 1248px, so the stripes got steeper and
+     packed tighter. `cover` keeps the Figma angle and spacing, and pinning
+     it right keeps the dense end of the stripes (they fade out leftward). */
+  object-fit: cover;
+  object-position: right center;
   pointer-events: none;
 }
 
