@@ -112,6 +112,7 @@ than the 40px those sections were originally specified at.
 | `--fs-body-base` | **16px** | 16px | 16px | **Default** — `p` and `body`, long-form copy |
 | `--fs-body-sm` | 16px | 16px | 14px | UI text: nav labels, button labels |
 | `--fs-body-xs` | 14px | 14px | 12px | Captions, legal, meta text |
+| `--fs-body-card` | 16px | 16px | **12px** | Feature card copy. The mobile design drops it to 12px while desktop stays 16px. Tablet interpolated. |
 
 **`base` and `sm` render the same size on desktop and tablet** (16px), splitting
 only on mobile (16 vs 14). `base` was 18px on desktop until it was lowered; the

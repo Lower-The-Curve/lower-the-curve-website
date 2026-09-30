@@ -159,6 +159,7 @@
 }
 
 .feature-cards__description {
+  font-size: var(--fs-body-card);
   line-height: 1.375;
   color: #000000;
   margin: 0;
@@ -192,15 +193,34 @@
 }
 
 @media (max-width: 575px) {
-  .feature-cards__inner {
-    gap: 32px;
+  /* Mobile Figma: 358x86 cards, 36px icon, copy 290x32 at left 57 / top 40. */
+  .feature-cards {
+    --icon-size: 36px;
   }
 
+  .feature-cards__inner {
+    gap: 28px;
+  }
+
+  /* 390x457 frame: 40 heading + 28 + 4 x 86.41 cards + 3 x 14.5. */
   .feature-cards__list {
-    gap: 16px;
+    gap: 14.5px;
   }
 
   .feature-cards__card {
-    padding: 22px 16px 21px 18px;
+    gap: 5px;
+    padding: 16px 11px 14.4px 16px;
+  }
+
+  .feature-cards__body {
+    gap: 2.4px;
+  }
+
+  .feature-cards__card-title {
+    line-height: 1.2;
+  }
+
+  .feature-cards__description {
+    line-height: 16px;
   }
 }
