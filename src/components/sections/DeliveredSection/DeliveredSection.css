@@ -95,6 +95,10 @@
   pointer-events: none;
 }
 
+.delivered__blue-glow {
+  display: none;
+}
+
 /* --- GRID --------------------------------------------------------------- */
 
 .delivered__grid {
@@ -329,6 +333,17 @@
     top: -1rem;
     right: -2rem;
     width: 5rem;
+  }
+
+  .delivered__blue-glow {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    left: -3.5rem;
+    top: 65%;
+    width: 10rem;
+    height: auto;
+    pointer-events: none;
   }
 
   .delivered__inner {

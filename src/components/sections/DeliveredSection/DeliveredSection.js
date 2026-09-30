@@ -124,6 +124,7 @@ export default function DeliveredSection({ section }) {
   const linkLabel = fieldValue(section, 'link_label');
   const cards = cardsFrom(section);
   const greenGlow = fileFrom(section, 'green_glow');
+  const blueGlow = fileFrom(section, 'blue_glow');
   if (!cards.length) return null;
 
   return (
@@ -135,6 +136,17 @@ export default function DeliveredSection({ section }) {
           width={greenGlow.image.width ?? 300}
           height={greenGlow.image.height ?? 300}
           className='delivered__glow'
+          aria-hidden='true'
+          unoptimized
+        />
+      )}
+      {blueGlow?.image && (
+        <Image
+          src={blueGlow.image.url}
+          alt=''
+          width={blueGlow.image.width ?? 300}
+          height={blueGlow.image.height ?? 300}
+          className='delivered__blue-glow'
           aria-hidden='true'
           unoptimized
         />
