@@ -113,12 +113,21 @@ export default function RichTextWithStatsSection({ section }) {
   // Show when a link exists unless the CMS boolean is explicitly false.
   const renderButton =
     Boolean(buttonLink) && showButtonField !== 'false';
-  const stats =
-    fieldValue(section, 'use_stats') === 'true'
-      ? statsForDisplay(referencesFrom(section, 'stats'))
-      : [];
+  // Two independent toggles (booleans arrive as "true"/"false" strings):
+  //   - `use_bar`   : the blue stats bar.
+  //   - `use_vector`: the vector art — the tall arch on desktop, the arc behind
+  //                   the laptop on tablet/phone. The live definition still has
+  //                   the KEY `use_stats` (only the admin label was renamed), so
+  //                   both keys are read; `use_vector` wins once it exists.
+  const showBar = fieldValue(section, 'use_bar') === 'true';
+  const showVector =
+    fieldValue(section, 'use_vector', 'use_stats') === 'true';
+  const stats = showBar
+    ? statsForDisplay(referencesFrom(section, 'stats'))
+    : [];
   const hasStats = stats.length > 0;
-  const hasFigmaLayout = Boolean(hasStats && image);
+  const hasFigmaLayout = Boolean(image && (hasStats || showVector));
+  const hasVector = hasFigmaLayout && showVector;
   const buttonVariant =
     fieldValue(section, 'button_styles')?.trim().toLowerCase() === 'outline'
       ? 'secondary'
@@ -139,7 +148,7 @@ export default function RichTextWithStatsSection({ section }) {
             <div className="rich-text-with-stats__media">
               {hasFigmaLayout ? (
                 <div className="rich-text-with-stats__art-stage">
-                  {hasFigmaLayout && (
+                  {hasVector && (
                     <ArchBackdropMobile className="rich-text-with-stats__arc" />
                   )}
                   <Image
@@ -214,62 +223,70 @@ export default function RichTextWithStatsSection({ section }) {
             )}
           </div>
 
-          {hasStats && (
-            <div className="rich-text-with-stats__stats-block">
-              {hasFigmaLayout && (
+          {(hasStats || hasVector) && (
+            <div
+              className={`rich-text-with-stats__stats-block ${
+                hasStats ? '' : 'rich-text-with-stats__stats-block--no-bar'
+              }`}
+            >
+              {/* Desktop arch is anchored to this block's top edge, so the
+                  block stays (empty) when the bar is off and the vector is on. */}
+              {hasVector && (
                 <ArchBackdrop className="rich-text-with-stats__backdrop" />
               )}
-              <div className="rich-text-with-stats__stats-wrap">
-                {hasFigmaLayout && <StatsBarLines />}
-                {hasFigmaLayout && (
-                  <svg
-                    className="rich-text-with-stats__stripes"
-                    aria-hidden="true"
-                  >
-                    <defs>
-                      <pattern
-                        id={stripeId}
-                        width="13"
-                        height="13"
-                        patternUnits="userSpaceOnUse"
-                        patternTransform="rotate(-42)"
-                      >
-                        <line
-                          x1="6.5"
-                          y1="0"
-                          x2="6.5"
-                          y2="13"
-                          stroke="white"
-                          strokeOpacity="0.1"
-                          strokeWidth="4"
-                        />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill={`url(#${stripeId})`} />
-                  </svg>
-                )}
-                <ul className="rich-text-with-stats__stats">
-                {stats.map((stat) => {
-                  const value = fieldValue(stat, 'value', 'title');
-                  const label = fieldValue(stat, 'description', 'label');
+              {hasStats && (
+                <div className="rich-text-with-stats__stats-wrap">
+                  {hasFigmaLayout && <StatsBarLines />}
+                  {hasFigmaLayout && (
+                    <svg
+                      className="rich-text-with-stats__stripes"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <pattern
+                          id={stripeId}
+                          width="13"
+                          height="13"
+                          patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(-42)"
+                        >
+                          <line
+                            x1="6.5"
+                            y1="0"
+                            x2="6.5"
+                            y2="13"
+                            stroke="white"
+                            strokeOpacity="0.1"
+                            strokeWidth="4"
+                          />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill={`url(#${stripeId})`} />
+                    </svg>
+                  )}
+                  <ul className="rich-text-with-stats__stats">
+                  {stats.map((stat) => {
+                    const value = fieldValue(stat, 'value', 'title');
+                    const label = fieldValue(stat, 'description', 'label');
 
-                  return (
-                    <li key={stat.id} className="rich-text-with-stats__stat">
-                      {value && (
-                        <span className="rich-text-with-stats__stat-value">
-                          {value}
-                        </span>
-                      )}
-                      {label && (
-                        <p className="rich-text-with-stats__stat-label">
-                          {label}
-                        </p>
-                      )}
-                    </li>
-                  );
-                })}
-                </ul>
-              </div>
+                    return (
+                      <li key={stat.id} className="rich-text-with-stats__stat">
+                        {value && (
+                          <span className="rich-text-with-stats__stat-value">
+                            {value}
+                          </span>
+                        )}
+                        {label && (
+                          <p className="rich-text-with-stats__stat-label">
+                            {label}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  })}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
