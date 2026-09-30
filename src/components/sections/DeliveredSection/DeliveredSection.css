@@ -330,8 +330,26 @@
     display: contents;
   }
 
+  .delivered__card {
+    height: auto;
+  }
+
+  .delivered__card-title,
+  .delivered__card-copy {
+    display: block;
+  }
+
   .delivered__cta {
     display: none;
+  }
+
+  .delivered__panel {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
   }
 }
 
@@ -368,7 +386,7 @@
   .delivered__card {
     width: 100%;
     max-width: 357px;
-    height: 370px;
+    height: auto;
     border-radius: 1.5rem;
     transition: none;
   }
