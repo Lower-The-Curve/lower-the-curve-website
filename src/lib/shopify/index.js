@@ -9,6 +9,7 @@ import {
   getServicesPageQuery,
   getShopifyAppsPageQuery,
   getCaseStudiesPageQuery,
+  getPartnerDetailPageQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -397,4 +398,32 @@ export async function getCaseStudiesPage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the `partner_detail` entry for a partner.
+ *
+ * The URL key is the handle of the entry's `name` reference (a `partner`
+ * entry) — e.g. `/partners/blackroll` — NOT the `partner_detail` entry's own
+ * auto-generated handle, which Shopify derives from the copy and would change
+ * with it. The Storefront API has no field-value filter on `metaobjects`, so
+ * the query returns the entries and the match happens here.
+ *
+ * @param {string} partnerHandle  e.g. "blackroll"
+ * @param {number} [first=50]     entries to fetch before matching.
+ * @returns {Promise<object|null>} The `partner_detail` node, or null if no
+ *   entry references a partner with that handle.
+ */
+export async function getPartnerDetailPage(partnerHandle, first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnerDetailPageQuery,
+    variables: { first },
+  });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameHandle = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.reference?.handle;
+
+  return nodes.find((node) => nameHandle(node) === partnerHandle) ?? null;
 }

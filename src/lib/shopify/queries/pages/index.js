@@ -5,3 +5,4 @@ export * from './home';
 export * from './services';
 export * from './shopify-apps';
 export * from './caseStudies';
+export * from './partnerDetail';
