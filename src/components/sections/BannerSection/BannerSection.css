@@ -121,7 +121,6 @@
   gap: 1rem;
   width: max-content;
   max-width: calc(100% + 0.5rem);
-  align-self: center;
 }
 
 .banner__highlight {
@@ -150,6 +149,12 @@
 
 .banner__highlights--two-line .banner__highlight-tail {
   display: block;
+}
+
+
+.banner__highlights--compact .banner__highlight-label {
+  white-space: nowrap;
+  font-size: var(--fs-body-xs);
 }
 
 .banner__button {
