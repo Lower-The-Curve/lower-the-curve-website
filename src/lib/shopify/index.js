@@ -9,6 +9,7 @@ import {
   getServicesPageQuery,
   getShopifyAppsPageQuery,
   getCaseStudiesPageQuery,
+  getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getHeaderQuery,
   getFooterQuery,
@@ -395,6 +396,21 @@ export async function getCaseStudiesPage() {
   const { body } = await shopifyFetch({
     query: getCaseStudiesPageQuery,
     variables: { handle: { type: 'content', handle: 'content-hcmnjrrd' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "about-us" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "about-us" doesn't exist.
+ */
+export async function getAboutUsPage() {
+  const { body } = await shopifyFetch({
+    query: getAboutUsPageQuery,
+    variables: { handle: { type: 'content', handle: 'about-us' } },
   });
 
   return body?.data?.metaobject ?? null;

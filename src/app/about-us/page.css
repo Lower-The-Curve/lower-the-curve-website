@@ -1,0 +1,4 @@
+/* Sections own their measure, so the page is a plain flow container. */
+.about-us-page {
+  display: block;
+}
