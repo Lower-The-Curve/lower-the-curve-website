@@ -6,17 +6,21 @@
   /* Clip the glow horizontally only; it hangs below the section on purpose. */
   overflow-x: clip;
   --icon-size: 56px;
-  --pad-bottom: 4rem;
+  /* The 401px Figma frame is the content; the 70px gap between frames
+     (1939 -> 2009 in Figma) is the section's padding. */
+  --pad-top: 70px;
+  --pad-bottom: 70px;
 }
 
 .feature-cards__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space) var(--pad-bottom);
+  padding: var(--pad-top) var(--space) var(--pad-bottom);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 42px;
+  /* Heading (40px) + gap puts the cards at y 90. */
+  gap: 50px;
 }
 
 /* Figma "Ellipse 9": top sits 10.5px above the last row of cards. */
@@ -35,24 +39,55 @@
 }
 
 .feature-cards__title {
+  width: 100%;
+  max-width: 780px;
   font-size: var(--fs-heading-md);
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 40px;
   color: var(--color-ink);
   text-align: center;
   margin: 0;
 }
 
 .feature-cards__accent {
-  font-weight: 700;
+  font-weight: 600;
 }
 
+/* Flat fallback; the gradient below replaces it where text clipping works. */
 .feature-cards__accent--blue {
-  color: var(--color-brand-dark);
+  color: var(--color-brand);
 }
 
 .feature-cards__accent--green {
   color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .feature-cards__accent--blue,
+  .feature-cards__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Same blue gradient as the hero and solutions headings. */
+  .feature-cards__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .feature-cards__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
 }
 
 /* Grid items stretch by default, so cards in a row share the same height. */
@@ -62,31 +97,32 @@
   padding: 0;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 25px 44px;
+  grid-template-columns: repeat(2, minmax(0, 580px));
+  justify-content: center;
+  gap: 31px 50px;
 }
 
-/* Padding includes the 3px border drawn by ::before. */
+/* 580x140 box; text column is 469px wide. */
 .feature-cards__card {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 29px 25px 28px;
-  border-radius: 23px;
+  gap: 17px;
+  padding: 26px 16px 25px 22px;
+  border-radius: 20px;
   background: rgba(250, 250, 250, 0.75);
   -webkit-backdrop-filter: blur(12.5px);
   backdrop-filter: blur(12.5px);
 }
 
-/* Gradient border (white left, grey right), masked to a 3px ring so it
-   doesn't show through the translucent fill. */
+/* 3px outer gradient border (white left, grey right), masked to a ring so
+   it doesn't show through the translucent fill. */
 .feature-cards__card::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -3px;
   padding: 3px;
-  border-radius: inherit;
+  border-radius: 23px;
   background: linear-gradient(90deg, #ffffff, rgba(189, 189, 189, 0.5));
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -124,36 +160,47 @@
 
 .feature-cards__description {
   line-height: 1.375;
-  color: var(--color-ink);
+  color: #000000;
   margin: 0;
 }
 
 @media (max-width: 1024px) {
+  /* Mobile Figma "Ellipse 9", used for the whole single-column layout:
+     111.87px, top ~60px above the last card, so about half of it hangs
+     into the next section. */
+  .feature-cards__glow {
+    left: -67.29px;
+    bottom: calc(var(--pad-bottom) + 60px - 111.87px);
+    width: 111.87px;
+    height: 111.87px;
+    filter: blur(4.1px);
+  }
+
+  .feature-cards {
+    --pad-top: 48px;
+    --pad-bottom: 48px;
+  }
+
   .feature-cards__inner {
-    gap: 2.5rem;
+    gap: 40px;
   }
 
   .feature-cards__list {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.25rem;
+    gap: 20px;
   }
 }
 
 @media (max-width: 575px) {
-  .feature-cards {
-    --pad-bottom: 3rem;
-  }
-
   .feature-cards__inner {
-    padding-top: 3rem;
-    gap: 2rem;
+    gap: 32px;
   }
 
   .feature-cards__list {
-    gap: 1rem;
+    gap: 16px;
   }
 
   .feature-cards__card {
-    padding: 23px 19px 22px;
+    padding: 22px 16px 21px 18px;
   }
 }
