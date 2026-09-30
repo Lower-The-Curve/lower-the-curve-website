@@ -232,14 +232,28 @@
 /* --- DESKTOP HOVER ------------------------------------------------------ */
 
 @media (min-width: 1025px) and (hover: hover) {
+  /* No CTA — closed */
+  .delivered__card--no-cta {
+    height: 280px;
+    transition: height 0.28s ease;
+  }
+
+  /* No CTA — open */
+  .delivered__card--no-cta:hover,
+  .delivered__card--no-cta:focus-within {
+    height: 450px;
+  }
+
+  /* CTA — closed */
+  .delivered__card--has-cta {
+    height: 280px;
+    transition: height 0.28s ease;
+  }
+
+  /* CTA — open */
   .delivered__card--has-cta:hover,
   .delivered__card--has-cta:focus-within {
     height: 580px;
-  }
-
-  .delivered__card--no-cta:hover,
-  .delivered__card--no-cta:focus-within {
-    height: auto;
   }
 
   .delivered__panel {
