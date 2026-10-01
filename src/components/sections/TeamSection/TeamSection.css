@@ -134,7 +134,9 @@
   border-radius: 0;
   opacity: 0.8;
   overflow: hidden;
-  background: var(--color-ink);
+  /* No background: the anti-aliased edge of the rounded clip would blend the photo
+     with it and draw a dark hairline along the corners. */
+  background: transparent;
   color: #ffffff;
   outline-offset: 3px;
   transition:
