@@ -161,38 +161,13 @@ export default function PartnerDetailSection({ section }) {
 
         {mockup && (
           <div className="partner-detail__media">
-            {/* Decorative eclipses behind the mockup, sized and placed as
-                fractions of the media box so they travel with it at every
-                breakpoint. The blue circle sits over the green glow, matching
-                the design; both sit below the mockup because the media is a
-                stacking context and these carry negative z-index.
-                Pure decoration — hidden from assistive tech. */}
-            <img
-              src="/assets/partner-detail-eclipse-blue.svg"
-              alt=""
-              aria-hidden="true"
-              className="partner-detail__eclipse partner-detail__eclipse--blue"
-              width={744}
-              height={690}
-              decoding="async"
-            />
-            <img
-              src="/assets/partner-detail-eclipse-green.svg"
-              alt=""
-              aria-hidden="true"
-              className="partner-detail__eclipse partner-detail__eclipse--green"
-              width={426}
-              height={187}
-              decoding="async"
-            />
-            <div className="partner-detail__blur" aria-hidden="true" />
             <Image
               src={mockup.url}
               alt={mockup.altText ?? ''}
               width={mockup.width ?? 2196}
               height={mockup.height ?? 1556}
               className="partner-detail__mockup"
-              sizes="(max-width: 575px) 140vw, (max-width: 1024px) 500px, 78vw"
+              sizes="(max-width: 575px) 140vw, (max-width: 1024px) 500px, 89vw"
               unoptimized={/\.svg(\?|$)/i.test(mockup.url)}
             />
           </div>

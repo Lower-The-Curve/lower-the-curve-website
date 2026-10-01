@@ -8,9 +8,9 @@
     max(0px, (100vw - var(--partner-detail-measure)) / 2) + var(--space) + 40rem
   );
   --partner-detail-media-w: min(
-    78vw,
-    72rem,
-    calc((100vw - var(--partner-detail-copy-edge)) / 0.63)
+    89.4vw,
+    82.5rem,
+    calc((100vw - var(--partner-detail-copy-edge)) / 0.69)
   );
   min-height: calc(100vh - var(--header-height));
   min-height: calc(100svh - var(--header-height));
@@ -33,53 +33,18 @@
   position: absolute;
   top: 50%;
   right: 0;
-  transform: translateY(calc(-50% - 3.8rem));
-  width: min(
-    78vw,
-    72rem,
-    calc((100vw - var(--partner-detail-copy-edge)) / 0.63)
-  );
+  transform: translateX(calc(var(--partner-detail-media-w) * 0.1195))
+    translateY(calc(-50% - 3.8rem + var(--partner-detail-media-w) * 0.0402));
+  width: var(--partner-detail-media-w);
 }
 .partner-detail__mockup {
   display: block;
   width: 100%;
   height: auto;
 }
-
-.partner-detail__eclipse {
-  position: absolute;
-  display: block;
-  height: auto;
-  pointer-events: none;
-}
-.partner-detail__eclipse--green {
-  z-index: -2;
-  top: 0.4%;
-  left: 31.4%;
-  width: 47.3%;
-}
-.partner-detail__eclipse--blue {
-  z-index: -1;
-  top: min(-0.8%, calc(0.4034 * var(--partner-detail-media-w) - 50vh + 8.8px));
-  left: 41.5%;
-  width: 67.9%;
-}
-.partner-detail__blur {
-  position: absolute;
-  z-index: -1;
-  top: calc(0.3542 * var(--partner-detail-media-w) - 50vh + 8.8px);
-  right: 0;
-  width: 97.9%;
-  height: 53.4%;
-  backdrop-filter: blur(35px);
-  -webkit-backdrop-filter: blur(35px);
-  pointer-events: none;
-}
 .partner-detail__content {
   grid-column: 1;
   grid-row: 2;
-  position: relative;
-  z-index: 1;
   max-width: 40rem;
   display: flex;
   flex-direction: column;
@@ -194,16 +159,8 @@
     grid-row: 2;
     width: 500px;
     margin-inline: auto;
-    margin-top: -3rem;
-    transform: translateX(calc(500px * -0.185));
-  }
-  /* In flow, the media's top is set by the layout, not the 50% formula, so
-     the screen-pinning calc above no longer applies. */
-  .partner-detail__eclipse--blue {
-    top: -0.8%;
-  }
-  .partner-detail__blur {
-    top: 1.7%;
+    margin-top: calc(-3rem - 20px);
+    transform: translateX(calc(500px * -0.106));
   }
   .partner-detail__content {
     grid-row: 3;
@@ -213,7 +170,7 @@
 @media (max-width: 575px) {
   .partner-detail__media {
     width: 140%;
-    margin-left: -45.8%;
+    margin-left: -38%;
     margin-right: 0;
     transform: none;
   }
