@@ -1,0 +1,71 @@
+/* Team section: centred heading and intro over a grid of member cards.
+   Minimal layout on existing tokens — not yet matched to Figma. */
+.team__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 70px var(--space);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.team__title {
+  max-width: 780px;
+  font-weight: 400;
+  color: var(--color-ink);
+  text-align: center;
+  margin: 0;
+}
+
+.team__accent {
+  font-weight: 600;
+}
+
+.team__accent--blue {
+  color: var(--color-brand);
+}
+
+.team__accent--green {
+  color: var(--color-accent-green);
+}
+
+.team__description {
+  max-width: 780px;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.team__list {
+  width: 100%;
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 32px 24px;
+}
+
+.team__member {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team__photo {
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  object-fit: cover;
+}
+
+.team__name {
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.team__role {
+  margin: 0;
+  color: var(--color-text-muted);
+}

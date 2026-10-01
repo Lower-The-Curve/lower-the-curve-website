@@ -2,6 +2,9 @@ import { getAboutUsPage } from '@/lib/shopify';
 import FeatureCardsSection, {
   FEATURE_CARDS_TYPE,
 } from '@/components/sections/FeatureCardsSection/FeatureCardsSection';
+import TeamSection, {
+  TEAM_SECTION_TYPE,
+} from '@/components/sections/TeamSection/TeamSection';
 import './page.css';
 
 export const metadata = {
@@ -38,6 +41,8 @@ export default async function AboutUsPage() {
         switch (section.type) {
           case FEATURE_CARDS_TYPE:
             return <FeatureCardsSection key={section.id} section={section} />;
+          case TEAM_SECTION_TYPE:
+            return <TeamSection key={section.id} section={section} />;
           default:
             return null;
         }

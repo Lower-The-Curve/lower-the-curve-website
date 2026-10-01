@@ -16,6 +16,7 @@ export * from './banner';
 export * from './projectRoute';
 export * from './richTextWithStats';
 export * from './featureCards';
+export * from './team';
 export * from './partnerDetail';
 export * from './header';
 export * from './footer';
