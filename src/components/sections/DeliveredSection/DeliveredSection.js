@@ -79,23 +79,6 @@ function tagStyle(tag) {
   };
 }
 
-// A multi-word label is split so the hover state can show a short form: the first
-// word plus the first three letters of the rest.
-function splitLabel(label) {
-  const space = label.indexOf(' ');
-  if (space === -1) return null;
-
-  const first = label.slice(0, space);
-  const rest = label.slice(space + 1).trim();
-  if (!rest) return null;
-
-  return {
-    first: `${first}\u00a0`,
-    head: rest.slice(0, 3),
-    tail: rest.slice(3),
-  };
-}
-
 function isExternal(url) {
   return /^(https?:|mailto:|tel:|#)/.test(url);
 }
@@ -130,23 +113,6 @@ function CardShell({ href, hasCta, children }) {
     <Link href={href} className={className}>
       {children}
     </Link>
-  );
-}
-
-function TagLabel({ label }) {
-  const parts = splitLabel(label);
-
-  if (!parts) return label;
-
-  return (
-    <>
-      <span>{parts.first}</span>
-      <span>{parts.head}</span>
-      {parts.tail && <span className='delivered__tag-tail'>{parts.tail}</span>}
-      <span className='delivered__tag-dot' aria-hidden='true'>
-        .
-      </span>
-    </>
   );
 }
 
@@ -185,7 +151,7 @@ function DeliveredCardItem({ card, linkLabel, order }) {
                     className="delivered__tag"
                     style={tagStyle(tag)}
                   >
-                    <TagLabel label={label} />
+                    {label}
                   </li>
                 );
               })}
