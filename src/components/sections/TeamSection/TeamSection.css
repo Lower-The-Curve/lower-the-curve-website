@@ -1,9 +1,52 @@
-/* Team section: centred heading and intro over a grid of member cards.
-   Minimal layout on existing tokens — not yet matched to Figma. */
+/* Team section: centred heading and intro over an accordion row of member cards.
+   One card is expanded (wide, full colour, blue overlay); the rest are collapsed
+   (narrow, greyscale, dark overlay). The row scrolls horizontally.
+
+   Card measures are custom properties on the block so the three breakpoints only
+   restate numbers, never rules. Breakpoints are the existing tiers (1024 / 575). */
+.team {
+  --team-card-collapsed: 12.5rem;
+  --team-card-expanded: 25rem;
+  --team-card-height: 31.25rem;
+  --team-radius: 25px;
+  --team-card-radius: var(--team-radius);
+  --team-gap: 1.25rem;
+  /* Row's left inset at the design's 1440px frame: (1440 - 1248) / 2 + 16. */
+  --team-track-inset: 7rem;
+  --team-ease: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Caption placement from the design's 1440px frame: inset from the card's left
+     edge, distance from its bottom edge to the role's baseline box, and the gap
+     between name and role. "open" = the expanded card. */
+  --team-caption-x-open: 40px;
+  --team-caption-x-closed: 20px;
+  --team-caption-bottom-open: 65.5px;
+  --team-caption-bottom-closed: 69.5px;
+  --team-caption-gap-open: 7.5px;
+  --team-caption-gap-closed: 6px;
+
+  position: relative;
+  /* The glow bleeds past the viewport edge; clip it rather than let it add a
+     horizontal scrollbar. `clip` (not `hidden`) keeps the section from becoming
+     a scroll container. */
+  overflow-x: clip;
+}
+
+.team__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(28rem, 40vw);
+  height: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .team__inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 70px var(--space);
+  padding: 70px var(--space) 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12,6 +55,9 @@
 
 .team__title {
   max-width: 780px;
+  /* 32/40 per design: --fs-heading-md rather than the h2 default (--fs-heading-lg). */
+  font-size: var(--fs-heading-md);
+  line-height: 1.25;
   font-weight: 400;
   color: var(--color-ink);
   text-align: center;
@@ -31,41 +77,246 @@
 }
 
 .team__description {
-  max-width: 780px;
-  color: var(--color-text-muted);
+  /* The design breaks after "process"; its text box is ~602px wide. */
+  max-width: 620px;
+  /* 16/22 per design: the p default size, with the design's leading. */
+  line-height: 22px;
+  color: var(--color-ink);
   text-align: center;
   margin: 0;
 }
 
-.team__list {
-  width: 100%;
+/* The row. Left edge lines up with the section's content measure; the right edge
+   runs to the viewport so a card is always seen cut off, inviting a swipe. */
+.team__track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  gap: var(--team-gap);
+  margin: 40px 0 0;
+  padding: 0 var(--space) 70px;
+  /* Tracks the content edge of every other section (half the free space either
+     side of --max-width, plus the gutter) but stops growing at --team-track-inset,
+     so on a wide screen the row keeps the design's 1440px gap instead of drifting
+     inward with the content measure. */
+  padding-inline-start: max(
+    var(--space),
+    min(
+      var(--team-track-inset),
+      calc((100% - var(--max-width)) / 2 + var(--space))
+    )
+  );
   list-style: none;
-  margin: 26px 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 32px 24px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  cursor: grab;
+  /* The row owns horizontal panning; vertical page scroll stays native. */
+  touch-action: pan-x pan-y;
 }
 
-.team__member {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.team__track::-webkit-scrollbar {
+  display: none;
+}
+
+.team__track:active {
+  cursor: grabbing;
+}
+
+.team__card {
+  position: relative;
+  flex: 0 0 var(--team-card-collapsed);
+  height: var(--team-card-height);
+  /* Collapsed cards are square; only the expanded one rounds, on its left
+     corners (400x500, 25px per the design's picture properties); see
+     the --first / --last modifiers below. */
+  border-radius: 0;
+  opacity: 0.8;
+  overflow: hidden;
+  background: var(--color-ink);
+  color: #ffffff;
+  outline-offset: 3px;
+  transition:
+    flex-basis var(--team-ease),
+    border-radius var(--team-ease),
+    opacity var(--team-ease);
+  user-select: none;
+}
+
+.team__card--active {
+  flex-basis: var(--team-card-expanded);
+  border-radius: var(--team-card-radius);
+  opacity: 1;
+}
+
+/* Which corners round on the expanded card depends on where it sits in the row:
+   all four by default (a middle card, or a lone one), the left pair on the
+   first, the right pair on the last. Collapsed cards stay square. */
+.team__card--first {
+  --team-card-radius: var(--team-radius) 0 0 var(--team-radius);
+}
+
+.team__card--last {
+  --team-card-radius: 0 var(--team-radius) var(--team-radius) 0;
 }
 
 .team__photo {
-  width: 100%;
-  height: auto;
-  margin-bottom: 12px;
+  /* Sized to the expanded card and centred, so a collapsed card is a centred
+     strip of the same framing (the design's mask) and expanding reveals the
+     photo rather than rescaling it. */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--team-card-expanded);
+  max-width: none;
+  height: 100%;
+  transform: translateX(-50%);
   object-fit: cover;
+  object-position: center top;
+  filter: grayscale(1);
+  transition: filter var(--team-ease);
+  /* Keeps the photo from being picked up by the browser's native image drag. */
+  -webkit-user-drag: none;
+}
+
+.team__card--active .team__photo {
+  filter: none;
+}
+
+/* Overlays: both always present, crossfaded. Dark on collapsed cards, blue on
+   the expanded one. */
+.team__shade,
+.team__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity var(--team-ease);
+}
+
+.team__shade {
+  /* The design's 70% black band over the bottom ~41% of the card. */
+  background: linear-gradient(to top, var(--color-ink) 0%, transparent 41%);
+  opacity: 0.7;
+}
+
+.team__tint {
+  background: linear-gradient(
+    to top,
+    var(--color-brand-dark) 0%,
+    var(--color-brand) 22%,
+    transparent 45%
+  );
+  opacity: 0;
+}
+
+.team__card--active .team__shade {
+  opacity: 0;
+}
+
+.team__card--active .team__tint {
+  opacity: 0.69;
+}
+
+.team__caption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0 var(--team-caption-x-closed) var(--team-caption-bottom-closed);
+  transition: padding var(--team-ease);
+}
+
+.team__card--active .team__caption {
+  padding: 0 var(--team-caption-x-open) var(--team-caption-bottom-open);
 }
 
 .team__name {
   margin: 0;
-  color: var(--color-ink);
+  font-size: var(--fs-team-name-closed);
+  font-weight: 600;
+  line-height: 1;
+  color: inherit;
+  transition: font-size var(--team-ease);
+}
+
+.team__card--active .team__name {
+  font-size: var(--fs-team-name-open);
 }
 
 .team__role {
-  margin: 0;
-  color: var(--color-text-muted);
+  margin: var(--team-caption-gap-closed) 0 0;
+  font-size: var(--fs-team-role-closed);
+  line-height: 1;
+  color: inherit;
+  transition:
+    font-size var(--team-ease),
+    margin var(--team-ease);
+}
+
+.team__card--active .team__role {
+  margin-top: var(--team-caption-gap-open);
+  font-size: var(--fs-team-role-open);
+}
+
+@media (max-width: 1024px) {
+  .team {
+    --team-card-collapsed: 10rem;
+    --team-card-expanded: 20rem;
+    --team-card-height: 25rem;
+    --team-gap: 1rem;
+    --team-caption-x-open: 32px;
+    --team-caption-x-closed: 16px;
+    --team-caption-bottom-open: 52px;
+    --team-caption-bottom-closed: 56px;
+    --team-caption-gap-open: 6px;
+    --team-caption-gap-closed: 5px;
+  }
+}
+
+@media (max-width: 575px) {
+  .team {
+    --team-card-collapsed: 4.9rem;
+    --team-card-expanded: 9.8rem;
+    --team-card-height: 12.25rem;
+    --team-radius: 0.6125rem;
+    --team-gap: 0.49rem;
+    --team-caption-x-open: 1rem;
+    --team-caption-x-closed: 0.49rem;
+    --team-caption-bottom-open: 16px;
+    --team-caption-bottom-closed: 17px;
+    --team-caption-gap-open: 2px;
+    --team-caption-gap-closed: 1.5px;
+  }
+
+  .team__inner {
+    padding-top: 40px;
+    gap: 20px;
+  }
+
+  /* Mobile leading per design (32/38 title, 16/20 description). Sizes are the
+     same tokens as desktop; only the line heights differ. */
+  .team__title {
+    line-height: 1.1875;
+  }
+
+  .team__description {
+    line-height: 1.25;
+  }
+
+  .team__track {
+    margin-top: 30px;
+    padding-bottom: 40px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team__card,
+  .team__photo,
+  .team__shade,
+  .team__tint,
+  .team__caption,
+  .team__name,
+  .team__role {
+    transition: none;
+  }
 }

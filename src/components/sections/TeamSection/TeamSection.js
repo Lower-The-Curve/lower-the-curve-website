@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
+import TeamSlider from './TeamSlider';
 import './TeamSection.css';
 
 export const TEAM_SECTION_TYPE = 'team';
@@ -37,12 +38,29 @@ export default function TeamSection({ section }) {
 
   const title = fieldValue(section, 'title');
   const description = fieldValue(section, 'description');
-  const members = referencesFrom(section, 'team_members');
+  const glow = imageFrom(section, 'green_glow');
+  const members = referencesFrom(section, 'team_members').map((member) => ({
+    id: member.id,
+    name: fieldValue(member, 'name'),
+    role: fieldValue(member, 'role'),
+    photo: imageFrom(member, 'photo'),
+  }));
 
   if (!members.length) return null;
 
   return (
     <section className="team">
+      {glow && (
+        <Image
+          src={glow.url}
+          alt=""
+          width={glow.width ?? 448}
+          height={glow.height ?? 448}
+          className="team__glow"
+          aria-hidden="true"
+        />
+      )}
+
       <div className="team__inner">
         {title && (
           <h2 className="team__title">
@@ -54,31 +72,9 @@ export default function TeamSection({ section }) {
           </h2>
         )}
         {description && <p className="team__description">{description}</p>}
-
-        <ul className="team__list">
-          {members.map((member) => {
-            const name = fieldValue(member, 'name');
-            const role = fieldValue(member, 'role');
-            const photo = imageFrom(member, 'photo');
-
-            return (
-              <li key={member.id} className="team__member">
-                {photo && (
-                  <Image
-                    src={photo.url}
-                    alt={photo.altText || name || ''}
-                    width={photo.width ?? 400}
-                    height={photo.height ?? 500}
-                    className="team__photo"
-                  />
-                )}
-                {name && <h3 className="team__name">{name}</h3>}
-                {role && <p className="team__role">{role}</p>}
-              </li>
-            );
-          })}
-        </ul>
       </div>
+
+      <TeamSlider members={members} />
     </section>
   );
 }

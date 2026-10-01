@@ -126,6 +126,17 @@
      desktop and mobile were given. */
   --fs-cta-title: 46px;
   --fs-cta-body: 24px;
+
+  /* --- THE TEAM CARD CAPTIONS --------------------------------------------
+     Four sizes, off the scale on purpose: the design sets the open card's
+     name/role at 36/22px (desktop) and 14/10px (mobile), and the closed cards'
+     at 18/10px (desktop) and 8/6px (mobile). Nothing on the body scale goes
+     below 12px or sits at 36/22. Tablet was not specified and keeps the values
+     it already rendered. "open" = the expanded card. */
+  --fs-team-name-open: 36px;
+  --fs-team-role-open: 22px;
+  --fs-team-name-closed: 18px;
+  --fs-team-role-closed: 10px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -152,6 +163,11 @@
     /* Interpolated — only desktop and mobile were specified. */
     --fs-cta-title: 38px;
     --fs-cta-body: 18px;
+
+    --fs-team-name-open: 32px;
+    --fs-team-role-open: 20px;
+    --fs-team-name-closed: 18px;
+    --fs-team-role-closed: 14px;
   }
 }
 
@@ -193,6 +209,11 @@
 
     --fs-cta-title: 30px;
     --fs-cta-body: 14px;
+
+    --fs-team-name-open: 14px;
+    --fs-team-role-open: 10px;
+    --fs-team-name-closed: 8px;
+    --fs-team-role-closed: 6px;
   }
 }
 
