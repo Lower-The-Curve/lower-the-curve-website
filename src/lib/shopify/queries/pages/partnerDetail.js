@@ -1,6 +1,7 @@
 import {
   partnerDetailSectionFragment,
   whatWeBuiltSectionFragment,
+  partnerTestimonialSectionFragment,
 } from '../sections';
 
 export const getPartnerDetailPageQuery = /* GraphQL */ `
@@ -23,4 +24,17 @@ export const getWhatWeBuiltQuery = `
     }
   }
   ${whatWeBuiltSectionFragment}
+`;
+
+// The live API identifier is `teestimonial` (doubled "e") — Shopify fixes an
+// identifier at creation and does not rename it when the display name changes.
+export const getPartnerTestimonialQuery = `
+  query GetPartnerTestimonial {
+    metaobjects(type: "teestimonial", first: 50) {
+      nodes {
+        ...PartnerTestimonialSectionFields
+      }
+    }
+  }
+  ${partnerTestimonialSectionFragment}
 `;

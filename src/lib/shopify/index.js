@@ -12,6 +12,7 @@ import {
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
+  getPartnerTestimonialQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -481,5 +482,46 @@ export async function getWhatWeBuilt(partnerDetail) {
 
   return (
     nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
+  );
+}
+
+/**
+ * Fetch the `teestimonial` entry belonging to a partner.
+ *
+ * The live API identifier is `teestimonial` (doubled "e") — Shopify fixes an
+ * identifier at creation and does not rename it when the display name changes,
+ * so the typo is what the code must match.
+ *
+ * There is no reference field linking the two. The only link in the live data
+ * is the handle: a testimonial's handle is the partner handle, a dash, and the
+ * person's handle (the partner `blackroll` owns `blackroll-hans-muller`). So the
+ * match is a case-insensitive handle prefix — the exact handle, or
+ * `${partnerHandle}-` — and a partner with no matching entry simply renders no
+ * section. The Storefront API has no field-value filter on `metaobjects`, so
+ * the query returns the entries and the match happens here, same pattern as
+ * getPartnerDetailPage() and getWhatWeBuilt() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(), whose `name` reference handle is the partner's.
+ * @returns {Promise<object|null>} The `teestimonial` node, or null.
+ */
+export async function getPartnerTestimonial(partnerDetail) {
+  const partnerHandle = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.handle?.trim()
+    .toLowerCase();
+
+  if (!partnerHandle) return null;
+
+  const { body } = await shopifyFetch({ query: getPartnerTestimonialQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  return (
+    nodes.find((node) => {
+      const handle = node?.handle?.toLowerCase() ?? '';
+
+      return handle === partnerHandle || handle.startsWith(`${partnerHandle}-`);
+    }) ?? null
   );
 }
