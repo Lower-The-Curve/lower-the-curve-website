@@ -2,6 +2,10 @@
    Values measured from Figma (node 600-2206). */
 .feature-cards {
   position: relative;
+  /* Above the next section, so its background doesn't hide the lower half of
+     the glow (it hangs below this section, as in Figma). Stays well under the
+     header's 100. */
+  z-index: 1;
   isolation: isolate;
   /* Clip the glow horizontally only; it hangs below the section on purpose. */
   overflow-x: clip;
@@ -23,17 +27,18 @@
   gap: 50px;
 }
 
-/* Figma "Ellipse 9": top sits 10.5px above the last row of cards. */
 .feature-cards__glow {
+  --glow-size: clamp(111.87px, calc(44.593px + 17.2505vw), 293px);
+  --glow-rise: clamp(10.5px, calc(73.956px - 4.4067vw), 56.77px);
   position: absolute;
-  left: -138px;
-  bottom: calc(var(--pad-bottom) + 10.5px - 293px);
-  width: 293px;
-  height: 293px;
+  left: clamp(-138px, calc(-41.026px - 6.7343vw), -67.29px);
+  bottom: calc(var(--pad-bottom) + var(--glow-rise) - var(--glow-size));
+  width: var(--glow-size);
+  height: var(--glow-size);
   border-radius: 50%;
   background: linear-gradient(264deg, #80ea71 19%, #298c6d 81%);
   opacity: 0.9;
-  filter: blur(5.45px);
+  filter: blur(clamp(4.1px, calc(3.5986px + 0.12857vw), 5.45px));
   z-index: -1;
   pointer-events: none;
 }
@@ -145,15 +150,16 @@
 
 .feature-cards__body {
   min-width: 0;
+  padding-top: 2px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 11px;
 }
 
 .feature-cards__card-title {
   font-size: var(--fs-body-xl);
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 32px;
   color: var(--color-ink);
   margin: 0;
 }
@@ -166,17 +172,6 @@
 }
 
 @media (max-width: 1024px) {
-  /* Mobile Figma "Ellipse 9", used for the whole single-column layout:
-     111.87px, top ~60px above the last card, so about half of it hangs
-     into the next section. */
-  .feature-cards__glow {
-    left: -67.29px;
-    bottom: calc(var(--pad-bottom) + 60px - 111.87px);
-    width: 111.87px;
-    height: 111.87px;
-    filter: blur(4.1px);
-  }
-
   .feature-cards {
     --pad-top: 48px;
     --pad-bottom: 48px;
@@ -199,25 +194,33 @@
   }
 
   .feature-cards__inner {
-    gap: 28px;
+    gap: 26px;
   }
 
-  /* 390x457 frame: 40 heading + 28 + 4 x 86.41 cards + 3 x 14.5. */
+  /* 457 = 66 + 4 x 86.41 cards + 3 x 15.1. */
   .feature-cards__list {
-    gap: 14.5px;
+    gap: 15.1px;
   }
 
   .feature-cards__card {
     gap: 5px;
     padding: 16px 11px 14.4px 16px;
+    border-radius: 12.34px;
+  }
+
+  .feature-cards__card::before {
+    inset: -1.85px;
+    padding: 1.85px;
+    border-radius: 14.19px;
   }
 
   .feature-cards__body {
-    gap: 2.4px;
+    padding-top: 1.8px;
+    gap: 4.2px;
   }
 
   .feature-cards__card-title {
-    line-height: 1.2;
+    line-height: 18px;
   }
 
   .feature-cards__description {
