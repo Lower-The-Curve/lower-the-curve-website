@@ -1491,3 +1491,26 @@ Two consequences:
   135deg** — both existing tokens, no new colour. The exact stops are estimated
   from the reference screenshot; if the design's navy is deeper than
   `--color-brand-darker` (#003a9e), that's a new token and a deliberate addition.
+
+### Type scale addition: the team card captions
+The team section's design sets the expanded card's name/role at **36/22px** on
+desktop and **14/10px** on mobile, and the collapsed cards' at **18/10px** and
+**8/6px**. Nothing on the body scale goes below 12px or sits at 36/22, so four
+off-scale tokens were added (all three tier blocks in `typography.css`),
+chosen over snapping to 14/12 because the collapsed captions are meant to be
+smaller than any body step.
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-team-name-open` | 36px | 32px | 14px | expanded card's name |
+| `--fs-team-role-open` | 22px | 20px | 10px | expanded card's role |
+| `--fs-team-name-closed` | 18px | 18px | 8px | collapsed cards' name |
+| `--fs-team-role-closed` | 10px | 14px | 6px | collapsed cards' role |
+
+- **Desktop and mobile were specified; tablet was not.** Tablet keeps the values
+  the captions already rendered (32/20 open, 18/14 closed), so it was not touched
+  when desktop moved to 36/22/18/10. That leaves tablet's closed role (14px)
+  larger than desktop's (10px) — confirm with design.
+- **6–8px is below any legibility floor** and is what the design asks for; flagged
+  here in case design reconsiders.
+- Don't reach for these outside `TeamSection`.
