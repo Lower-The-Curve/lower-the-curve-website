@@ -105,6 +105,21 @@
   line-height: 0.875;
 }
 
+/* Final value and counting copy share one cell, so the width never shifts. */
+.stats-grid__value--counting {
+  display: inline-grid;
+}
+
+.stats-grid__value-final,
+.stats-grid__value-live {
+  grid-area: 1 / 1;
+}
+
+/* opacity (not visibility) keeps it readable by screen readers. */
+.stats-grid__value-final {
+  opacity: 0;
+}
+
 .stats-grid__label {
   font-size: var(--fs-body-xl);
   line-height: 1.5;

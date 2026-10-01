@@ -1,4 +1,5 @@
 import accentedTitle from '@/components/ui/accentedTitle';
+import StatCountUp from './StatCountUp';
 import './StatsGridSection.css';
 
 // Fragment: lib/shopify/queries/sections/statsGrid.js.
@@ -61,9 +62,7 @@ export default function StatsGridSection({ section }) {
 
             return (
               <li key={stat.id} className="stats-grid__item">
-                <span className="stats-grid__value stats-grid__number">
-                  {fieldValue(stat, 'value')}
-                </span>
+                <StatCountUp value={fieldValue(stat, 'value')} />
                 {label && <span className="stats-grid__label">{label}</span>}
               </li>
             );
