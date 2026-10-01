@@ -439,6 +439,7 @@ in the design system rather than in a style guide.
 | `solutions` | [src/components/sections/SolutionsSection/SolutionsSection.css](src/components/sections/SolutionsSection/SolutionsSection.css) |
 | `testimonials` | [src/components/sections/TestimonialsSection/TestimonialsSection.css](src/components/sections/TestimonialsSection/TestimonialsSection.css) |
 | `case-studies` | [src/components/sections/CaseStudiesSection/CaseStudiesSection.css](src/components/sections/CaseStudiesSection/CaseStudiesSection.css) |
+| `delivered` | [src/components/sections/DeliveredSection/DeliveredSection.css](src/components/sections/DeliveredSection/DeliveredSection.css) |
 | `home-page` | [src/app/page.css](src/app/page.css) |
 | `services-page` | [src/app/services/page.css](src/app/services/page.css) |
 

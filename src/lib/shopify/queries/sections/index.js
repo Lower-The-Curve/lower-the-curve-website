@@ -18,3 +18,4 @@ export * from './richTextWithStats';
 export * from './partnerDetail';
 export * from './header';
 export * from './footer';
+export * from './delivered';
