@@ -1,8 +1,8 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import accentedTitle from '@/components/ui/accentedTitle';
-import ArrowIcon from '@/components/ui/Button/ArrowIcon';
-import './DeliveredSection.css';
+import Image from "next/image";
+import Link from "next/link";
+import accentedTitle from "@/components/ui/accentedTitle";
+import ArrowIcon from "@/components/ui/Button/ArrowIcon";
+import "./DeliveredSection.css";
 
 // The delivered section is a single `delivered` metaobject with:
 //   - `title`       : single_line_text_field, the heading (accent markup)
@@ -15,7 +15,7 @@ import './DeliveredSection.css';
 //   service_tag     label, color, color_end, color_3
 //
 // Its GraphQL fragment lives in lib/shopify/queries/sections/delivered.js.
-export const DELIVERED_TYPE = 'delivered';
+export const DELIVERED_TYPE = "delivered";
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;
@@ -43,7 +43,7 @@ function fileFrom(node, key) {
 
 function cardsFrom(section) {
   return (
-    field(section, 'cards')?.references?.nodes ??
+    field(section, "cards")?.references?.nodes ??
     section?.fields?.find((f) => f.references?.nodes?.length)?.references
       ?.nodes ??
     []
@@ -51,19 +51,19 @@ function cardsFrom(section) {
 }
 
 function tagsFrom(card) {
-  return field(card, 'tags')?.references?.nodes ?? [];
+  return field(card, "tags")?.references?.nodes ?? [];
 }
 
 // Shopify colour fields arrive as hex strings. Stops that are empty are omitted,
 // so a two-stop tag and a three-stop tag share one painter.
 function tagStyle(tag) {
   const stops = [
-    fieldValue(tag, 'color'),
-    fieldValue(tag, 'color_3'),
-    fieldValue(tag, 'color_end'),
+    fieldValue(tag, "color"),
+    fieldValue(tag, "color_3"),
+    fieldValue(tag, "color_end"),
   ].filter(Boolean);
 
-  const textColor = fieldValue(tag, 'text_color');
+  const textColor = fieldValue(tag, "text_color");
 
   if (!stops.length && !textColor) return undefined;
 
@@ -72,10 +72,27 @@ function tagStyle(tag) {
       ? { backgroundColor: stops[0] }
       : stops.length > 1
         ? {
-            backgroundImage: `linear-gradient(135deg, ${stops.join(', ')})`,
+            backgroundImage: `linear-gradient(135deg, ${stops.join(", ")})`,
           }
         : {}),
     ...(textColor ? { color: textColor } : {}),
+  };
+}
+
+// A multi-word label is split so the hover state can show a short form: the first
+// word plus the first three letters of the rest.
+function splitLabel(label) {
+  const space = label.indexOf(' ');
+  if (space === -1) return null;
+
+  const first = label.slice(0, space);
+  const rest = label.slice(space + 1).trim();
+  if (!rest) return null;
+
+  return {
+    first: `${first}\u00a0`,
+    head: rest.slice(0, 3),
+    tail: rest.slice(3),
   };
 }
 
@@ -85,12 +102,12 @@ function isExternal(url) {
 
 function CardShell({ href, hasCta, children }) {
   const className = [
-    'delivered__card',
-    href ? 'delivered__card--linked' : '',
-    hasCta ? 'delivered__card--has-cta' : 'delivered__card--no-cta',
+    "delivered__card",
+    href ? "delivered__card--linked" : "",
+    hasCta ? "delivered__card--has-cta" : "delivered__card--no-cta",
   ]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
   if (!href) {
     return <div className={className}>{children}</div>;
@@ -101,8 +118,8 @@ function CardShell({ href, hasCta, children }) {
       <a
         href={href}
         className={className}
-        target='_blank'
-        rel='noopener noreferrer'
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {children}
       </a>
@@ -116,42 +133,59 @@ function CardShell({ href, hasCta, children }) {
   );
 }
 
+function TagLabel({ label }) {
+  const parts = splitLabel(label);
+
+  if (!parts) return label;
+
+  return (
+    <>
+      <span>{parts.first}</span>
+      <span>{parts.head}</span>
+      {parts.tail && <span className='delivered__tag-tail'>{parts.tail}</span>}
+      <span className='delivered__tag-dot' aria-hidden='true'>
+        .
+      </span>
+    </>
+  );
+}
+
 function DeliveredCardItem({ card, linkLabel, order }) {
-  const cardTitle = fieldValue(card, 'title');
-  const cardDescription = fieldValue(card, 'description');
-  const url = fieldValue(card, 'url', 'link');
-  const image = imageFrom(card, 'image');
+  const cardTitle = fieldValue(card, "title");
+  const cardDescription = fieldValue(card, "description");
+  const url = fieldValue(card, "url", "link");
+  const image = imageFrom(card, "image");
   const tags = tagsFrom(card);
 
   return (
-    <li className='delivered__item' style={{ order }}>
+    <li className="delivered__item" style={{ order }}>
       <CardShell href={url} hasCta={Boolean(url && linkLabel)}>
-        <div className='delivered__preview'>
+        <div className="delivered__preview">
           {image && (
             <Image
               src={image.url}
-              alt={image.altText ?? cardTitle ?? ''}
+              alt={image.altText ?? cardTitle ?? ""}
               width={image.width ?? 1160}
               height={image.height ?? 560}
-              className='delivered__image'
-              sizes='(max-width: 1024px) 100vw, 38vw'
+              className="delivered__image"
+              sizes="(max-width: 1024px) 100vw, 38vw"
               unoptimized={/\.svg(\?|$)/i.test(image.url)}
             />
           )}
 
           {tags.length > 0 && (
-            <ul className='delivered__tags'>
+            <ul className="delivered__tags">
               {tags.map((tag) => {
-                const label = fieldValue(tag, 'label');
+                const label = fieldValue(tag, "label");
                 if (!label) return null;
 
                 return (
                   <li
                     key={tag.id ?? tag.handle}
-                    className='delivered__tag'
+                    className="delivered__tag"
                     style={tagStyle(tag)}
                   >
-                    {label}
+                    <TagLabel label={label} />
                   </li>
                 );
               })}
@@ -160,18 +194,18 @@ function DeliveredCardItem({ card, linkLabel, order }) {
         </div>
 
         {(cardTitle || cardDescription || (url && linkLabel)) && (
-          <div className='delivered__panel'>
-            <div className='delivered__panel-inner'>
+          <div className="delivered__panel">
+            <div className="delivered__panel-inner">
               {cardTitle && (
-                <h3 className='delivered__card-title'>{cardTitle}</h3>
+                <h3 className="delivered__card-title">{cardTitle}</h3>
               )}
               {cardDescription && (
-                <p className='delivered__card-copy'>{cardDescription}</p>
+                <p className="delivered__card-copy">{cardDescription}</p>
               )}
               {url && linkLabel && (
-                <span className='btn btn--primary btn--sm delivered__cta'>
-                  <span className='btn__label'>{linkLabel}</span>
-                  <ArrowIcon className='btn__arrow btn__arrow--rise' />
+                <span className="btn btn--primary btn--sm delivered__cta">
+                  <span className="btn__label">{linkLabel}</span>
+                  <ArrowIcon className="btn__arrow btn__arrow--rise" />
                 </span>
               )}
             </div>
@@ -193,57 +227,57 @@ function cardsByColumn(cards) {
 export default function DeliveredSection({ section }) {
   if (!section) return null;
 
-  const title = fieldValue(section, 'title');
-  const description = fieldValue(section, 'description');
-  const linkLabel = fieldValue(section, 'link_label');
+  const title = fieldValue(section, "title");
+  const description = fieldValue(section, "description");
+  const linkLabel = fieldValue(section, "link_label");
   const cards = cardsFrom(section);
-  const greenGlow = fileFrom(section, 'green_glow');
-  const blueGlow = fileFrom(section, 'blue_glow');
+  const greenGlow = fileFrom(section, "green_glow");
+  const blueGlow = fileFrom(section, "blue_glow");
   if (!cards.length) return null;
 
   return (
-    <section className='delivered'>
+    <section className="delivered">
       {greenGlow?.image && (
         <Image
           src={greenGlow.image.url}
-          alt=''
+          alt=""
           width={greenGlow.image.width ?? 300}
           height={greenGlow.image.height ?? 300}
-          className='delivered__glow'
-          aria-hidden='true'
+          className="delivered__glow"
+          aria-hidden="true"
           unoptimized
         />
       )}
       {blueGlow?.image && (
         <Image
           src={blueGlow.image.url}
-          alt=''
+          alt=""
           width={blueGlow.image.width ?? 300}
           height={blueGlow.image.height ?? 300}
-          className='delivered__blue-glow'
-          aria-hidden='true'
+          className="delivered__blue-glow"
+          aria-hidden="true"
           unoptimized
         />
       )}
-      <div className='delivered__inner'>
+      <div className="delivered__inner">
         {(title || description) && (
-          <div className='delivered__intro'>
+          <div className="delivered__intro">
             {title && (
-              <h2 className='delivered__title'>
+              <h2 className="delivered__title">
                 {accentedTitle(title, {
-                  accent: 'delivered__accent',
-                  blue: 'delivered__accent--blue',
-                  green: 'delivered__accent--green',
+                  accent: "delivered__accent",
+                  blue: "delivered__accent--blue",
+                  green: "delivered__accent--green",
                 })}
               </h2>
             )}
-            {description && <p className='delivered__lede'>{description}</p>}
+            {description && <p className="delivered__lede">{description}</p>}
           </div>
         )}
 
-        <div className='delivered__grid'>
+        <div className="delivered__grid">
           {cardsByColumn(cards).map((column, columnIndex) => (
-            <ul key={columnIndex} className='delivered__column'>
+            <ul key={columnIndex} className="delivered__column">
               {column.map(({ card, index }) => (
                 <DeliveredCardItem
                   key={card.id}
