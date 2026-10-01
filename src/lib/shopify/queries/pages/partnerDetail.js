@@ -1,4 +1,7 @@
-import { partnerDetailSectionFragment } from '../sections';
+import {
+  partnerDetailSectionFragment,
+  whatWeBuiltSectionFragment,
+} from '../sections';
 
 export const getPartnerDetailPageQuery = /* GraphQL */ `
   query GetPartnerDetailPage($first: Int!) {
@@ -9,4 +12,15 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     }
   }
   ${partnerDetailSectionFragment}
+`;
+
+export const getWhatWeBuiltQuery = `
+  query GetWhatWeBuilt {
+    metaobjects(type: "what_we_built", first: 50) {
+      nodes {
+        ...WhatWeBuiltSectionFields
+      }
+    }
+  }
+  ${whatWeBuiltSectionFragment}
 `;
