@@ -206,9 +206,21 @@
   line-height: 1;
   color: #ffffff;
   white-space: nowrap;
+}
+
+.delivered__tag-tail,
+.delivered__tag-dot {
+  flex: none;
   overflow: hidden;
   interpolate-size: allow-keywords;
+}
+
+.delivered__tag-tail {
   width: max-content;
+}
+
+.delivered__tag-dot {
+  width: 0;
 }
 
 /* --- PANEL -------------------------------------------------------------- */
@@ -231,14 +243,21 @@
 /* --- DESKTOP HOVER ------------------------------------------------------ */
 
 @media (min-width: 1025px) {
-  /* On hover the tags shrink to half their width, anchored left. */
-  .delivered__tag {
+  /* On hover a multi-word tag animates down to the first word plus the first
+     three letters of the rest and a full stop: the tail collapses, the dot opens. */
+  .delivered__tag-tail,
+  .delivered__tag-dot {
     transition: width 0.28s ease;
   }
 
-  .delivered__card:hover .delivered__tag,
-  .delivered__card:focus-within .delivered__tag {
-    width: calc-size(max-content, size * 0.6);
+  .delivered__card:hover .delivered__tag-tail,
+  .delivered__card:focus-within .delivered__tag-tail {
+    width: 0;
+  }
+
+  .delivered__card:hover .delivered__tag-dot,
+  .delivered__card:focus-within .delivered__tag-dot {
+    width: max-content;
   }
 
   .delivered__panel {
@@ -256,16 +275,14 @@
     transition: padding-block 0.28s ease;
   }
 
-  .delivered__card:hover .delivered__panel,
-  .delivered__card:focus-within .delivered__panel {
+  .delivered__card:hover .delivered__panel {
     grid-template-rows: 1fr;
     opacity: 1;
     visibility: visible;
     transition-delay: 0s;
   }
 
-  .delivered__card:hover .delivered__panel-inner,
-  .delivered__card:focus-within .delivered__panel-inner {
+  .delivered__card:hover .delivered__panel-inner {
     padding-block: 1.25rem 1.5rem;
   }
 }
