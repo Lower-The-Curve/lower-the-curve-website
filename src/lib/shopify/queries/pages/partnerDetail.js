@@ -1,4 +1,5 @@
 import {
+  partnerApproachSectionFragment,
   partnerDetailSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
@@ -12,6 +13,7 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     }
   }
   ${partnerDetailSectionFragment}
+  ${partnerApproachSectionFragment}
 `;
 
 export const getWhatWeBuiltQuery = `

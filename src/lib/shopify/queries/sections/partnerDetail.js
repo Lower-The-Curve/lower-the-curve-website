@@ -27,6 +27,8 @@ export const partnerDetailSectionFragment = /* GraphQL */ `
             type
             value
           }
+          # The approach reference needs its steps resolved too.
+          ...PartnerApproachSectionFields
         }
       }
       # first: 50 must match the other section fragments that select the
