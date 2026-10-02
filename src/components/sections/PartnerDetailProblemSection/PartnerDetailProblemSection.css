@@ -4,6 +4,8 @@
 */
 .partner-detail-problem {
   --partner-detail-problem-icon: 75px;
+  --partner-detail-problem-sphere: clamp(110px, 18.525vw, 266.76px);
+  --partner-detail-problem-dot: clamp(17px, 4.722vw, 68px);
   position: relative;
   isolation: isolate;
   overflow-x: clip;
@@ -97,6 +99,7 @@
 
 .partner-detail-problem__issues {
   grid-area: issues;
+  position: relative;
 }
 
 .partner-detail-problem__list {
@@ -106,6 +109,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 .partner-detail-problem__row {
@@ -161,6 +166,127 @@
   display: block;
   width: 33px;
   height: auto;
+}
+
+/* Figma "Ellipse 10" and the 54px blue dot. Both scale with the viewport:
+   full Figma size at 1440 (the vw factor is size / 1440), smaller on phones.
+   The sphere's Figma Left/Top are its rotated corner, not its box: its centre
+   sits 50px inside the right edge (31% of it off the page) and 279px below
+   the section top. Figma's -38.47° is clockwise, i.e. CSS rotate(38.47deg),
+   which puts the light stop top-left and the dark one bottom-right. */
+.partner-detail-problem__sphere,
+.partner-detail-problem__blue-dot {
+  position: absolute;
+  pointer-events: none;
+}
+
+.partner-detail-problem__sphere {
+  z-index: -1;
+  top: calc(279px - var(--partner-detail-problem-sphere) / 2);
+  right: calc(var(--partner-detail-problem-sphere) * -0.3126);
+  width: var(--partner-detail-problem-sphere);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f3f2f2, #989898);
+  opacity: 0.71;
+  transform: rotate(38.47deg);
+  filter: blur(calc(var(--partner-detail-problem-sphere) * 0.0489));
+}
+
+.partner-detail-problem__blue-dot {
+  z-index: 0;
+  width: var(--partner-detail-problem-dot);
+  height: var(--partner-detail-problem-dot);
+  top: calc(150px - var(--partner-detail-problem-dot) / 2);
+  left: calc(-16px - var(--partner-detail-problem-dot) / 2);
+}
+
+/* Mobile values are the Figma 390 frame's: title -> paragraph 16px,
+   paragraph -> subtitle 56px, subtitle -> list 26px; paragraph 16/20. */
+@media (max-width: 1024px) {
+  .partner-detail-problem__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'description'
+      'subtitle'
+      'issues';
+    row-gap: 0;
+    padding: 3rem var(--space) 3.5rem;
+  }
+
+  .partner-detail-problem__title,
+  .partner-detail-problem__subtitle,
+  .partner-detail-problem__description {
+    text-align: center;
+  }
+
+  /* 10em breaks the headings after "We" / "for", as in the mobile frame. */
+  .partner-detail-problem__title,
+  .partner-detail-problem__subtitle {
+    justify-self: center;
+    max-width: 10em;
+  }
+
+  .partner-detail-problem__title {
+    margin-bottom: 16px;
+  }
+
+  .partner-detail-problem__description {
+    margin-bottom: 56px;
+  }
+
+  .partner-detail-problem__subtitle {
+    margin-bottom: 26px;
+  }
+
+  .partner-detail-problem__paragraph {
+    line-height: 1.25;
+  }
+
+  .partner-detail-problem__row {
+    background-color: color-mix(in srgb, var(--color-ink) 2%, var(--color-bg));
+  }
+
+  /* Beside the subtitle's second line, 6px inside the content edge. */
+  .partner-detail-problem__blue-dot {
+    top: calc(-46px - var(--partner-detail-problem-dot) / 2);
+    left: calc(6px - var(--partner-detail-problem-dot) / 2);
+  }
+
+  /* Centred on the right edge, between the paragraph and the subtitle. */
+  .partner-detail-problem__sphere {
+    top: calc(43% - var(--partner-detail-problem-sphere) / 2);
+    right: calc(var(--partner-detail-problem-sphere) * -0.5);
+  }
+}
+
+/* Cards 358x60, radius 10, no gap; icon 30px at 16px; label 14/24 SemiBold
+   at 60px from the left, 18px from the top. */
+@media (max-width: 575px) {
+  .partner-detail-problem {
+    --partner-detail-problem-icon: 30px;
+  }
+
+  .partner-detail-problem__list {
+    gap: 0;
+  }
+
+  .partner-detail-problem__row {
+    column-gap: 14px;
+    min-height: 60px;
+    padding: 18px 12px 18px 16px;
+    border-radius: 10px;
+  }
+
+  .partner-detail-problem__label {
+    font-size: var(--fs-body-sm);
+    line-height: 24px;
+  }
+
+  .partner-detail-problem__arrow {
+    width: 17px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
 import ArrowIcon from '@/components/ui/Button/ArrowIcon';
+import BlueDot from '@/components/sections/SolutionsSection/BlueDot';
 import './PartnerDetailProblemSection.css';
 
 // The partner's "problem" section, right under the partner hero. It reads a
@@ -143,6 +144,8 @@ export default function PartnerDetailProblemSection({ section, partnerName }) {
 
   return (
     <section className="partner-detail-problem">
+      <span className="partner-detail-problem__sphere" aria-hidden="true" />
+
       <div className="partner-detail-problem__inner">
         {title && (
           <h2 className="partner-detail-problem__title">
@@ -168,6 +171,8 @@ export default function PartnerDetailProblemSection({ section, partnerName }) {
 
         {issues.length > 0 && (
           <div className="partner-detail-problem__issues">
+            <BlueDot className="partner-detail-problem__blue-dot" />
+
             <ol className="partner-detail-problem__list">
               {issues.map((issue, index) => {
                 const linked = Boolean(issue.url);
