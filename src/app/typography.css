@@ -137,6 +137,17 @@
   --fs-team-role-open: 22px;
   --fs-team-name-closed: 18px;
   --fs-team-role-closed: 10px;
+
+  /* --- THE APPROACH TIMELINE CARDS ---------------------------------------
+     Three sizes, off the scale on purpose: the design sets the step card's
+     title/copy/week pill at 24/16/16px on desktop and 16/10/8px on mobile.
+     Nothing on the body scale goes below 12px, and no heading step is 16px.
+     The step NUMBER is not here — it is --fs-heading-lg (48px / 32px). Tablet
+     was not specified and keeps the desktop values, because the cards stay
+     desktop-sized and the row swipes there. */
+  --fs-approach-title: 24px;
+  --fs-approach-copy: 16px;
+  --fs-approach-pill: 16px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -168,6 +179,10 @@
     --fs-team-role-open: 20px;
     --fs-team-name-closed: 18px;
     --fs-team-role-closed: 14px;
+
+    --fs-approach-title: 24px;
+    --fs-approach-copy: 16px;
+    --fs-approach-pill: 16px;
   }
 }
 
@@ -214,6 +229,10 @@
     --fs-team-role-open: 10px;
     --fs-team-name-closed: 8px;
     --fs-team-role-closed: 6px;
+
+    --fs-approach-title: 16px;
+    --fs-approach-copy: 10px;
+    --fs-approach-pill: 8px;
   }
 }
 
