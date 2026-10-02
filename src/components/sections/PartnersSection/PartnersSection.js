@@ -7,48 +7,9 @@ import './PartnersSection.css';
 //     each with `name`, `link`, and `image` (file_reference -> MediaImage logo).
 // Readers below accept a few alternate key names so small admin renames don't
 // break rendering.
+//
+// Its GraphQL fragment lives in lib/shopify/queries/sections/partners.js.
 export const PARTNERS_TYPE = 'partners';
-
-// Colocated fragment for the partners section: resolves the list of partner
-// items and each item's logo.
-export const partnersSectionFragment = /* GraphQL */ `
-  fragment PartnersSectionFields on Metaobject {
-    id
-    handle
-    type
-    fields {
-      key
-      type
-      value
-      references(first: 50) {
-        nodes {
-          __typename
-          ... on Metaobject {
-            id
-            type
-            handle
-            fields {
-              key
-              type
-              value
-              reference {
-                __typename
-                ... on MediaImage {
-                  image {
-                    url
-                    altText
-                    width
-                    height
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key);

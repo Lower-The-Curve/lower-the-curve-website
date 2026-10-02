@@ -1,0 +1,8 @@
+/* The Shopify Apps page — the `shopify-apps-page` BEM block, on the <main> element.
+
+   Same as the services page: sections own their measure and spacing, so this is a
+   plain full-width flow container and a full-bleed section (the hero) can reach
+   the viewport edges. */
+.shopify-apps-page {
+  display: block;
+}

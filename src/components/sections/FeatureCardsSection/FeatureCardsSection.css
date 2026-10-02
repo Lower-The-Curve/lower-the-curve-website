@@ -1,0 +1,229 @@
+/* Feature cards section: centred heading over a two-up grid of value cards.
+   Values measured from Figma (node 600-2206). */
+.feature-cards {
+  position: relative;
+  /* Above the next section, so its background doesn't hide the lower half of
+     the glow (it hangs below this section, as in Figma). Stays well under the
+     header's 100. */
+  z-index: 1;
+  isolation: isolate;
+  /* Clip the glow horizontally only; it hangs below the section on purpose. */
+  overflow-x: clip;
+  --icon-size: 56px;
+  /* The 401px Figma frame is the content; the 70px gap between frames
+     (1939 -> 2009 in Figma) is the section's padding. */
+  --pad-top: 70px;
+  --pad-bottom: 70px;
+}
+
+.feature-cards__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: var(--pad-top) var(--space) var(--pad-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Heading (40px) + gap puts the cards at y 90. */
+  gap: 50px;
+}
+
+.feature-cards__glow {
+  --glow-size: clamp(111.87px, calc(44.593px + 17.2505vw), 293px);
+  --glow-rise: clamp(10.5px, calc(73.956px - 4.4067vw), 56.77px);
+  position: absolute;
+  left: clamp(-138px, calc(-41.026px - 6.7343vw), -67.29px);
+  bottom: calc(var(--pad-bottom) + var(--glow-rise) - var(--glow-size));
+  width: var(--glow-size);
+  height: var(--glow-size);
+  border-radius: 50%;
+  background: linear-gradient(264deg, #80ea71 19%, #298c6d 81%);
+  opacity: 0.9;
+  filter: blur(clamp(4.1px, calc(3.5986px + 0.12857vw), 5.45px));
+  z-index: -1;
+  pointer-events: none;
+}
+
+.feature-cards__title {
+  width: 100%;
+  max-width: 780px;
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 40px;
+  color: var(--color-ink);
+  text-align: center;
+  margin: 0;
+}
+
+.feature-cards__accent {
+  font-weight: 600;
+}
+
+/* Flat fallback; the gradient below replaces it where text clipping works. */
+.feature-cards__accent--blue {
+  color: var(--color-brand);
+}
+
+.feature-cards__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .feature-cards__accent--blue,
+  .feature-cards__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Same blue gradient as the hero and solutions headings. */
+  .feature-cards__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .feature-cards__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+/* Grid items stretch by default, so cards in a row share the same height. */
+.feature-cards__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 580px));
+  justify-content: center;
+  gap: 31px 50px;
+}
+
+/* 580x140 box; text column is 469px wide. */
+.feature-cards__card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  padding: 26px 16px 25px 22px;
+  border-radius: 20px;
+  background: rgba(250, 250, 250, 0.75);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+
+/* 3px outer gradient border (white left, grey right), masked to a ring so
+   it doesn't show through the translucent fill. */
+.feature-cards__card::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  padding: 3px;
+  border-radius: 23px;
+  background: linear-gradient(90deg, #ffffff, rgba(189, 189, 189, 0.5));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* Fixed box so icons of different proportions line up and never shrink. */
+.feature-cards__icon {
+  flex-shrink: 0;
+  display: block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  object-fit: contain;
+}
+
+.feature-cards__body {
+  min-width: 0;
+  padding-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.feature-cards__card-title {
+  font-size: var(--fs-body-xl);
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.feature-cards__description {
+  font-size: var(--fs-body-card);
+  line-height: 1.375;
+  color: #000000;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .feature-cards {
+    --pad-top: 48px;
+    --pad-bottom: 48px;
+  }
+
+  .feature-cards__inner {
+    gap: 40px;
+  }
+
+  .feature-cards__list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 575px) {
+  /* Mobile Figma: 358x86 cards, 36px icon, copy 290x32 at left 57 / top 40. */
+  .feature-cards {
+    --icon-size: 36px;
+  }
+
+  .feature-cards__inner {
+    gap: 26px;
+  }
+
+  /* 457 = 66 + 4 x 86.41 cards + 3 x 15.1. */
+  .feature-cards__list {
+    gap: 15.1px;
+  }
+
+  .feature-cards__card {
+    gap: 5px;
+    padding: 16px 11px 14.4px 16px;
+    border-radius: 12.34px;
+  }
+
+  .feature-cards__card::before {
+    inset: -1.85px;
+    padding: 1.85px;
+    border-radius: 14.19px;
+  }
+
+  .feature-cards__body {
+    padding-top: 1.8px;
+    gap: 4.2px;
+  }
+
+  .feature-cards__card-title {
+    line-height: 18px;
+  }
+
+  .feature-cards__description {
+    line-height: 16px;
+  }
+}

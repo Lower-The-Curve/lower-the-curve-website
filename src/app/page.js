@@ -19,7 +19,7 @@ import './page.css';
 
 // The home `content` entry's component slots, in the order the admin shows them
 // (Component 1 … Component 5). The query aliases the live field keys onto these
-// names — see queries/home.js for why the keys don't match their labels.
+// names — see queries/pages/home.js for why the keys don't match their labels.
 const COMPONENT_SLOTS = [
   'component1',
   'component2',
@@ -58,7 +58,7 @@ export default async function HomePage() {
             return <SolutionsSection key={section.id} section={section} />;
           // Two cases on purpose: the live definition's API identifier is
           // misspelled `testimonails`, and recreating it correctly must not
-          // silently blank the section out. See testimonials.shared.js.
+          // silently blank the section out. See TestimonialsSection.js.
           case TESTIMONIALS_TYPE:
           case TESTIMONIALS_TYPE_CORRECTED:
             return <TestimonialsSection key={section.id} section={section} />;

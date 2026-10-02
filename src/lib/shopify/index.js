@@ -7,17 +7,27 @@
 import {
   getHomePageQuery,
   getServicesPageQuery,
+  getShopifyAppsPageQuery,
+  getCaseStudiesPageQuery,
+  getAboutUsPageQuery,
+  getPartnerDetailPageQuery,
+  getWhatWeBuiltQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
+// Also tolerate a full URL ("https://lower-the-curve.myshopify.com/") — strip
+// the scheme, any path, and the trailing slash before building the endpoint.
 const rawDomain = process.env.SHOPIFY_STORE_DOMAIN;
-const domain = rawDomain
-  ? rawDomain.includes('.')
-    ? rawDomain
-    : `${rawDomain}.myshopify.com`
+const storeHost = rawDomain
+  ? rawDomain.trim().replace(/^https?:\/\//i, '').split('/')[0]
+  : null;
+const domain = storeHost
+  ? storeHost.includes('.')
+    ? storeHost
+    : `${storeHost}.myshopify.com`
   : null;
 const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 const apiVersion = process.env.SHOPIFY_STOREFRONT_API_VERSION || '2025-01';
@@ -61,7 +71,17 @@ export async function shopifyFetch({
     cache,
   });
 
-  const body = await result.json();
+  const raw = await result.text();
+  let body;
+
+  try {
+    body = raw ? JSON.parse(raw) : {};
+  } catch {
+    const preview = raw.replace(/\s+/g, ' ').trim().slice(0, 200);
+    throw new Error(
+      `Shopify Storefront API returned non-JSON (HTTP ${result.status}): ${preview || '(empty body)'}`
+    );
+  }
 
   if (body.errors) {
     throw new Error(
@@ -340,4 +360,126 @@ export async function getServicesPage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "shopify-apps" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "shopify-apps" doesn't exist.
+ */
+export async function getShopifyAppsPage() {
+  const { body } = await shopifyFetch({
+    query: getShopifyAppsPageQuery,
+    variables: { handle: { type: 'content', handle: 'shopify-apps' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "Case Studies" content metaobject and its resolved section
+ * references.
+ *
+ * The live handle is `content-hcmnjrrd` — Shopify generated it from the entry's
+ * page name. Renaming the handle in the admin is a one-line change here.
+ *
+ * NOTE: there is a second "Case Studies" content entry in the store with
+ * handle `content-o096zcnb`. It only references the Blackroll banner, so the
+ * page uses `content-hcmnjrrd`, which holds both the Blackroll and Our Story
+ * banners. Delete the stale entry in the admin, or point this handle at
+ * whichever entry is canonical.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with that handle doesn't exist.
+ */
+export async function getCaseStudiesPage() {
+  const { body } = await shopifyFetch({
+    query: getCaseStudiesPageQuery,
+    variables: { handle: { type: 'content', handle: 'content-hcmnjrrd' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "about-us" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "about-us" doesn't exist.
+ */
+export async function getAboutUsPage() {
+  const { body } = await shopifyFetch({
+    query: getAboutUsPageQuery,
+    variables: { handle: { type: 'content', handle: 'about-us' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the `partner_detail` entry for a partner.
+ *
+ * The URL key is the handle of the entry's `name` reference (a `partner`
+ * entry) — e.g. `/partners/blackroll` — NOT the `partner_detail` entry's own
+ * auto-generated handle, which Shopify derives from the copy and would change
+ * with it. The Storefront API has no field-value filter on `metaobjects`, so
+ * the query returns the entries and the match happens here.
+ *
+ * @param {string} partnerHandle  e.g. "blackroll"
+ * @param {number} [first=50]     entries to fetch before matching.
+ * @returns {Promise<object|null>} The `partner_detail` node, or null if no
+ *   entry references a partner with that handle.
+ */
+export async function getPartnerDetailPage(partnerHandle, first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnerDetailPageQuery,
+    variables: { first },
+  });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameHandle = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.reference?.handle;
+
+  return nodes.find((node) => nameHandle(node) === partnerHandle) ?? null;
+}
+
+/**
+ * Fetch the `what_we_built` entry belonging to a partner.
+ *
+ * There is no reference field linking the two: the `partner` entry has no
+ * `what_we_built` field and neither does `partner_detail`. The only link in the
+ * live data is the parent's own `name` field ("Blackroll"), which matches the
+ * referenced `partner` entry's `name`. So the match is made here, case- and
+ * whitespace-insensitively, and a partner with no matching entry simply renders
+ * no section.
+ *
+ * The Storefront API has no field-value filter on `metaobjects`, so the query
+ * returns the entries and the match happens in code — same pattern as
+ * getPartnerDetailPage() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(), whose `name` reference carries the partner's name.
+ * @returns {Promise<object|null>} The `what_we_built` node, or null.
+ */
+export async function getWhatWeBuilt(partnerDetail) {
+  const partnerName = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.fields?.find((field) => field.key === 'name')?.value;
+
+  if (!partnerName) return null;
+
+  const { body } = await shopifyFetch({ query: getWhatWeBuiltQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameOf = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.value;
+
+  const wanted = partnerName.trim().toLowerCase();
+
+  return (
+    nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
+  );
 }

@@ -1,0 +1,403 @@
+/* Delivered section — the `delivered` BEM block. Centred heading and lede over a
+   two-column layout of store-preview cards. Desktop columns are independent, so
+   an expanded card only pushes cards in its own column (same gap as the closed
+   stack). On desktop the card title, copy and shared pill
+   are revealed only on hover / focus-within; on tablet and mobile (<= 1024px) they
+   are always visible.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css.
+*/
+
+.delivered {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.delivered__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* --- INTRO -------------------------------------------------------------- */
+
+.delivered__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.delivered__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 40px;
+  text-align: center;
+  margin: 0;
+}
+
+.delivered__accent {
+  font-weight: 700;
+}
+
+.delivered__accent--blue {
+  color: var(--color-brand);
+}
+
+.delivered__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .delivered__accent--blue,
+  .delivered__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .delivered__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .delivered__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.delivered__lede {
+  color: var(--color-ink);
+  margin: 0;
+  max-width: 44rem;
+}
+
+.delivered__glow {
+  position: absolute;
+  z-index: -1;
+  top: 15rem;
+  right: 10rem;
+  width: 15rem;
+  height: auto;
+  pointer-events: none;
+}
+
+.delivered__blue-glow {
+  display: none;
+}
+
+/* --- GRID --------------------------------------------------------------- */
+
+.delivered__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 3rem;
+  align-items: start;
+}
+
+.delivered__column {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  min-width: 0;
+}
+
+.delivered__item {
+  min-width: 0;
+}
+
+/* --- CARD --------------------------------------------------------------- */
+
+.delivered__card {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  border: 5px solid transparent;
+  border-radius: 30px;
+
+  background-image:
+    linear-gradient(var(--color-bg), var(--color-bg)),
+    linear-gradient(90deg, #ffffff 0%, rgba(189, 189, 189, 0.5) 100%);
+
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+
+  overflow: hidden;
+
+  box-shadow: 0 6px 28px color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+.delivered__card--linked:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+/* --- PREVIEW ------------------------------------------------------------ */
+
+.delivered__preview {
+  position: relative;
+  aspect-ratio: 29 / 14;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.delivered__preview::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 95%);
+  pointer-events: none;
+}
+
+.delivered__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.delivered__tags {
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 1.25rem;
+  bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  max-width: calc(100% - 2.5rem);
+}
+
+.delivered__tag {
+  flex: 0 0 auto;
+  border-radius: 80px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-body-xs);
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* --- PANEL -------------------------------------------------------------- */
+
+.delivered__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.delivered__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* --- DESKTOP HOVER ------------------------------------------------------ */
+
+@media (min-width: 1025px) {
+  .delivered__panel {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.28s ease,
+      opacity 0.28s ease,
+      visibility 0s linear 0.28s;
+  }
+
+  .delivered__panel-inner {
+    padding-block: 0;
+    transition: padding-block 0.28s ease;
+  }
+
+  .delivered__card:hover .delivered__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .delivered__card:hover .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+}
+
+.delivered__card-title {
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.delivered__card-copy {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--fs-body-lg);
+  font-weight: 400;
+  line-height: 22px;
+  white-space: pre-line;
+}
+
+/* The pill is a <span> because the card itself is the link. */
+
+.delivered__cta {
+  margin-top: 1rem;
+  background: transparent;
+  background-image: none;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.delivered__cta:hover {
+  background: var(--color-brand);
+  background-image: none;
+  color: var(--color-bg);
+  border-color: var(--color-brand);
+}
+
+.delivered__cta .btn__arrow--rise {
+  transition: transform 0.25s ease;
+}
+
+.delivered__cta:hover .btn__arrow--rise {
+  transform: rotate(-45deg) translateX(3px);
+}
+
+/* --- TABLET (<= 1024px) ----------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .delivered__grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 3rem;
+  }
+
+  .delivered__column {
+    display: contents;
+  }
+
+  .delivered__card-title,
+  .delivered__card-copy {
+    display: block;
+  }
+
+  .delivered__cta {
+    display: none;
+  }
+
+  .delivered__panel {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .delivered__panel-inner {
+    padding-block: 1.25rem 0.5rem;
+  }
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+
+@media (max-width: 575px) {
+  .delivered__glow {
+    top: -1rem;
+    right: -2rem;
+    width: 5rem;
+  }
+
+  .delivered__blue-glow {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    left: -3.5rem;
+    top: 72%;
+    width: 10rem;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .delivered__inner {
+    padding: 3rem var(--space);
+    gap: 2rem;
+  }
+
+  .delivered__grid {
+    row-gap: 1.5rem;
+    justify-items: center;
+  }
+
+  .delivered__card {
+    width: 100%;
+    max-width: 357px;
+    border-radius: 1.5rem;
+  }
+
+  .delivered__tags {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    max-width: none;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .delivered__tag {
+    border-radius: 57.12px;
+    padding: 7px 14px;
+    font-size: var(--fs-body-xs);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .delivered__panel-inner {
+    padding-inline: 1.25rem;
+  }
+
+  .delivered__card-title {
+    font-size: var(--fs-body-base);
+    line-height: 18px;
+  }
+
+  .delivered__card-copy {
+    font-size: var(--fs-body-sm);
+    line-height: 16px;
+  }
+}

@@ -1,0 +1,296 @@
+import { useId } from 'react';
+import Image from 'next/image';
+import Button from '@/components/ui/Button/Button';
+import accentedTitle from '@/components/ui/accentedTitle';
+import richTextBody from '@/components/ui/RichTextBody/richTextBody';
+import ArchBackdrop, { ArchBackdropMobile } from './ArchBackdrop';
+import StatsBarLines from './StatsBarLines';
+import './RichTextWithStatsSection.css';
+
+// `rich_text_with_stats` — Figma frame “# informative section” (1440×702).
+// Fragment: lib/shopify/queries/sections/richTextWithStats.js.
+export const RICH_TEXT_WITH_STATS_TYPE = 'rich_text_with_stats';
+
+function field(node, key) {
+  return node?.fields?.find((f) => f.key === key) ?? null;
+}
+
+function fieldValue(node, ...keys) {
+  for (const key of keys) {
+    const value = field(node, key)?.value;
+    if (value) return value;
+  }
+  return null;
+}
+
+function imageFrom(node, ...keys) {
+  for (const key of keys) {
+    const image = field(node, key)?.reference?.image;
+    if (image) return image;
+  }
+  return null;
+}
+
+function referencesFrom(node, ...keys) {
+  for (const key of keys) {
+    const nodes = field(node, key)?.references?.nodes;
+    if (nodes?.length) return nodes;
+  }
+  return [];
+}
+
+function linkFrom(node, ...keys) {
+  const raw = fieldValue(node, ...keys);
+  if (!raw) return null;
+
+  try {
+    const { text, url } = JSON.parse(raw);
+    return text && url ? { text, url } : null;
+  } catch {
+    return null;
+  }
+}
+
+// Figma stats bar reads left → right (50+, 120%, …). CMS list order is reversed.
+function statsForDisplay(nodes) {
+  return [...nodes].reverse();
+}
+
+// Desktop splits after “scale”. Phone is three rows: “Everything you” /
+// “need to scale your” / “Shopify brand”.
+const DESK_BREAK = 'rich-text-with-stats__break rich-text-with-stats__break--desk';
+const PHONE_BREAK = 'rich-text-with-stats__break rich-text-with-stats__break--phone';
+
+function figmaTitleWithBreak(title) {
+  if (!title) return title;
+
+  let next = title;
+
+  if (!/<br/i.test(next)) {
+    // CMS often authors `…<span>scale</span> your <span>Shopify</span>…`.
+    const desk = next.replace(
+      /(scale\s*<\/span>)\s+(your\b)/i,
+      `$1<br class="${DESK_BREAK}"> $2`
+    );
+    next = desk !== next
+      ? desk
+      : next.replace(
+          /(scale\s*<\/span>)\s+(<span\b)/i,
+          `$1<br class="${DESK_BREAK}"> $2`
+        );
+    if (next === title) {
+      next = next.replace(
+        /\bscale\s+your\b/i,
+        `scale<br class="${DESK_BREAK}"> your`
+      );
+    }
+  }
+
+  if (!next.includes('break--phone')) {
+    next = next.replace(
+      /(\byou)\s+(need\b)/i,
+      `$1<br class="${PHONE_BREAK}"> $2`
+    );
+    next = next.replace(
+      /(\byour)\s+(<span\b[^>]*>\s*Shopify\b|Shopify\b)/i,
+      `$1<br class="${PHONE_BREAK}"> $2`
+    );
+  }
+
+  return next;
+}
+
+export default function RichTextWithStatsSection({ section }) {
+  const stripeId = useId().replace(/:/g, '');
+
+  if (!section) return null;
+
+  const title = fieldValue(section, 'title');
+  const image = imageFrom(section, 'image', 'media');
+  const bodyContent = richTextBody(fieldValue(section, 'body'));
+  const buttonLink = linkFrom(section, 'button', 'link');
+  const showButtonField = fieldValue(section, 'show_button');
+  // Show when a link exists unless the CMS boolean is explicitly false.
+  const renderButton =
+    Boolean(buttonLink) && showButtonField !== 'false';
+  // Two independent toggles (booleans arrive as "true"/"false" strings):
+  //   - `use_bar`   : the blue stats bar.
+  //   - `use_vector`: the vector art — the tall arch on desktop, the arc behind
+  //                   the laptop on tablet/phone. The live definition still has
+  //                   the KEY `use_stats` (only the admin label was renamed), so
+  //                   both keys are read; `use_vector` wins once it exists.
+  const showBar = fieldValue(section, 'use_bar') === 'true';
+  const showVector =
+    fieldValue(section, 'use_vector', 'use_stats') === 'true';
+  const stats = showBar
+    ? statsForDisplay(referencesFrom(section, 'stats'))
+    : [];
+  const hasStats = stats.length > 0;
+  const hasFigmaLayout = Boolean(image && (hasStats || showVector));
+  const hasVector = hasFigmaLayout && showVector;
+  const buttonVariant =
+    fieldValue(section, 'button_styles')?.trim().toLowerCase() === 'outline'
+      ? 'secondary'
+      : 'primary';
+  if (!title && !image && !bodyContent && !hasStats) return null;
+
+  return (
+    <section
+      className={`rich-text-with-stats ${
+        image ? 'rich-text-with-stats--has-media' : ''
+      } ${hasStats ? 'rich-text-with-stats--with-stats' : ''} ${
+        hasFigmaLayout ? 'rich-text-with-stats--figma-art' : ''
+      }`}
+    >
+      <div className="rich-text-with-stats__clip">
+        <div className="rich-text-with-stats__inner">
+          {image && (
+            <div className="rich-text-with-stats__media">
+              {hasFigmaLayout ? (
+                <div className="rich-text-with-stats__art-stage">
+                  {hasVector && (
+                    <ArchBackdropMobile className="rich-text-with-stats__arc" />
+                  )}
+                  <Image
+                    src={image.url}
+                    alt={image.altText ?? ''}
+                    width={image.width ?? 465}
+                    height={image.height ?? 491}
+                    className="rich-text-with-stats__image rich-text-with-stats__image--figma"
+                    unoptimized={/\.svg(\?|$)/i.test(image.url)}
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={image.url}
+                  alt={image.altText ?? ''}
+                  width={image.width ?? 1000}
+                  height={image.height ?? 800}
+                  className="rich-text-with-stats__image"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  unoptimized={/\.svg(\?|$)/i.test(image.url)}
+                />
+              )}
+            </div>
+          )}
+
+          <div className="rich-text-with-stats__content">
+            {title && (
+              <h2 className="rich-text-with-stats__title">
+                {accentedTitle(figmaTitleWithBreak(title), {
+                    accent: 'rich-text-with-stats__accent',
+                    blue: 'rich-text-with-stats__accent--blue',
+                    green: 'rich-text-with-stats__accent--green',
+                  }
+                )}
+              </h2>
+            )}
+
+            {bodyContent && (
+              <div className="rich-text-with-stats__copy">{bodyContent}</div>
+            )}
+
+            {hasFigmaLayout && (
+              <div className="rich-text-with-stats__copy rich-text-with-stats__copy--phone">
+                <div className="rich-text-body">
+                  <p className="rich-text-body__paragraph">
+                    We help ambitious brands turn Shopify into a powerful growth
+                    engine. From public app development and seamless
+                    integrations to high-performing custom themes and advanced
+                    B2B functionalities, we build scalable solutions designed
+                    for performance, flexibility, and long-term success.
+                  </p>
+                  <p className="rich-text-body__paragraph">
+                    Whether you’re launching your first product, optimizing
+                    conversions, or expanding into wholesale and global
+                    markets, our team works alongside you to design systems
+                    that don’t just look good — they deliver measurable
+                    results.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {renderButton && (
+              <Button
+                href={buttonLink.url}
+                variant={buttonVariant}
+                arrow="rise"
+                className="rich-text-with-stats__button"
+              >
+                {buttonLink.text}
+              </Button>
+            )}
+          </div>
+
+          {(hasStats || hasVector) && (
+            <div
+              className={`rich-text-with-stats__stats-block ${
+                hasStats ? '' : 'rich-text-with-stats__stats-block--no-bar'
+              }`}
+            >
+              {/* Desktop arch is anchored to this block's top edge, so the
+                  block stays (empty) when the bar is off and the vector is on. */}
+              {hasVector && (
+                <ArchBackdrop className="rich-text-with-stats__backdrop" />
+              )}
+              {hasStats && (
+                <div className="rich-text-with-stats__stats-wrap">
+                  {hasFigmaLayout && <StatsBarLines />}
+                  {hasFigmaLayout && (
+                    <svg
+                      className="rich-text-with-stats__stripes"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <pattern
+                          id={stripeId}
+                          width="13"
+                          height="13"
+                          patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(-42)"
+                        >
+                          <line
+                            x1="6.5"
+                            y1="0"
+                            x2="6.5"
+                            y2="13"
+                            stroke="white"
+                            strokeOpacity="0.1"
+                            strokeWidth="4"
+                          />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill={`url(#${stripeId})`} />
+                    </svg>
+                  )}
+                  <ul className="rich-text-with-stats__stats">
+                  {stats.map((stat) => {
+                    const value = fieldValue(stat, 'value', 'title');
+                    const label = fieldValue(stat, 'description', 'label');
+
+                    return (
+                      <li key={stat.id} className="rich-text-with-stats__stat">
+                        {value && (
+                          <span className="rich-text-with-stats__stat-value">
+                            {value}
+                          </span>
+                        )}
+                        {label && (
+                          <p className="rich-text-with-stats__stat-label">
+                            {label}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  })}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

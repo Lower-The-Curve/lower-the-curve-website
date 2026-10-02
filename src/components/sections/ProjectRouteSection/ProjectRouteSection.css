@@ -1,0 +1,425 @@
+/* Project route — the `project-route` BEM block. Centered heading + lede, a
+   pill tab bar, and a two-up card grid that swaps with the active tab.
+
+   Sizes come from the type scale in src/app/typography.css and colors from the
+   tokens in src/app/globals.css — no raw font-sizes or brand hexes here.
+
+   Specified type (process section, 1440):
+   heading 40px → --fs-heading-ml (the h2 default is 48px, and the design
+   differs), lede the p default --fs-body-base, tab labels and card copy 18px
+   → --fs-body-lg, card title --fs-heading-sm. Accent and active tab are
+   Semibold (600). */
+
+@property --indicator-left {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --indicator-width {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 140px;
+}
+
+.project-route {
+  position: relative;
+  isolation: isolate;
+  /* Clip the right-edge glow so a blurred disc cannot open a horizontal scroll. */
+  overflow: clip;
+}
+
+.project-route__glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Mobile-only on the default layout. Sits beside the first card's icon, not
+   on the section edge. The split layout repositions this via --split. */
+.project-route__green-glow {
+  display: none;
+  position: absolute;
+  top: -1.25rem;
+  left: 2.5rem;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.project-route--split {
+  overflow: visible;
+  overflow-x: clip;
+}
+
+.project-route--split .project-route__glow {
+  top: 50%;
+  transform: translate(50%, -50%);
+}
+
+.project-route--split .project-route__green-glow {
+  display: block;
+  top: 0;
+  left: 0;
+  width: 14rem;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+/* Mobile-only copy, parked on the second card. Hidden until the phone
+   breakpoint so desktop keeps the section-level mid-right disc. */
+.project-route__glow--card {
+  display: none;
+}
+
+.project-route__inner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* 50px from the lede block to the tab bar, and from the tab bar to the cards. */
+  gap: 3.125rem;
+}
+
+.project-route__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 20px between the 48px title line and the lede. */
+  gap: 1.25rem;
+}
+
+/* 40px on desktop — --fs-heading-ml, not the h2 default of 48px. Regular
+   weight; the accented word carries Semibold. line-height 1.2 is the 48px
+   leading on that 40px size. */
+.project-route__title {
+  font-size: var(--fs-heading-ml);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.project-route__accent {
+  font-weight: 600;
+}
+
+.project-route__accent--blue {
+  color: var(--color-brand);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .project-route__accent--blue {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    background-image: linear-gradient(
+      to left,
+      var(--color-brand-dark) 7.812%,
+      var(--color-brand) 98.357%
+    );
+  }
+}
+
+/* 16px lede, 22px leading, 1000px measure. The p default is already
+   --fs-body-base; the token is restated so a wrapper can never be the thing
+   that tries (and fails) to size it. Color is the body ink, same as the
+   heading. */
+.project-route__description {
+  margin: 0;
+  max-width: 62.5rem;
+  font-size: var(--fs-body-base);
+  line-height: 1.375;
+  color: var(--color-text);
+}
+
+/* Fills the content box up to the 1150px desktop track. Narrower than that,
+   the track scrolls instead of squashing a label. min-width: 0 lets this flex
+   item shrink below the track's max-content width so the page itself does
+   not scroll sideways. */
+.project-route__scroller {
+  width: 100%;
+  max-width: 71.875rem;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.project-route__scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.project-route__tabs {
+  --tab-size: 8.75rem;
+  --tab-gap: 3.125rem;
+  --tab-pad: 1.875rem;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: max-content;
+  height: 3.125rem;
+  padding-inline: var(--tab-pad);
+  gap: var(--tab-gap);
+  /* 60px in the file — fully round on a 50px bar, and it clips the pill
+     so the left cap shares the track's curve. */
+  border-radius: 3.75rem;
+  overflow: hidden;
+  background: rgba(242, 242, 242, 0.5);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+
+/* Slides under the active label. Width is the label plus the track's
+   horizontal padding, so the first and last stops sit flush with the track
+   ends and every stop stays centred on its label.
+   translateX's 100% is this element, not the track — that is why the offset
+   is written as (own width + gap - padding) rather than a percentage of the
+   parent. */
+.project-route__indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  height: 100%;
+  width: calc(
+    (100% - 2 * var(--tab-pad) - (var(--tab-count) - 1) * var(--tab-gap)) /
+      var(--tab-count) + 2 * var(--tab-pad)
+  );
+  /* 70px in the file. 3px ring: #fff → #bdbdbd at 50%, left to right.
+     The third layer is the blue fill under that ring, so the 50% grey
+     mixes with the pill instead of the track behind it.
+     border-image ignores border-radius, so the ring is a background layer. */
+  border: 3px solid transparent;
+  border-radius: 4.375rem;
+  background-image:
+    linear-gradient(
+      to left,
+      var(--color-brand-dark) 7.812%,
+      var(--color-brand) 98.357%
+    ),
+    linear-gradient(90deg, #ffffff 0%, rgb(189 189 189 / 0.5) 100%),
+    linear-gradient(
+      to left,
+      var(--color-brand-dark) 7.812%,
+      var(--color-brand) 98.357%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box, border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform: translateX(
+    calc(var(--tab-index) * (100% + var(--tab-gap) - 2 * var(--tab-pad)))
+  );
+  transition:
+    transform 0.28s ease,
+    width 0.28s ease,
+    --indicator-left 0.28s ease,
+    --indicator-width 0.28s ease;
+  pointer-events: none;
+}
+
+.project-route__tab {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 var(--tab-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: var(--fs-body-lg);
+  font-weight: 400;
+  /* 36px leading on the 18px label. */
+  line-height: 2;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.28s ease;
+}
+
+.project-route__tab:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+.project-route__tab--active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.project-route__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(
+    var(--project-route-columns, 2),
+    minmax(0, 1fr)
+  );
+  /* 100px column gap puts each card at 558px inside the 1216px content box
+     (78rem measure minus the 1rem gutters) — the design's copy measure. */
+  gap: 3rem 6.25rem;
+  width: 100%;
+}
+
+.project-route__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 10px between the title and the copy. The icon adds its own margin so the
+     gap under the icon is 30px. */
+  gap: 0.625rem;
+}
+
+.project-route__icon {
+  display: block;
+  width: auto;
+  height: 5.3125rem;
+  margin-bottom: 1.25rem;
+}
+
+.project-route__card-title {
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 1.333;
+  margin: 0;
+}
+
+.project-route__card-description {
+  margin: 0;
+  font-size: var(--fs-body-lg);
+  line-height: 1.333;
+  color: var(--color-text);
+}
+
+@media (max-width: 1024px) {
+  .project-route__cards {
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 575px) {
+  /* Process section mobile (390): gray disc hangs off the top-right so
+     overflow: clip cuts that side only. */
+  .project-route__glow {
+    top: -2.875rem;
+    right: -4.3125rem;
+  }
+
+  .project-route__green-glow {
+    display: block;
+    top: -1.375rem;
+    left: 1.75rem;
+    width: 1.5rem;
+    height: auto;
+  }
+
+  /* Shopify Apps mobile: gray sits on the second card icon and hangs off
+     the right; the section-level disc would otherwise stay mid-page. */
+  .project-route--split .project-route__glow {
+    display: none;
+  }
+
+  .project-route--split .project-route__glow--card {
+    display: block;
+    top: -1.5rem;
+    right: -3rem;
+    transform: none;
+  }
+
+  .project-route--split .project-route__green-glow {
+    width: 6rem;
+  }
+
+  .project-route__inner {
+    padding: 3rem var(--space);
+    /* 20px title→lede lives on __heading; 30px heading→tabs here. */
+    gap: 1.875rem;
+  }
+
+  /* Fits "How we get things" but not that plus "Done", so the accent sits
+     on its own line as the mobile reference shows. 38px leading on 32px. */
+  .project-route__title {
+    max-width: 18ch;
+    line-height: 1.1875;
+  }
+
+  .project-route__description {
+    line-height: 1.25;
+  }
+
+  /* The track is 390 wide and clipped; the labels keep their 50px gaps
+     and the bar scrolls. Negative gutters cancel the inner's --space. */
+  .project-route__scroller {
+    width: calc(100% + 2 * var(--space));
+    max-width: none;
+    margin-inline: calc(-1 * var(--space));
+  }
+
+  .project-route__tabs {
+    --tab-gap: 3.125rem;
+    --tab-pad: 1.8125rem;
+    width: max-content;
+    height: 2.5rem;
+    border-radius: 2.1708rem;
+    -webkit-backdrop-filter: blur(7.236px);
+    backdrop-filter: blur(7.236px);
+  }
+
+  .project-route__tab {
+    flex: 0 0 auto;
+    padding-inline: 0;
+    line-height: normal;
+  }
+
+  .project-route__indicator {
+    left: 0;
+    /* 140px in the file — do not shrink to the word. */
+    width: 8.75rem;
+    border-width: 1.737px;
+    border-radius: 2.6875rem;
+    transform: translateX(var(--indicator-left, 0px));
+  }
+
+  .project-route__cards {
+    grid-template-columns: 1fr;
+    gap: 1.875rem;
+    /* Extra 20px on top of the inner's 30px → 50px from the tab bar. */
+    margin-top: 1.25rem;
+  }
+
+  .project-route__card {
+    gap: 1.25rem;
+  }
+
+  .project-route__icon {
+    height: 4.6875rem;
+    margin-bottom: 0;
+  }
+
+  .project-route__card-title {
+    line-height: 1.25;
+  }
+
+  .project-route__card-description {
+    line-height: 1.125;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-route__indicator,
+  .project-route__tab {
+    transition: none;
+  }
+}

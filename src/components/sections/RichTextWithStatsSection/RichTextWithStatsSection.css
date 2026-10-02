@@ -1,0 +1,629 @@
+/* Rich text with stats — the `rich-text-with-stats` BEM block. Split layout
+   (5fr / 7fr) when media + stats match Solutions and Case Studies; horizontal
+   stats bar is the Figma “Stats sticky menu” (145px tall, 20px radius).
+
+   Sizes from src/app/typography.css; colours from src/app/globals.css — no raw
+   font-sizes or brand hexes. Heading --fs-heading-md, body via richTextBody /
+   stat values --fs-heading-md, stat labels --fs-body-sm (compact horizontal bar). */
+.rich-text-with-stats {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-bg);
+}
+
+.rich-text-with-stats__clip {
+  position: relative;
+  overflow: visible;
+}
+
+.rich-text-with-stats__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 64px var(--space);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.rich-text-with-stats--has-media .rich-text-with-stats__inner {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.rich-text-with-stats--with-stats .rich-text-with-stats__inner {
+  align-items: start;
+}
+
+.rich-text-with-stats--has-media.rich-text-with-stats--with-stats
+  .rich-text-with-stats__inner {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.rich-text-with-stats--figma-art {
+  --figma-stats-h: 145px;
+  --figma-stats-radius: 20px;
+  /* Desktop column gap. Shared with the arch width below so the arch
+     scales off the same column the laptop sits in. */
+  --figma-col-gap: clamp(32px, 6.25vw, 90px);
+  /* Figma nudges the laptop 12px left. It only spends the white space
+     outside the page measure, so the laptop never gets closer than the
+     16px gutter: 0 at or below 1248px wide, easing up to the full 12px
+     by 1272px. No new breakpoint needed. */
+  --figma-mac-offset-x: calc(-1 * clamp(0px, (100vw - 1248px) / 2, 12px));
+  --figma-mac-offset-y: -52px;
+  /* Arc underside meets the stats bar top (same idea as Solutions --swoosh-underside). */
+  --rich-text-swoosh-join: 30%;
+  --rich-text-swoosh-scale: 1.25;
+}
+
+@media (min-width: 1025px) {
+  .rich-text-with-stats--figma-art .rich-text-with-stats__inner {
+    padding-top: 37px;
+    padding-bottom: 0;
+    column-gap: var(--figma-col-gap);
+    row-gap: 0;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__media {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+    transform: translate(
+      var(--figma-mac-offset-x),
+      var(--figma-mac-offset-y)
+    );
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__content {
+    position: relative;
+    z-index: 1;
+    grid-row: 1;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats-block {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 40px;
+    /* The arch is shifted down so its foot meets the bar. That shift is
+       taller than the bar, so the foot would paint into the next section.
+       The top stays open; only the bottom edge is clipped. */
+    clip-path: inset(-100vh -48px 0 -48px);
+  }
+}
+
+.rich-text-with-stats--with-stats .rich-text-with-stats__stats-block {
+  grid-column: 1 / -1;
+}
+
+.rich-text-with-stats__media {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.rich-text-with-stats__art-stage {
+  position: relative;
+  width: 100%;
+  margin-inline: 0 auto 0;
+}
+
+.rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+  margin-inline: 0;
+}
+
+/* No px cap: the arch is sized off the laptop's column, not the viewport,
+   so the two always scale together. Column = the 5fr share of this
+   full-row block minus the gap; 0.856 is the Figma arch/laptop ratio
+   (398 / 465), which lands on the original 398px at the full page measure.
+   Aspect 398×513, then --rich-text-swoosh-scale. */
+.rich-text-with-stats__backdrop {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: block;
+  width: calc((100% - var(--figma-col-gap)) * 5 / 12 * 0.856);
+  height: auto;
+  aspect-ratio: 398 / 513;
+  transform: translateY(var(--rich-text-swoosh-join, 0))
+    scale(var(--rich-text-swoosh-scale, 1));
+  transform-origin: 0% 100%;
+  z-index: -1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Phone vector behind the laptop. Hidden on desktop; the stacked layout
+   (tablet and phone) places it. */
+.rich-text-with-stats__arc {
+  display: none;
+}
+
+.rich-text-with-stats__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rich-text-with-stats__image--figma {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.rich-text-with-stats__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  max-width: 711px;
+}
+
+.rich-text-with-stats--figma-art .rich-text-with-stats__content {
+  max-width: none;
+}
+
+.rich-text-with-stats__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  width: 100%;
+}
+
+/* Phone rows are hidden until the phone query. */
+.rich-text-with-stats__break--phone {
+  display: none;
+}
+
+.rich-text-with-stats__accent {
+  font-weight: 700;
+}
+
+.rich-text-with-stats__accent--blue {
+  color: var(--color-brand);
+}
+
+.rich-text-with-stats__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .rich-text-with-stats__accent--blue,
+  .rich-text-with-stats__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .rich-text-with-stats__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .rich-text-with-stats__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.rich-text-with-stats__copy {
+  width: 100%;
+}
+
+/* Phone frame copy. The CMS body stays on tablet and desktop. */
+.rich-text-with-stats__copy--phone {
+  display: none;
+}
+
+.rich-text-with-stats__button {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+/* This section's fill runs the other way from .btn--primary: light
+   --color-brand on the left, --color-brand-dark on the right.
+   No stroke: the shared transparent border anti-aliases into a rim
+   on the caps. The outline variant keeps its border. */
+.rich-text-with-stats__button.btn--primary {
+  border-width: 0;
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+}
+
+.rich-text-with-stats__button.btn--primary:hover {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-dark),
+    var(--color-brand-darker)
+  );
+}
+
+/* CMS “outline” (btn--secondary): blank pill at rest; gradient fill on hover.
+   Lighter --color-brand on the left (90deg). */
+.rich-text-with-stats__button.btn--secondary {
+  background-image: none;
+  background-color: #ffffff;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+.rich-text-with-stats__button.btn--secondary:hover {
+  background-color: var(--color-brand);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.rich-text-with-stats__button.btn--secondary:hover .btn__arrow path {
+  stroke: #ffffff;
+}
+
+.rich-text-with-stats__stats-block {
+  position: relative;
+  width: 100%;
+  margin-top: 40px;
+}
+
+.rich-text-with-stats__stats-wrap {
+  position: relative;
+  width: 100%;
+  min-height: var(--figma-stats-h, auto);
+  border-radius: var(--figma-stats-radius, 20px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.rich-text-with-stats__stats-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--color-brand);
+  background-image: linear-gradient(
+    180deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+}
+
+.rich-text-with-stats--with-stats:not(.rich-text-with-stats--figma-art)
+  .rich-text-with-stats__stats-block {
+  margin-top: 32px;
+}
+
+/* Same tokens as .solutions__stats: --color-brand at the light end,
+   --color-brand-dark at the dark end. The vertical card runs 180deg (lighter
+   top); this horizontal bar also runs 180deg (lighter top, darker bottom) so the
+   fill matches the Figma frame and does not read darker on the right edge. */
+.rich-text-with-stats__stats {
+  list-style: none;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  width: 100%;
+  min-height: inherit;
+  padding: 32px;
+  background: transparent;
+  color: #ffffff;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px 16px;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Figma line layer — StatsBarLines.js (1248×145 SVG, stretched to bar).
+   The phone/tablet vector stripes stay hidden until that layout. */
+.rich-text-with-stats__stripes {
+  display: none;
+}
+
+.rich-text-with-stats__stats-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  /* Crop, never stretch. The texture is a 1248×145 raster; `fill` squeezed
+     it on any bar narrower than 1248px, so the stripes got steeper and
+     packed tighter. `cover` keeps the Figma angle and spacing, and pinning
+     it right keeps the dense end of the stripes (they fade out leftward). */
+  object-fit: cover;
+  object-position: right center;
+  pointer-events: none;
+}
+
+@media (min-width: 1025px) {
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats {
+    padding: 20px 28px;
+    column-gap: 10px;
+  }
+}
+
+.rich-text-with-stats__stat {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Horizontal bar: one step down from Solutions' card stats (--fs-heading-ml). */
+.rich-text-with-stats__stat-value {
+  font-size: var(--fs-heading-md);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.rich-text-with-stats__stat-label {
+  margin: 0;
+  font-size: var(--fs-body-sm);
+  line-height: 1.35;
+  color: #ffffff;
+  text-wrap: balance;
+}
+
+@media (min-width: 1025px) {
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stat-label {
+    max-width: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .rich-text-with-stats--has-media .rich-text-with-stats__inner,
+  .rich-text-with-stats--has-media.rich-text-with-stats--with-stats
+    .rich-text-with-stats__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__inner {
+    padding: 64px var(--space);
+    row-gap: 32px;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats-block {
+    margin-top: 32px;
+  }
+
+  /* Vector on, bar off: the block only holds the desktop arch, which is
+     hidden at this width — drop it so it leaves no gap. */
+  .rich-text-with-stats__stats-block--no-bar {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+    margin-inline: auto;
+  }
+
+  /* The arc's tail is drawn to bleed past the right edge (it ends at ~117%
+     of the stage — ~114% with the laptop centred; the phone frame runs it off-screen). At a fixed size and
+     centred, a tablet shows the tail's square end stopping mid-air, so the
+     stage scales with the viewport instead: at 82vw, centred, the tail lands
+     past the right edge (needs ≥ ~78vw) and .rich-text-with-stats--figma-art
+     clips it. The phone block below takes the stage full-bleed. */
+  .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+    width: 82vw;
+  }
+
+  /* Phone and tablet: square bar, flush to both screen edges. Desktop keeps
+     the rounded bar inside the page measure. */
+  .rich-text-with-stats--figma-art {
+    overflow-x: clip;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats-wrap {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    border-radius: 0;
+  }
+
+  /* Phone and tablet stripes are vector lines, so they stay straight.
+     A diagonal CSS gradient steps from pixel to pixel. Held on the left
+     and faded toward the right. Desktop keeps the 1248×145 texture. */
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats-lines {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stripes {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 22%,
+      transparent 58%
+    );
+    mask-image: linear-gradient(90deg, #000 0%, #000 22%, transparent 58%);
+  }
+
+  /* Same vector as the phone, behind the laptop. The tall arch stays on
+     desktop, where it meets the stats bar. */
+  .rich-text-with-stats--figma-art .rich-text-with-stats__backdrop {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+    overflow: visible;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__arc {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    /* Shifted with the laptop (below) so the two keep their Figma overlap. */
+    left: 17.2%;
+    top: 12%;
+    width: 79.5%;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__image--figma {
+    width: 63%;
+    margin-top: 0;
+    /* (100% - 63%) / 2 — laptop centred in the stage. */
+    margin-left: 18.5%;
+    margin-right: 0;
+  }
+
+  .rich-text-with-stats__content {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* 20px at --fs-body-base (16px on tablet and phone). Desktop keeps
+     the shared 1.375 (22px) from .rich-text-body__paragraph. */
+  .rich-text-with-stats__copy .rich-text-body__paragraph {
+    line-height: 1.25;
+  }
+
+  /* The copy wrapper is full width, so the 600px measure is centred
+     inside it — otherwise it hugs the left under a centred title. */
+  .rich-text-with-stats__copy .rich-text-body {
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  .rich-text-with-stats__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 0;
+    padding: 32px 32px;
+    text-align: left;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats {
+    padding: 32px 28px;
+    column-gap: 20px;
+    row-gap: 28px;
+  }
+
+  .rich-text-with-stats__stat {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats,
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stat {
+    text-align: center;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stat {
+    align-items: center;
+  }
+
+  .rich-text-with-stats__stat-label {
+    max-width: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .rich-text-with-stats__inner {
+    padding: 48px var(--space);
+    gap: 32px;
+  }
+
+  .rich-text-with-stats__stats {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 28px 24px;
+    gap: 24px;
+  }
+
+  /* Phone: laptop and arch above the copy, then the two-stat bar.
+     The title break is the desktop split after “scale”. */
+  .rich-text-with-stats--figma-art .rich-text-with-stats__inner {
+    padding: 20px var(--space) 0;
+    gap: 32px;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__media {
+    width: calc(100% + 2 * var(--space));
+    margin-inline: calc(var(--space) * -1);
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
+    width: 100%;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__break--desk {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__break--phone {
+    display: revert;
+  }
+
+  /* Phone frame is a 157×44 hug. --fs-body-sm is 14px on phones, which
+     undershoots that pill, so the label uses the 16px body token.
+     The outline variant keeps the 3px stroke. */
+  .rich-text-with-stats--figma-art .rich-text-with-stats__button {
+    font-size: var(--fs-body-base);
+    gap: 15px;
+    padding: 10px 25px;
+    border-radius: 60px;
+    min-height: 44px;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__button.btn--secondary {
+    border-width: 3px;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__copy:not(.rich-text-with-stats__copy--phone) {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__copy--phone {
+    display: block;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stat:nth-child(n + 3) {
+    display: none;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    text-align: center;
+  }
+
+  .rich-text-with-stats--figma-art .rich-text-with-stats__stat {
+    align-items: center;
+    text-align: center;
+  }
+}
