@@ -5,6 +5,9 @@ import FeatureCardsSection, {
 import StatsGridSection, {
   STATS_GRID_TYPE,
 } from '@/components/sections/StatsGridSection/StatsGridSection';
+import TeamSection, {
+  TEAM_SECTION_TYPE,
+} from '@/components/sections/TeamSection/TeamSection';
 import './page.css';
 
 export const metadata = {
@@ -43,6 +46,8 @@ export default async function AboutUsPage() {
             return <FeatureCardsSection key={section.id} section={section} />;
           case STATS_GRID_TYPE:
             return <StatsGridSection key={section.id} section={section} />;
+          case TEAM_SECTION_TYPE:
+            return <TeamSection key={section.id} section={section} />;
           default:
             return null;
         }
