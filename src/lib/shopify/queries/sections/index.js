@@ -22,3 +22,4 @@ export * from './header';
 export * from './footer';
 export * from './delivered';
 export * from './whatWeBuilt';
+export * from './team';

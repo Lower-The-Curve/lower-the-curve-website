@@ -1,6 +1,7 @@
 import {
   featureCardsSectionFragment,
   statsGridSectionFragment,
+  teamSectionFragment,
 } from '../sections';
 
 
@@ -39,15 +40,18 @@ export const getAboutUsPageQuery = `
       __typename
       ...FeatureCardsSectionFields
       ...StatsGridSectionFields
+      ...TeamSectionFields
     }
     references(first: 20) {
       nodes {
         __typename
         ...FeatureCardsSectionFields
         ...StatsGridSectionFields
+        ...TeamSectionFields
       }
     }
   }
   ${featureCardsSectionFragment}
   ${statsGridSectionFragment}
+  ${teamSectionFragment}
 `;
