@@ -12,6 +12,7 @@ import {
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
+  getPartnerApproachIntroQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -482,4 +483,17 @@ export async function getWhatWeBuilt(partnerDetail) {
   return (
     nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
   );
+}
+
+/**
+ * Fetch the shared `approach` entry: the Approach section's heading and intro,
+ * identical for every partner. The per-partner steps live on the partner's
+ * `case_study_approach` entry instead.
+ *
+ * @returns {Promise<object|null>} The `approach` node, or null.
+ */
+export async function getPartnerApproachIntro() {
+  const { body } = await shopifyFetch({ query: getPartnerApproachIntroQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
 }

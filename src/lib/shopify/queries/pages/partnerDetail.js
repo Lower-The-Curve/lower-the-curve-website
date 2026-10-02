@@ -1,4 +1,6 @@
 import {
+  partnerApproachIntroFragment,
+  partnerApproachSectionFragment,
   partnerDetailSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
@@ -12,6 +14,7 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     }
   }
   ${partnerDetailSectionFragment}
+  ${partnerApproachSectionFragment}
 `;
 
 export const getWhatWeBuiltQuery = `
@@ -23,4 +26,17 @@ export const getWhatWeBuiltQuery = `
     }
   }
   ${whatWeBuiltSectionFragment}
+`;
+
+// The shared heading and intro for the Approach section. There is one `approach`
+// entry for every partner, so this takes the first.
+export const getPartnerApproachIntroQuery = /* GraphQL */ `
+  query GetPartnerApproachIntro {
+    metaobjects(type: "approach", first: 1) {
+      nodes {
+        ...PartnerApproachIntroFields
+      }
+    }
+  }
+  ${partnerApproachIntroFragment}
 `;
