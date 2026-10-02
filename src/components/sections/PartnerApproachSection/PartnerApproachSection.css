@@ -22,15 +22,18 @@
   overflow-y: visible;
 }
 
-/* Straddles the top-left corner: its upper half sits over the section above
-   (the page's `isolation` keeps z-index -1 behind that section's content). */
+/* Figma places the glow 183px above the heading and 138px off the left edge,
+   which is 119px above this section once its 64px of top padding is counted,
+   so it straddles the section above. The page's `isolation` keeps z-index -1
+   behind that section's content. */
 .partner-approach__glow {
   position: absolute;
   z-index: -1;
-  top: -7rem;
-  left: -9rem;
-  width: 22rem;
+  top: -119px;
+  left: -138px;
+  width: 329px;
   height: auto;
+  opacity: 0.9;
   pointer-events: none;
 }
 
@@ -281,10 +284,12 @@
 }
 
 @media (max-width: 575px) {
+  /* Figma: 21px above the heading, 51px off the left edge, so 27px below the
+     top of this section (48px of padding less 21px). */
   .partner-approach__glow {
-    top: -4rem;
-    left: -4rem;
-    width: 10rem;
+    top: 27px;
+    left: -51px;
+    width: 102px;
   }
 
   .partner-approach {
