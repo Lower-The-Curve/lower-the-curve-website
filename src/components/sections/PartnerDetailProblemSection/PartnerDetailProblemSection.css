@@ -113,8 +113,26 @@
   grid-template-columns: var(--partner-detail-problem-icon) minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 20px;
+  min-height: 120px;
+  padding: 22px 20px 22px 31px;
+  border-radius: 20px;
+  background-color: var(--color-bg);
   color: var(--color-brand);
   text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.partner-detail-problem__row--link:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (min-width: 1025px) {
+  .partner-detail-problem__row:hover {
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
 }
 
 
@@ -143,4 +161,10 @@
   display: block;
   width: 33px;
   height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-detail-problem__row {
+    transition: none;
+  }
 }
