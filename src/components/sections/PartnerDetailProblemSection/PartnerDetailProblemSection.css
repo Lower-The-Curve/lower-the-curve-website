@@ -166,6 +166,8 @@
 
 
 .partner-detail-problem__label {
+  /* Shrinks to its text, so the gradient spans the words, not the column. */
+  justify-self: start;
   min-width: 0;
   font-size: var(--fs-heading-sm);
   font-weight: 600;
@@ -200,7 +202,7 @@
 
 /* Figma border: a quarter of the box (5px at 20, 2.5px at 10). In the 10-unit
    viewBox box that is 2.5 units, so it scales with the icon. Colour stays
-   ArrowIcon's #004BC9 -> #106CFD gradient. */
+   ArrowIcon's brand gradient. */
 .partner-detail-problem__arrow path {
   stroke-width: 2.5;
 }
