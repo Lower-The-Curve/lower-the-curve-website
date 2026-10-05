@@ -21,7 +21,9 @@ import './CaseStudyMetricsSection.css';
 // Its GraphQL fragment lives in lib/shopify/queries/sections/caseStudyMetrics.js.
 //
 // Each row is a card (name, struck-through before > after) beside a pair of
-// bars on a 0-100% grid: the faded `before` bar overlays the solid `after` bar.
+// bars on a 0-100% grid. The longer of the two is the solid bar and the shorter
+// the faded one overlaid on it, so the pair reads the same whichever direction
+// the metric moved (a lower-is-better metric has before > after).
 export const CASE_STUDY_METRICS_TYPE = 'case_study_metrics';
 
 function field(node, key) {
@@ -95,7 +97,7 @@ export default function CaseStudyMetricsSection({ section, partner }) {
                     <s className="case-study-metrics__before">
                       {metric.beforeValue}
                     </s>
-                    <span className="case-study-metrics__arrow">&gt;</span>
+                    <span className="case-study-metrics__arrow" />
                     <span className="case-study-metrics__after">
                       {metric.afterValue}
                     </span>
@@ -103,14 +105,16 @@ export default function CaseStudyMetricsSection({ section, partner }) {
                 </div>
 
                 <div className="case-study-metrics__track" aria-hidden="true">
-                  <span
-                    className="case-study-metrics__bar case-study-metrics__bar--after"
-                    style={{ width: `${percent(metric.afterPercent)}%` }}
-                  />
-                  <span
-                    className="case-study-metrics__bar case-study-metrics__bar--before"
-                    style={{ width: `${percent(metric.beforePercent)}%` }}
-                  />
+                  {[metric.afterPercent, metric.beforePercent]
+                    .map(percent)
+                    .sort((x, y) => y - x)
+                    .map((width, i) => (
+                      <span
+                        key={i}
+                        className={`case-study-metrics__bar ${i ? 'case-study-metrics__bar--fade' : 'case-study-metrics__bar--solid'}`}
+                        style={{ width: `${width}%` }}
+                      />
+                    ))}
                 </div>
               </li>
             ))}
