@@ -115,6 +115,7 @@
 }
 
 .what-we-built__body {
+  font-size: 16px;
   margin-top: 30px;
   font-weight: 400;
   color: var(--color-ink);
@@ -144,6 +145,13 @@
 
 
 @media (max-width: 575px) {
+  .what-we-built__body {
+    margin-top: 12px;
+    font-size: 11.56px;
+  }
+  .what-we-built__item-title{
+    font-size: 23.12px;
+  }
   .what-we-built {
     --what-we-built-icon: 40px;
   }
