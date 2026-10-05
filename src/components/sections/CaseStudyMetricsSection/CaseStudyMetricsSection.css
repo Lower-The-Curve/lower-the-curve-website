@@ -1,0 +1,19 @@
+.case-study-metrics__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space) 6rem;
+}
+
+.case-study-metrics__title {
+  font-size: var(--fs-heading-lg);
+}
+
+.case-study-metrics__subtitle {
+  font-size: var(--fs-heading-sm);
+}
+
+.case-study-metrics__row {
+  display: flex;
+  gap: 2rem;
+  font-size: var(--fs-body-base);
+}

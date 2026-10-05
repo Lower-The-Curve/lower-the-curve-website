@@ -12,6 +12,7 @@ import {
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
+  getCaseStudyMetricsQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -482,4 +483,26 @@ export async function getWhatWeBuilt(partnerDetail) {
   return (
     nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
   );
+}
+
+/**
+ * Fetch the `case_study_metrics` entry — the title and subtitle of the
+ * "How key metrics moved" section.
+ *
+ * It is one shared entry: nothing links it to a partner (the partner's own
+ * `partner_detail` entry carries the metric rows, read in the component), so
+ * there is nothing to match on and the first entry is used. The Storefront API
+ * has no field-value filter on `metaobjects`, so the query returns the entries
+ * and the pick happens here — same pattern as getWhatWeBuilt() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(); a missing partner means no section.
+ * @returns {Promise<object|null>} The `case_study_metrics` node, or null.
+ */
+export async function getCaseStudyMetrics(partnerDetail) {
+  if (!partnerDetail) return null;
+
+  const { body } = await shopifyFetch({ query: getCaseStudyMetricsQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
 }
