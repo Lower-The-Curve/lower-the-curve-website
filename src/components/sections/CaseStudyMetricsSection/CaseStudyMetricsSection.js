@@ -93,15 +93,17 @@ export default function CaseStudyMetricsSection({ section, partner }) {
               <li key={metric.id} className="case-study-metrics__row">
                 <div className="case-study-metrics__card">
                   <span className="case-study-metrics__name">{metric.name}</span>
-                  <span className="case-study-metrics__change">
-                    <s className="case-study-metrics__before">
-                      {metric.beforeValue}
-                    </s>
-                    <span className="case-study-metrics__arrow" />
-                    <span className="case-study-metrics__after">
-                      {metric.afterValue}
+                  {(metric.beforeValue || metric.afterValue) && (
+                    <span className="case-study-metrics__change">
+                      <s className="case-study-metrics__before">
+                        {metric.beforeValue}
+                      </s>
+                      <span className="case-study-metrics__arrow" />
+                      <span className="case-study-metrics__after">
+                        {metric.afterValue}
+                      </span>
                     </span>
-                  </span>
+                  )}
                 </div>
 
                 <div className="case-study-metrics__track" aria-hidden="true">
