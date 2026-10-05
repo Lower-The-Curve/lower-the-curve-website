@@ -20,8 +20,8 @@ import './CaseStudyMetricsSection.css';
 //
 // Its GraphQL fragment lives in lib/shopify/queries/sections/caseStudyMetrics.js.
 //
-// Bare-bones version: rows only, percents shown as text until the bar chart
-// is built.
+// Each row is a card (name, struck-through before > after) beside a pair of
+// bars on a 0-100% grid: the faded `before` bar overlays the solid `after` bar.
 export const CASE_STUDY_METRICS_TYPE = 'case_study_metrics';
 
 function field(node, key) {
@@ -40,6 +40,13 @@ function fieldValue(node, ...keys) {
 
 function stripTags(text) {
   return text.replace(/<[^>]*>/g, '');
+}
+
+const SCALE = [0, 25, 50, 75, 100];
+
+// Bar lengths are authored 0-100; clamp so a stray value can't overflow the track.
+function percent(value) {
+  return Math.min(100, Math.max(0, parseFloat(value) || 0));
 }
 
 function metricsFrom(partner) {
@@ -76,19 +83,45 @@ export default function CaseStudyMetricsSection({ section, partner }) {
           <p className="case-study-metrics__subtitle">{stripTags(subtitle)}</p>
         )}
 
-        <ul className="case-study-metrics__list">
-          {metrics.map((metric) => (
-            <li key={metric.id} className="case-study-metrics__row">
-              <span className="case-study-metrics__name">{metric.name}</span>
-              <span className="case-study-metrics__change">
-                {metric.beforeValue} &gt; {metric.afterValue}
-              </span>
-              <span className="case-study-metrics__percents">
-                {metric.beforePercent}% / {metric.afterPercent}%
-              </span>
-            </li>
-          ))}
-        </ul>
+        <div className="case-study-metrics__chart">
+          <div className="case-study-metrics__grid" aria-hidden="true" />
+
+          <ul className="case-study-metrics__list">
+            {metrics.map((metric) => (
+              <li key={metric.id} className="case-study-metrics__row">
+                <div className="case-study-metrics__card">
+                  <span className="case-study-metrics__name">{metric.name}</span>
+                  <span className="case-study-metrics__change">
+                    <s className="case-study-metrics__before">
+                      {metric.beforeValue}
+                    </s>
+                    <span className="case-study-metrics__arrow">&gt;</span>
+                    <span className="case-study-metrics__after">
+                      {metric.afterValue}
+                    </span>
+                  </span>
+                </div>
+
+                <div className="case-study-metrics__track" aria-hidden="true">
+                  <span
+                    className="case-study-metrics__bar case-study-metrics__bar--after"
+                    style={{ width: `${percent(metric.afterPercent)}%` }}
+                  />
+                  <span
+                    className="case-study-metrics__bar case-study-metrics__bar--before"
+                    style={{ width: `${percent(metric.beforePercent)}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <ol className="case-study-metrics__scale" aria-hidden="true">
+            {SCALE.map((tick) => (
+              <li key={tick}>{tick}%</li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
