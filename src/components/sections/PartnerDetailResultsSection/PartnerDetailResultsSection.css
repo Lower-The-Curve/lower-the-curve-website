@@ -1,0 +1,240 @@
+/* Partner Detail Results — "The Numbers That Matter": centred heading and
+   intro, then a grid of blue gradient result cards (value, icon, title,
+   description). 3 columns on desktop, 2 on tablet, 1 on mobile
+   (2 with the --mobile-two modifier). Type sizes are scale tokens only
+   (DESIGN-SYSTEM.md §2); colours are brand tokens. */
+.partner-detail-results {
+  --partner-detail-results-icon: 50px;
+  --partner-detail-results-sphere: clamp(110px, 18.525vw, 266.76px);
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.partner-detail-results__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+/* --- Heading + intro ---------------------------------------------------- */
+
+.partner-detail-results__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.partner-detail-results__title {
+  margin: 0;
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.partner-detail-results__accent {
+  font-weight: 600;
+}
+
+.partner-detail-results__accent--blue {
+  color: var(--color-brand);
+}
+
+.partner-detail-results__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-detail-results__accent--blue,
+  .partner-detail-results__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .partner-detail-results__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .partner-detail-results__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.partner-detail-results__description {
+  max-width: 1080px;
+  margin: 0;
+  font-size: var(--fs-body-base);
+  line-height: 1.375;
+  color: var(--color-ink);
+  white-space: pre-line;
+}
+
+/* --- Card grid ---------------------------------------------------------- */
+
+.partner-detail-results__grid-wrap {
+  position: relative;
+}
+
+.partner-detail-results__grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1194px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 50px 60px;
+}
+
+.partner-detail-results__card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 25px 32px;
+  border-radius: 25px;
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  color: #ffffff;
+}
+
+.partner-detail-results__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.partner-detail-results__icon {
+  flex: 0 0 auto;
+  display: block;
+  width: var(--partner-detail-results-icon);
+  height: var(--partner-detail-results-icon);
+  object-fit: contain;
+}
+
+.partner-detail-results__card-title {
+  margin: 12px 0 0;
+  font-size: var(--fs-heading-sm);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.partner-detail-results__card-description {
+  margin: 14px 0 0;
+  font-size: var(--fs-body-base);
+  line-height: 1.25;
+  white-space: pre-line;
+}
+
+/* --- Value -------------------------------------------------------------- */
+
+.partner-detail-results__value {
+  font-size: var(--fs-heading-ml);
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* --- Decorative sphere -------------------------------------------------- */
+
+.partner-detail-results__sphere {
+  position: absolute;
+  z-index: 0;
+  bottom: calc(var(--partner-detail-results-sphere) * -0.35);
+  left: calc(var(--partner-detail-results-sphere) * -0.55);
+  width: var(--partner-detail-results-sphere);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f3f2f2, #989898);
+  opacity: 0.71;
+  transform: rotate(38.47deg);
+  filter: blur(calc(var(--partner-detail-results-sphere) * 0.0489));
+  pointer-events: none;
+}
+
+/* --- Tablet ------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .partner-detail-results {
+    --partner-detail-results-icon: 44px;
+  }
+
+  .partner-detail-results__inner {
+    padding: 3rem var(--space);
+    gap: 40px;
+  }
+
+  .partner-detail-results__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/* --- Mobile ------------------------------------------------------------- */
+
+@media (max-width: 575px) {
+  .partner-detail-results {
+    --partner-detail-results-icon: 40px;
+  }
+
+  .partner-detail-results__inner {
+    gap: 32px;
+  }
+
+  .partner-detail-results__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .partner-detail-results--mobile-two {
+    --partner-detail-results-icon: 24px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card {
+    padding: 14px 12px 18px;
+    border-radius: 16px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-head {
+    gap: 8px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__value {
+    font-size: var(--fs-heading-sm);
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-title {
+    margin-top: 10px;
+    font-size: var(--fs-body-lg);
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-description {
+    margin-top: 8px;
+    font-size: var(--fs-body-xs);
+  }
+}
