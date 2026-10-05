@@ -4,6 +4,7 @@
    (2 with the --mobile-two modifier). Type sizes are scale tokens only
    (DESIGN-SYSTEM.md §2); colours are brand tokens. */
 .partner-detail-results {
+  --partner-detail-results-ring: 150px;
   --partner-detail-results-icon: 50px;
   --partner-detail-results-sphere: clamp(110px, 18.525vw, 266.76px);
   position: relative;
@@ -147,12 +148,57 @@
   white-space: pre-line;
 }
 
-/* --- Value -------------------------------------------------------------- */
+/* --- Value + ring (ResultMetric) --------------------------------------- */
+
+.partner-detail-results__metric {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+}
+
+.partner-detail-results__metric--ring {
+  width: var(--partner-detail-results-ring);
+  height: var(--partner-detail-results-ring);
+}
+
+.partner-detail-results__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.partner-detail-results__ring-track,
+.partner-detail-results__ring-arc {
+  fill: none;
+  stroke-width: 6.5;
+}
+
+.partner-detail-results__ring-track {
+  stroke: rgba(255, 255, 255, 0.25);
+}
+
+.partner-detail-results__ring-arc {
+  stroke-linecap: round;
+}
 
 .partner-detail-results__value {
+  position: relative;
+  display: inline-grid;
   font-size: var(--fs-heading-ml);
   font-weight: 600;
   line-height: 1;
+}
+
+.partner-detail-results__value-final,
+.partner-detail-results__value-live {
+  grid-area: 1 / 1;
+}
+
+.partner-detail-results__value-final--hidden {
+  opacity: 0;
 }
 
 /* --- Decorative sphere -------------------------------------------------- */
@@ -176,6 +222,7 @@
 
 @media (max-width: 1024px) {
   .partner-detail-results {
+    --partner-detail-results-ring: 130px;
     --partner-detail-results-icon: 44px;
   }
 
@@ -194,6 +241,7 @@
 
 @media (max-width: 575px) {
   .partner-detail-results {
+    --partner-detail-results-ring: 120px;
     --partner-detail-results-icon: 40px;
   }
 
@@ -207,6 +255,7 @@
   }
 
   .partner-detail-results--mobile-two {
+    --partner-detail-results-ring: 72px;
     --partner-detail-results-icon: 24px;
   }
 

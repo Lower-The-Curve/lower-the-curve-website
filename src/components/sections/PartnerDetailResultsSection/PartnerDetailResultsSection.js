@@ -1,8 +1,11 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
+import ResultMetric from './ResultMetric';
 import './PartnerDetailResultsSection.css';
 
 export const PARTNER_DETAIL_RESULTS_TYPE = 'partner_detail_results';
+
+const DEFAULT_RING_FILL = 0.75;
 
 const PARTNER_TOKEN = /\{partner\}/gi;
 
@@ -26,13 +29,16 @@ function fieldValue(node, ...keys) {
   return null;
 }
 
+function toggledOn(node, ...keys) {
+  return fieldValue(node, ...keys) !== 'false';
+}
+
 function paragraphs(text) {
   return text
     .split(/\n\s*\n/)
     .map((part) => part.trim())
     .filter(Boolean);
 }
-
 
 function iconFrom(node, ...keys) {
   for (const key of keys) {
@@ -45,6 +51,13 @@ function iconFrom(node, ...keys) {
   return null;
 }
 
+function ringFillFrom(node) {
+  const parsed = Number.parseInt(fieldValue(node, 'ring_fill') ?? '', 10);
+
+  if (!Number.isFinite(parsed)) return DEFAULT_RING_FILL;
+
+  return Math.min(100, Math.max(0, parsed)) / 100;
+}
 
 export function partnerNameOf(partnerDetail) {
   return fieldValue(field(partnerDetail, 'name')?.reference, 'name', 'title');
@@ -65,6 +78,7 @@ function resultItems(section) {
       title: fieldValue(node, 'title'),
       description: fieldValue(node, 'description'),
       icon: iconFrom(node, 'icon'),
+      fill: ringFillFrom(node),
     }))
     .filter((result) => result.value || result.title);
 }
@@ -77,6 +91,8 @@ export default function PartnerDetailResultsSection({ section, partnerName }) {
     withPartner(fieldValue(section, 'description') ?? '', partnerName)
   );
   const results = resultItems(section);
+  const animate = toggledOn(section, 'animate_on_scroll');
+  const showRings = toggledOn(section, 'show_rings');
   const mobileTwo = fieldValue(section, 'mobile_columns')?.trim() === '2';
 
   if (!title && !description.length && !results.length) return null;
@@ -113,9 +129,12 @@ export default function PartnerDetailResultsSection({ section, partnerName }) {
                 <li key={result.id} className="partner-detail-results__card">
                   <div className="partner-detail-results__card-head">
                     {result.value && (
-                      <span className="partner-detail-results__value">
-                        {result.value}
-                      </span>
+                      <ResultMetric
+                        value={result.value}
+                        fill={result.fill}
+                        showRing={showRings}
+                        animate={animate}
+                      />
                     )}
 
                     {/* Decorative: the title beside it names the result. */}
