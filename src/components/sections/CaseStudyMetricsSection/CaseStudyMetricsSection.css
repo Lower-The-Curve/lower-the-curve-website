@@ -65,8 +65,9 @@
   min-height: 80px;
   padding: 0 31px 0 19px;
   border-radius: 20px;
-  background: rgba(244, 244, 244, 0.75);
-  backdrop-filter: blur(25px);
+  background: #f4f4f4bf;
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
 }
 
 .case-study-metrics__name {
