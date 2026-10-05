@@ -33,9 +33,9 @@
   bottom: var(--metrics-scale-space);
   left: calc(50% + var(--metrics-gap) / 2);
   right: 0;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  background-image: linear-gradient(to right, #dadada 1px, transparent 1px);
   background-size: 10% 100%;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid #dadada;
 }
 
 .case-study-metrics__list {
@@ -114,7 +114,7 @@
 }
 
 .case-study-metrics__bar--before {
-  background: linear-gradient(to right, rgba(189, 189, 189, 0), var(--color-bg));
+  background: linear-gradient(90deg, rgba(189, 189, 189, 0) 0%, var(--color-bg) 100%);
 }
 
 .case-study-metrics__scale {
