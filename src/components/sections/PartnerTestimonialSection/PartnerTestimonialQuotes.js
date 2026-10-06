@@ -1,15 +1,3 @@
-// The partner testimonial's quote marks, drawn from the two Figma exports in
-// public/assets: down-“.svg (the closing mark) and up-“.svg (the opening mark).
-// Each is two slabs in the brand gradient; the export's two hex stops were
-// character for character --color-brand-dark and --color-brand, so the stops
-// read the tokens and stay out of the brand-hex grep.
-//
-// Each mark gets its own namespaced gradient id: the exports both ship
-// `paint0_linear_290_*`, and url(#…) resolves to the first match in the
-// document, so two un-namespaced exports share one definition. They are also
-// not the same gradient — the opening's runs right-to-left, the closing's
-// left-to-right — so sharing would visibly flip one of them.
-
 export function QuoteOpenIcon({ className }) {
   return (
     <svg
