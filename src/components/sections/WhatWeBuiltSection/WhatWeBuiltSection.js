@@ -130,16 +130,11 @@ export default function WhatWeBuiltSection({ section }) {
 
         {items.length > 0 && (
           <ul className='what-we-built__list'>
-            {items.map((item, index) => (
+            {items.map((item) => (
               <li key={item.id} className='what-we-built__item'>
                 <div className='what-we-built__marker'>
                   <WhatWeBuiltIcon iconKey={item.icon} />
-                  {index < items.length - 1 && (
-                    <span
-                      className='what-we-built__line'
-                      aria-hidden='true'
-                    />
-                  )}
+                  <span className='what-we-built__line' aria-hidden='true' />
                 </div>
 
                 <div className='what-we-built__content'>

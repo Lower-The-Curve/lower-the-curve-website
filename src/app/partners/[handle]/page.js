@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getPartnerDetailPage, getWhatWeBuilt, getCaseStudyMetrics } from '@/lib/shopify';
 import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
+import PartnerDetailProblemSection, {
+  partnerNameOf,
+} from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
 import './page.css';
@@ -18,6 +21,10 @@ export default async function PartnerDetailPage({ params }) {
   return (
     <main className="partner-detail-page">
       <PartnerDetailSection section={section} />
+      <PartnerDetailProblemSection
+        section={section.problem?.reference}
+        partnerName={partnerNameOf(section)}
+      />
       <WhatWeBuiltSection section={whatWeBuilt} />
       <CaseStudyMetricsSection
         section={metrics}

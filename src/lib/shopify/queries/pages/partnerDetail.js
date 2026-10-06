@@ -1,6 +1,7 @@
 import {
   caseStudyMetricsSectionFragment,
   partnerDetailSectionFragment,
+  partnerDetailProblemSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
 
@@ -10,11 +11,19 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
       nodes {
         ...PartnerDetailSectionFields
         ...CaseStudyMetricsSectionFields
+
+        problem: field(key: "problem") {
+          reference {
+            __typename
+            ...PartnerDetailProblemSectionFields
+          }
+        }
       }
     }
   }
   ${partnerDetailSectionFragment}
   ${caseStudyMetricsSectionFragment}
+  ${partnerDetailProblemSectionFragment}
 `;
 
 export const getWhatWeBuiltQuery = `
