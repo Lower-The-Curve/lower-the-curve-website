@@ -18,6 +18,8 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
           reference {
             __typename
             ...PartnerDetailResultsSectionFields
+          }
+        }
         ...CaseStudyMetricsSectionFields
 
         problem: field(key: "problem") {

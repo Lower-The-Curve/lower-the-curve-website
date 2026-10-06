@@ -12,7 +12,7 @@ import PartnerDetailProblemSection, {
 } from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
 import PartnerDetailResultsSection, {
-  partnerNameOf,
+  partnerNameOf as resultsPartnerNameOf,
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
 import './page.css';
@@ -42,7 +42,8 @@ export default async function PartnerDetailPage({ params }) {
       <WhatWeBuiltSection section={whatWeBuilt} />
       <PartnerDetailResultsSection
         section={section.results?.reference}
-        partnerName={partnerNameOf(section)}
+        partnerName={resultsPartnerNameOf(section)}
+      />
       <CaseStudyMetricsSection
         section={metrics}
         partner={section}
