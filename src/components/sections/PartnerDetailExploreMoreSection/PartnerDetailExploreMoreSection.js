@@ -91,7 +91,6 @@ function pickCards(cards, partner, mode) {
       fieldValue(card, 'title')
   );
 
-  // Storefront returns `selection_mode` as typed in the admin's preset list.
   const ordered =
     mode?.trim().toLowerCase() === 'random'
       ? shuffled(eligible)
@@ -102,7 +101,7 @@ function pickCards(cards, partner, mode) {
   return ordered.slice(0, CARD_COUNT);
 }
 
-function ExploreMoreCard({ card, buttonText }) {
+function ExploreMoreCard({ card, buttonText, buttonSolid, glow }) {
   const title = fieldValue(card, 'title');
   const description = fieldValue(card, 'description')?.trim();
   const url = fieldValue(card, 'url', 'link');
@@ -111,6 +110,7 @@ function ExploreMoreCard({ card, buttonText }) {
 
   return (
     <li className="partner-explore-more__item">
+      {glow && <span className="partner-explore-more__glow" aria-hidden="true" />}
       <article className="partner-explore-more__card">
         <div className="partner-explore-more__preview">
           {image && (
@@ -151,8 +151,12 @@ function ExploreMoreCard({ card, buttonText }) {
           {url && buttonText && (
             <Button
               href={url}
-              variant="secondary"
-              className="partner-explore-more__button"
+              variant={buttonSolid ? 'primary' : 'secondary'}
+              className={`partner-explore-more__button ${
+                buttonSolid
+                  ? 'partner-explore-more__button--solid'
+                  : 'partner-explore-more__button--outline'
+              }`}
             >
               {buttonText}
             </Button>
@@ -176,6 +180,8 @@ export default function PartnerDetailExploreMoreSection({
 
   const title = fieldValue(section, 'title');
   const buttonText = fieldValue(section, 'button_text', 'button_label');
+  const buttonSolid =
+    fieldValue(section, 'button_style')?.trim().toLowerCase() === 'solid';
 
   return (
     <section className="partner-explore-more">
@@ -191,8 +197,14 @@ export default function PartnerDetailExploreMoreSection({
         )}
 
         <ul className="partner-explore-more__grid">
-          {picked.map((card) => (
-            <ExploreMoreCard key={card.id} card={card} buttonText={buttonText} />
+          {picked.map((card, index) => (
+            <ExploreMoreCard
+              key={card.id}
+              card={card}
+              buttonText={buttonText}
+              buttonSolid={buttonSolid}
+              glow={index === picked.length - 1}
+            />
           ))}
         </ul>
       </div>
