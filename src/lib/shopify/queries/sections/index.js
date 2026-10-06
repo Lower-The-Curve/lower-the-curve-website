@@ -18,6 +18,7 @@ export * from './richTextWithStats';
 export * from './featureCards';
 export * from './statsGrid';
 export * from './partnerDetail';
+export * from './partnerApproach';
 export * from './partnerDetailProblem';
 export * from './header';
 export * from './footer';

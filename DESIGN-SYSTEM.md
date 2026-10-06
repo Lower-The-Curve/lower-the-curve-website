@@ -1530,3 +1530,23 @@ smaller than any body step.
 - **6–8px is below any legibility floor** and is what the design asks for; flagged
   here in case design reconsiders.
 - Don't reach for these outside `TeamSection`.
+
+### Type scale addition: the approach timeline cards
+The partner Approach section's step cards are set at **24/16/16px** (title /
+copy / week pill) on desktop and **16/10/8px** on mobile. Nothing on the body
+scale goes below 12px and no heading step is 16px, so three off-scale tokens
+were added (all three tier blocks in `typography.css`).
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-approach-title` | 24px | 24px | 16px | step card title |
+| `--fs-approach-copy` | 16px | 16px | 10px | step card description |
+| `--fs-approach-pill` | 16px | 16px | 8px | week-range pill |
+
+- The step number reuses `--fs-heading-lg` (48px desktop, 32px mobile).
+- **Tablet was not specified** and keeps the desktop values: the cards stay
+  desktop-sized and the row swipes horizontally below 1025px.
+- **Mobile is a swipeable row**, per the Figma mobile frame, not the vertical
+  timeline the written brief describes.
+- 8px and 10px are below any legibility floor and are what the design asks for.
+- Don't reach for these outside `PartnerApproachSection`.

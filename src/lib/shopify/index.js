@@ -12,6 +12,7 @@ import {
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
+  getPartnerApproachIntroQuery,
   getCaseStudyMetricsQuery,
   getHeaderQuery,
   getFooterQuery,
@@ -486,6 +487,14 @@ export async function getWhatWeBuilt(partnerDetail) {
 }
 
 /**
+ * Fetch the shared `approach` entry: the Approach section's heading and intro,
+ * identical for every partner. The per-partner steps live on the partner's
+ * `case_study_approach` entry instead.
+ *
+ * @returns {Promise<object|null>} The `approach` node, or null.
+ */
+export async function getPartnerApproachIntro() {
+  const { body } = await shopifyFetch({ query: getPartnerApproachIntroQuery });
  * Fetch the `case_study_metrics` entry — the title and subtitle of the
  * "How key metrics moved" section.
  *
