@@ -1,12 +1,13 @@
 'use client';
 
-
 import { useEffect, useId, useRef, useState } from 'react';
 
 const NUMBER = /^(\D*)(\d+)(\D*)$/;
 const DURATION = 1400;
 
-const RADIUS = 46;
+const RADIUS = 45.45;
+const STROKE = 9.09;
+const CAP = (STROKE / 2 / (2 * Math.PI * RADIUS)) * 100;
 
 function easeOutCubic(t) {
   return 1 - (1 - t) ** 3;
@@ -56,6 +57,8 @@ export default function ResultMetric({ value, fill, showRing, animate }) {
   }, [animate]);
 
   const counting = match && progress < 1;
+  const full = fill * progress >= 1;
+  const arc = Math.max(fill * 100 * progress - CAP * 2, 0);
   const live = counting
     ? `${match[1]}${Math.round(target * progress)}${match[3]}`
     : text;
@@ -75,9 +78,9 @@ export default function ResultMetric({ value, fill, showRing, animate }) {
           focusable="false"
         >
           <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#ffffff" />
-              <stop offset="1" stopColor="#ffffff" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#bdbdbd" stopOpacity="0.5" />
             </linearGradient>
           </defs>
           <circle
@@ -85,6 +88,7 @@ export default function ResultMetric({ value, fill, showRing, animate }) {
             cx="50"
             cy="50"
             r={RADIUS}
+            stroke={`url(#${gradientId})`}
           />
           <circle
             className="partner-detail-results__ring-arc"
@@ -93,8 +97,9 @@ export default function ResultMetric({ value, fill, showRing, animate }) {
             r={RADIUS}
             pathLength="100"
             stroke={`url(#${gradientId})`}
-            strokeDasharray="100 100"
-            strokeDashoffset={100 - fill * 100 * progress}
+            strokeDasharray={full ? undefined : `${arc} 100`}
+            strokeDashoffset={full ? undefined : -CAP}
+            opacity={full || arc > 0 ? 1 : 0}
           />
         </svg>
       )}

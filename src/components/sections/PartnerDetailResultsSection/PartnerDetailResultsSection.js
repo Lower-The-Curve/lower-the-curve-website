@@ -5,7 +5,7 @@ import './PartnerDetailResultsSection.css';
 
 export const PARTNER_DETAIL_RESULTS_TYPE = 'partner_detail_results';
 
-const DEFAULT_RING_FILL = 0.75;
+const DEFAULT_RING_FILL = 0.9;
 
 const PARTNER_TOKEN = /\{partner\}/gi;
 
@@ -63,6 +63,16 @@ export function partnerNameOf(partnerDetail) {
   return fieldValue(field(partnerDetail, 'name')?.reference, 'name', 'title');
 }
 
+const BREAK = /<br\s*\/?>/i;
+
+function withBreaks(text) {
+  return text.split(BREAK).flatMap((part, i) =>
+    i === 0
+      ? [part]
+      : [' ', <br key={i} className="partner-detail-results__break" />, part]
+  );
+}
+
 function withPartner(text, partnerName) {
   return text.replace(PARTNER_TOKEN, partnerName ?? '');
 }
@@ -93,7 +103,7 @@ export default function PartnerDetailResultsSection({ section, partnerName }) {
   const results = resultItems(section);
   const animate = toggledOn(section, 'animate_on_scroll');
   const showRings = toggledOn(section, 'show_rings');
-  const mobileTwo = fieldValue(section, 'mobile_columns')?.trim() === '2';
+  const mobileTwo = fieldValue(section, 'mobile_columns')?.trim() !== '1';
 
   if (!title && !description.length && !results.length) return null;
 
@@ -152,7 +162,7 @@ export default function PartnerDetailResultsSection({ section, partnerName }) {
 
                   {result.title && (
                     <h3 className="partner-detail-results__card-title">
-                      {result.title}
+                      {withBreaks(result.title)}
                     </h3>
                   )}
 
