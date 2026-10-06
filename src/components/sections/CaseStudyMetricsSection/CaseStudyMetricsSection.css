@@ -1,0 +1,227 @@
+.case-study-metrics__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space) 6rem;
+}
+
+.case-study-metrics__title {
+  margin: 0;
+  font-size: var(--fs-metric-title);
+  font-weight: 600;
+  line-height: 32px;
+  color: #0d0d0d;
+}
+
+.case-study-metrics__subtitle {
+  margin: 10px 0 0;
+  font-size: var(--fs-metric-subtitle);
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--color-brand);
+}
+
+/* Chart: names on the left half, bars + grid on the right half. */
+.case-study-metrics__chart {
+  --metrics-gap: 30px;
+  --metrics-split: 0.5165;
+  --metrics-scale-space: 22px;
+  position: relative;
+  margin-top: 51px;
+}
+
+.case-study-metrics__grid {
+  position: absolute;
+  top: 0;
+  bottom: var(--metrics-scale-space);
+  left: calc((100% - var(--metrics-gap)) * var(--metrics-split) + var(--metrics-gap));
+  right: 0;
+  background-image: linear-gradient(to right, #dadada 1px, transparent 1px);
+  background-size: 10% 100%;
+  border-right: 1px solid #dadada;
+}
+
+.case-study-metrics__list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-study-metrics__row {
+  display: flex;
+  gap: var(--metrics-gap);
+  align-items: center;
+}
+
+.case-study-metrics__card {
+  flex: 0 0 calc((100% - var(--metrics-gap)) * var(--metrics-split));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 80px;
+  padding: 0 31px 0 19px;
+  border-radius: 20px;
+  background: #f4f4f4bf;
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+}
+
+.case-study-metrics__name {
+  font-size: var(--fs-metric);
+  font-weight: 600;
+  line-height: 26px;
+  color: #1d1d1d;
+}
+
+.case-study-metrics__change {
+  display: flex;
+  gap: 8px;
+  font-size: var(--fs-metric);
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.case-study-metrics__before {
+  color: #8b8b8b;
+}
+
+.case-study-metrics__after {
+  color: var(--color-brand);
+}
+
+/* The chevron between the values: a stroked SVG used as a mask, so the same
+   brand gradient fills it as fills the text. */
+.case-study-metrics__arrow {
+  flex: none;
+  align-self: center;
+  width: 0.45em;
+  height: 0.65em;
+  background: var(--color-brand);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.5 7 7l-5.5 5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.5 7 7l-5.5 5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  background-image: linear-gradient(
+    270deg,
+    var(--color-brand-dark) -7.81%,
+    var(--color-brand) 98.36%
+  );
+}
+
+.case-study-metrics__track {
+  position: relative;
+  flex: 1;
+  height: 43px;
+}
+
+.case-study-metrics__bar {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  border-radius: 0 100px 100px 0;
+}
+
+.case-study-metrics__bar--solid {
+  background: linear-gradient(
+    270deg,
+    var(--color-brand-dark) -7.81%,
+    var(--color-brand) 98.36%
+  );
+  opacity: 0.8;
+}
+
+.case-study-metrics__bar--fade {
+  background: linear-gradient(90deg, rgba(189, 189, 189, 0) 0%, var(--color-bg) 100%);
+}
+
+.case-study-metrics__scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0 0 calc((100% - var(--metrics-gap)) * var(--metrics-split) + var(--metrics-gap));
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-metric-scale);
+  font-weight: 400;
+  line-height: 16.52px;
+  color: #000;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .case-study-metrics__subtitle,
+  .case-study-metrics__after {
+    background-image: linear-gradient(
+      270deg,
+      var(--color-brand-dark) -7.81%,
+      var(--color-brand) 98.36%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* The gradient only paints inside the element's box, and the specified
+     line-heights are shorter than the glyphs (6.44px under 8px type) — pad the
+     box out so the text isn't clipped, and cancel the padding with margin. */
+  .case-study-metrics__after {
+    padding-block: 0.25em;
+    margin-block: -0.25em;
+  }
+}
+
+/* The mobile design is the desktop chart scaled down to a ~357px frame: same
+   side-by-side layout, smaller cards, tighter rhythm. */
+@media (max-width: 575px) {
+  .case-study-metrics__inner {
+    padding-block: 2rem 3rem;
+  }
+
+  .case-study-metrics__title {
+    line-height: 24px;
+  }
+
+  .case-study-metrics__subtitle {
+    margin-top: 6px;
+    line-height: 16px;
+  }
+
+  .case-study-metrics__chart {
+    --metrics-gap: 3px;
+    --metrics-split: 0.52;
+    --metrics-scale-space: 7px;
+    margin-top: 1.5rem;
+  }
+
+  .case-study-metrics__list {
+    gap: 3px;
+  }
+
+  .case-study-metrics__card {
+    gap: 4px;
+    min-height: 23px;
+    padding: 0 5px 0 6px;
+    border-radius: 6px;
+  }
+
+  .case-study-metrics__name {
+    line-height: 7.61px;
+  }
+
+  .case-study-metrics__change {
+    gap: 2px;
+    line-height: 6.44px;
+  }
+
+  .case-study-metrics__track {
+    height: 12.5px;
+  }
+
+  .case-study-metrics__scale {
+    margin-top: 2px;
+    line-height: 4.83px;
+  }
+}

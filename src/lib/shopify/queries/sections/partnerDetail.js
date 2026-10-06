@@ -45,6 +45,9 @@ export const partnerDetailSectionFragment = /* GraphQL */ `
               type
               value
             }
+            # case_study_approach is a list reference; its steps (and each
+            # step's icon) need resolving too.
+            ...PartnerApproachSectionFields
           }
         }
       }

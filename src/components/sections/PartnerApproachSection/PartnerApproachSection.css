@@ -1,0 +1,362 @@
+/* Desktop sizes come from the Figma frame; the 575px block restates them for
+   the mobile frame. --partner-approach-ring is the radius of the gap the line
+   leaves around each icon (icon radius + ~15px). */
+.partner-approach {
+  --partner-approach-icon: 60px;
+  --partner-approach-ring: 45.5px;
+  --partner-approach-line: 6px;
+  --partner-approach-gap: 20px;
+  --partner-approach-card: 290px;
+  --partner-approach-offset: 50px;
+  --partner-approach-border: 3px;
+  /* Figma's gradient for the line, the step numbers and the week pills. */
+  --partner-approach-gradient: linear-gradient(
+    270deg,
+    var(--color-brand-dark) -7.81%,
+    var(--color-brand) 98.36%
+  );
+  position: relative;
+  /* The glow bleeds off the left edge; clip only the x axis so it can still
+     rise into the section above. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Figma places the glow 183px above the heading and 138px off the left edge,
+   which is 119px above this section once its 64px of top padding is counted,
+   so it straddles the section above. The page's `isolation` keeps z-index -1
+   behind that section's content. */
+.partner-approach__glow {
+  position: absolute;
+  z-index: -1;
+  top: -119px;
+  left: -138px;
+  width: 329px;
+  height: auto;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.partner-approach__inner {
+  /* The Figma row is 1220px wide (4 x 290 + 3 x 20); --max-width less the
+     side padding is 1216px, so the cap is restated to fit it. */
+  max-width: calc(1220px + var(--space) * 2);
+  margin-inline: auto;
+  padding: 4rem var(--space) 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+}
+
+.partner-approach__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.partner-approach__title {
+  max-width: 713px;
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 40px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.partner-approach__accent {
+  font-weight: 600;
+}
+
+/* Flat fills first, so the words are always readable. The gradients below only
+   replace them where clipping a background to the glyphs actually works. */
+.partner-approach__accent--blue {
+  color: var(--color-brand);
+}
+
+.partner-approach__accent--green {
+  color: var(--color-accent-green);
+}
+
+.partner-approach__lede {
+  max-width: 783px;
+  line-height: 22px;
+  color: var(--color-ink);
+  white-space: pre-line;
+  margin: 0;
+}
+
+/* The row swipes below 1025px; on desktop the scroller is just a wrapper. */
+.partner-approach__scroller {
+  max-width: 1220px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.partner-approach__track {
+  position: relative;
+}
+
+/* ONE line for the whole row, drawn behind the icons. It is wider than the row
+   by half a gap each side so it divides into N equal tiles — one per step — and
+   each tile's mask cuts a ring out around that step's icon. clip-path then trims
+   the half-gaps and rounds the two outer ends. */
+.partner-approach__line {
+  position: absolute;
+  top: calc((var(--partner-approach-icon) - var(--partner-approach-line)) / 2);
+  left: calc(var(--partner-approach-gap) / -2);
+  right: calc(var(--partner-approach-gap) / -2);
+  height: var(--partner-approach-line);
+  background: var(--partner-approach-gradient);
+  clip-path: inset(0 calc(var(--partner-approach-gap) / 2) round 3px);
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent calc(var(--partner-approach-ring) - 0.5px),
+    #000 var(--partner-approach-ring)
+  );
+  mask-image: radial-gradient(
+    circle at 50% 50%,
+    transparent calc(var(--partner-approach-ring) - 0.5px),
+    #000 var(--partner-approach-ring)
+  );
+  -webkit-mask-size: calc(100% / var(--partner-approach-steps)) 100%;
+  mask-size: calc(100% / var(--partner-approach-steps)) 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+.partner-approach__list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--partner-approach-steps), minmax(0, 1fr));
+  column-gap: var(--partner-approach-gap);
+}
+
+.partner-approach__item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--partner-approach-offset));
+  min-width: 0;
+}
+
+.partner-approach__marker {
+  display: flex;
+  justify-content: center;
+  height: var(--partner-approach-icon);
+}
+
+.partner-approach__icon {
+  display: block;
+  width: var(--partner-approach-icon);
+  height: var(--partner-approach-icon);
+}
+
+.partner-approach__card {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 21px 21px;
+  border: var(--partner-approach-border) solid transparent;
+  border-radius: 20px;
+  background: rgba(249, 249, 249, 0.75);
+  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px);
+}
+
+/* The card's border is a gradient (white to translucent grey). border-image
+   ignores border-radius, so it is painted on a pseudo-element and masked down to
+   a ring, which follows the rounded corners. */
+.partner-approach__card::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--partner-approach-border) * -1);
+  padding: var(--partner-approach-border);
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(189, 189, 189, 0.375) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+.partner-approach__number {
+  font-size: var(--fs-heading-lg);
+  font-weight: 700;
+  line-height: 48px;
+  color: var(--color-brand);
+}
+
+.partner-approach__pill {
+  position: absolute;
+  top: 24px;
+  right: 17px;
+  padding: 4px 15px;
+  border-radius: 30px;
+  background: var(--partner-approach-gradient);
+  color: var(--color-bg);
+  font-size: var(--fs-approach-pill);
+  font-weight: 700;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.partner-approach__step-title {
+  margin-top: 0;
+  font-size: var(--fs-approach-title);
+  font-weight: 700;
+  line-height: 30px;
+  color: var(--color-ink);
+}
+
+.partner-approach__step-copy {
+  margin-top: 10px;
+  font-size: var(--fs-approach-copy);
+  line-height: 22px;
+  color: var(--color-ink);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-approach__accent--blue {
+    background-image: linear-gradient(
+      to right,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .partner-approach__number {
+    background-image: var(--partner-approach-gradient);
+  }
+
+  .partner-approach__accent--blue,
+  .partner-approach__number {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Tablet and below: the cards keep their desktop size and the row swipes. The
+   scroller bleeds to the viewport edge; the track is as wide as its cards. */
+@media (max-width: 1024px) {
+  .partner-approach__scroller {
+    max-width: none;
+    width: auto;
+    margin-inline: calc(var(--space) * -1);
+    padding-inline: var(--space);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .partner-approach__scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  .partner-approach__track {
+    width: max-content;
+  }
+
+  .partner-approach__list {
+    grid-template-columns: repeat(
+      var(--partner-approach-steps),
+      var(--partner-approach-card)
+    );
+  }
+}
+
+@media (max-width: 575px) {
+  /* Figma: 21px above the heading, 51px off the left edge, so 27px below the
+     top of this section (48px of padding less 21px). */
+  .partner-approach__glow {
+    top: 27px;
+    left: -51px;
+    width: 102px;
+  }
+
+  .partner-approach {
+    --partner-approach-icon: 35.66px;
+    --partner-approach-ring: 27px;
+    --partner-approach-line: 3.57px;
+    --partner-approach-gap: 10px;
+    --partner-approach-card: 175px;
+    --partner-approach-offset: 15.34px;
+    --partner-approach-border: 1.92px;
+  }
+
+  .partner-approach__inner {
+    padding: 3rem var(--space) 4rem;
+    gap: 30px;
+  }
+
+  .partner-approach__title {
+    max-width: 358px;
+    line-height: 38px;
+  }
+
+  /* The mobile frame breaks the heading before the accent ("How LTC" /
+     "approached it"). Keeping the accent run whole gets that with no authored
+     <br>, and it still wraps if a partner's accent is too long for one line. */
+  .partner-approach__accent {
+    display: inline-block;
+  }
+
+  .partner-approach__lede {
+    max-width: 358px;
+    line-height: 20px;
+  }
+
+  .partner-approach__item {
+    gap: var(--partner-approach-offset);
+  }
+
+  /* The card is 171 x 223 inside its 175-wide slot, as in the frame. */
+  .partner-approach__card {
+    min-height: 223px;
+    margin: 2px 2px 3px;
+    gap: 6.2px;
+    padding: 10px 8px 10px;
+    border-radius: 12.83px;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .partner-approach__number {
+    line-height: 30.786px;
+  }
+
+  .partner-approach__step-title {
+    line-height: 20px;
+  }
+
+  .partner-approach__pill {
+    top: 16px;
+    right: 7px;
+    padding: 2.57px 9.62px;
+    border-radius: 19.24px;
+    line-height: 12px;
+  }
+
+  .partner-approach__step-copy {
+    margin-top: 5px;
+    line-height: 16px;
+  }
+}
