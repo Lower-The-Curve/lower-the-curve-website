@@ -51,6 +51,8 @@ export const getPartnerApproachIntroQuery = /* GraphQL */ `
     }
   }
   ${partnerApproachIntroFragment}
+`;
+
 export const getCaseStudyMetricsQuery = `
   query GetCaseStudyMetrics {
     metaobjects(type: "case_study_metrics", first: 50) {

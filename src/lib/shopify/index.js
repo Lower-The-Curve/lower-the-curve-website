@@ -495,6 +495,11 @@ export async function getWhatWeBuilt(partnerDetail) {
  */
 export async function getPartnerApproachIntro() {
   const { body } = await shopifyFetch({ query: getPartnerApproachIntroQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
+}
+
+/**
  * Fetch the `case_study_metrics` entry — the title and subtitle of the
  * "How key metrics moved" section.
  *

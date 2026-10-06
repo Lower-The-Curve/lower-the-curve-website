@@ -3,11 +3,10 @@ import {
   getPartnerDetailPage,
   getPartnerApproachIntro,
   getWhatWeBuilt,
+  getCaseStudyMetrics,
 } from '@/lib/shopify';
 import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
 import PartnerApproachSection from '@/components/sections/PartnerApproachSection/PartnerApproachSection';
-import { getPartnerDetailPage, getWhatWeBuilt, getCaseStudyMetrics } from '@/lib/shopify';
-import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
 import PartnerDetailProblemSection, {
   partnerNameOf,
 } from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
