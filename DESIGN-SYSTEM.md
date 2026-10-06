@@ -170,6 +170,22 @@ Snapping to 48/32 and 24/18 was the alternative; the specified numbers were used
 instead, deliberately. **Tablet is interpolated** — only desktop and mobile were
 given. Don't reach for these outside that band.
 
+### The case-study metrics set — off the scale on purpose
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-metric` | 22px | 14px | 8px | metric card names and before/after values |
+| `--fs-metric-title` | 32px | 28px | 24px | the section heading |
+| `--fs-metric-subtitle` | 24px | 20px | 16px | the "Before/After" line |
+| `--fs-metric-scale` | 14px | 10px | 6px | the chart's 0–100% axis labels |
+
+Desktop and mobile come from the design. On mobile the chart is the desktop
+layout scaled down to a ~357px frame, so its type shrinks with it (8px and 6px —
+the same kind of tiny the team-card captions already use). **Tablet is
+interpolated.** The heading pair can't reuse `--fs-heading-md/sm`: those are flat
+32/24 at every tier and the design drops them to 24/16 on mobile. Don't reach for
+these outside `CaseStudyMetricsSection`.
+
 ### The footer pair — the one place the scale runs backwards
 
 | Token | Desktop | Tablet | Mobile | Use for |

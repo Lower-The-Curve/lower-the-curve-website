@@ -1,7 +1,9 @@
 import {
   partnerApproachIntroFragment,
   partnerApproachSectionFragment,
+  caseStudyMetricsSectionFragment,
   partnerDetailSectionFragment,
+  partnerDetailProblemSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
 
@@ -10,11 +12,21 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     metaobjects(type: "partner_detail", first: $first) {
       nodes {
         ...PartnerDetailSectionFields
+        ...CaseStudyMetricsSectionFields
+
+        problem: field(key: "problem") {
+          reference {
+            __typename
+            ...PartnerDetailProblemSectionFields
+          }
+        }
       }
     }
   }
   ${partnerDetailSectionFragment}
   ${partnerApproachSectionFragment}
+  ${caseStudyMetricsSectionFragment}
+  ${partnerDetailProblemSectionFragment}
 `;
 
 export const getWhatWeBuiltQuery = `
@@ -39,4 +51,13 @@ export const getPartnerApproachIntroQuery = /* GraphQL */ `
     }
   }
   ${partnerApproachIntroFragment}
+export const getCaseStudyMetricsQuery = `
+  query GetCaseStudyMetrics {
+    metaobjects(type: "case_study_metrics", first: 50) {
+      nodes {
+        ...CaseStudyMetricsSectionFields
+      }
+    }
+  }
+  ${caseStudyMetricsSectionFragment}
 `;

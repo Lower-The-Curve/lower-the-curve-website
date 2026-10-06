@@ -6,7 +6,13 @@ import {
 } from '@/lib/shopify';
 import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
 import PartnerApproachSection from '@/components/sections/PartnerApproachSection/PartnerApproachSection';
+import { getPartnerDetailPage, getWhatWeBuilt, getCaseStudyMetrics } from '@/lib/shopify';
+import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
+import PartnerDetailProblemSection, {
+  partnerNameOf,
+} from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
+import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
 import './page.css';
 
 export default async function PartnerDetailPage({ params }) {
@@ -21,12 +27,21 @@ export default async function PartnerDetailPage({ params }) {
     ?.references?.nodes?.[0];
   const approachIntro = await getPartnerApproachIntro();
   const whatWeBuilt = await getWhatWeBuilt(section);
+  const metrics = await getCaseStudyMetrics(section);
 
   return (
     <main className="partner-detail-page">
       <PartnerDetailSection section={section} />
       <PartnerApproachSection section={approach} intro={approachIntro} />
+      <PartnerDetailProblemSection
+        section={section.problem?.reference}
+        partnerName={partnerNameOf(section)}
+      />
       <WhatWeBuiltSection section={whatWeBuilt} />
+      <CaseStudyMetricsSection
+        section={metrics}
+        partner={section}
+      />
     </main>
   );
 }
