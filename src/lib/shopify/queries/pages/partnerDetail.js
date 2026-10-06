@@ -3,6 +3,7 @@ import {
   partnerApproachSectionFragment,
   caseStudyMetricsSectionFragment,
   partnerDetailSectionFragment,
+  partnerDetailResultsSectionFragment,
   partnerDetailProblemSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
@@ -12,6 +13,11 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     metaobjects(type: "partner_detail", first: $first) {
       nodes {
         ...PartnerDetailSectionFields
+
+        results: field(key: "results") {
+          reference {
+            __typename
+            ...PartnerDetailResultsSectionFields
         ...CaseStudyMetricsSectionFields
 
         problem: field(key: "problem") {
@@ -24,6 +30,7 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     }
   }
   ${partnerDetailSectionFragment}
+  ${partnerDetailResultsSectionFragment}
   ${partnerApproachSectionFragment}
   ${caseStudyMetricsSectionFragment}
   ${partnerDetailProblemSectionFragment}
