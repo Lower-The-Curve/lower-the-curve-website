@@ -48,6 +48,10 @@
    OFF-SCALE PAIR (footer's get-in-touch band, see the :root block)
      --fs-cta-title   46px     38px    30px     the band's headline
      --fs-cta-body    24px     18px    14px     the band's lede
+     --fs-metric           22px  14px   8px   case-study metric names + values
+     --fs-metric-title     32px  28px  24px   case-study metrics heading
+     --fs-metric-subtitle  24px  20px  16px   case-study metrics Before/After
+     --fs-metric-scale     14px  10px   6px   case-study metrics chart axis labels
 
    Notes on the collapsing steps:
    - --fs-heading-ml, --fs-heading-md and --fs-heading-lg all collapse onto 32px
@@ -126,6 +130,10 @@
      desktop and mobile were given. */
   --fs-cta-title: 46px;
   --fs-cta-body: 24px;
+  --fs-metric: 22px;
+  --fs-metric-title: 32px;
+  --fs-metric-subtitle: 24px;
+  --fs-metric-scale: 14px;
 
   /* --- THE TEAM CARD CAPTIONS --------------------------------------------
      Four sizes, off the scale on purpose: the design sets the open card's
@@ -163,6 +171,10 @@
     /* Interpolated — only desktop and mobile were specified. */
     --fs-cta-title: 38px;
     --fs-cta-body: 18px;
+    --fs-metric: 14px;
+    --fs-metric-title: 28px;
+    --fs-metric-subtitle: 20px;
+    --fs-metric-scale: 10px;
 
     --fs-team-name-open: 32px;
     --fs-team-role-open: 20px;
@@ -209,6 +221,10 @@
 
     --fs-cta-title: 30px;
     --fs-cta-body: 14px;
+    --fs-metric: 8px;
+    --fs-metric-title: 24px;
+    --fs-metric-subtitle: 16px;
+    --fs-metric-scale: 6px;
 
     --fs-team-name-open: 14px;
     --fs-team-role-open: 10px;

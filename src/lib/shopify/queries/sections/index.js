@@ -24,3 +24,4 @@ export * from './footer';
 export * from './delivered';
 export * from './whatWeBuilt';
 export * from './team';
+export * from './caseStudyMetrics';
