@@ -151,7 +151,8 @@
     font-size: 11.56px;
   }
   .what-we-built__item-title{
-    font-size: 23.12px;
+    font-size: 18px;
+    line-height: 18px;
   }
   .what-we-built {
     --what-we-built-icon: 40px;
