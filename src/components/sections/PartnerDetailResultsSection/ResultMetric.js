@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
-const NUMBER = /^(\D*)(\d+)(\D*)$/;
 const DURATION = 1400;
 
 const RADIUS = 45.45;
@@ -13,12 +12,11 @@ function easeOutCubic(t) {
   return 1 - (1 - t) ** 3;
 }
 
-export default function ResultMetric({ value, fill, showRing, animate }) {
+export default function ResultMetric({ value, suffix, max, showRing, animate }) {
   const ref = useRef(null);
   const gradientId = useId();
-  const text = value.trim();
-  const match = text.match(NUMBER);
-  const target = match ? Number(match[2]) : null;
+  const fill = Math.min(value / max, 1);
+  const text = `${value}${suffix}`;
   const [progress, setProgress] = useState(1);
 
   useEffect(() => {
@@ -56,12 +54,10 @@ export default function ResultMetric({ value, fill, showRing, animate }) {
     };
   }, [animate]);
 
-  const counting = match && progress < 1;
+  const counting = progress < 1;
   const full = fill * progress >= 1;
   const arc = Math.max(fill * 100 * progress - CAP * 2, 0);
-  const live = counting
-    ? `${match[1]}${Math.round(target * progress)}${match[3]}`
-    : text;
+  const live = `${Math.round(value * progress)}${suffix}`;
 
   return (
     <div
