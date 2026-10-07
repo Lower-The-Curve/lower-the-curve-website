@@ -33,7 +33,7 @@
 
 .team__glow {
   position: absolute;
-  top: 0;
+  top: 6rem;
   left: 0;
   width: min(28rem, 40vw);
   height: auto;
@@ -100,7 +100,7 @@
      side of --max-width, plus the gutter) but stops growing at --team-track-inset,
      so on a wide screen the row keeps the design's 1440px gap instead of drifting
      inward with the content measure. */
-  padding-inline-start: max(
+  padding-inline: max(
     var(--space),
     min(
       var(--team-track-inset),
@@ -308,7 +308,6 @@
     margin-top: 30px;
     padding-bottom: 40px;
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
