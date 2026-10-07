@@ -152,11 +152,11 @@ function ExploreMoreCard({ card, buttonText, buttonSolid, glow }) {
             <Button
               href={url}
               variant={buttonSolid ? 'primary' : 'secondary'}
-              className={`partner-explore-more__button ${
+              className={
                 buttonSolid
-                  ? 'partner-explore-more__button--solid'
-                  : 'partner-explore-more__button--outline'
-              }`}
+                  ? 'partner-explore-more__button'
+                  : 'partner-explore-more__button partner-explore-more__button--outline'
+              }
             >
               {buttonText}
             </Button>
