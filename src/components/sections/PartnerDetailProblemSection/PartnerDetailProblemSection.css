@@ -32,7 +32,7 @@
 
 .partner-detail-problem__title,
 .partner-detail-problem__subtitle {
-  max-width: 469px;
+  max-width: 400px;
   margin: 0;
   font-size: var(--fs-heading-md);
   font-weight: 400;
@@ -46,6 +46,27 @@
 
 .partner-detail-problem__subtitle {
   grid-area: subtitle;
+}
+
+/* Desktop break for the subtitle, authored in Shopify as
+   <br class="partner-detail-problem__break"> (accentedTitle keeps the class).
+   "The Problem We Needed to" is ~432px, wider than the 400px cap, so from
+   1200px the subtitle doesn't wrap on its own: only the <br> breaks it, and
+   the first line draws past the box (the column is 469px). Below 1200px the
+   column gets too narrow for an unwrapped line, so the <br> is hidden and the
+   heading wraps normally. */
+.partner-detail-problem__break {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .partner-detail-problem__subtitle {
+    white-space: nowrap;
+  }
+
+  .partner-detail-problem__break {
+    display: inline;
+  }
 }
 
 .partner-detail-problem__description {
