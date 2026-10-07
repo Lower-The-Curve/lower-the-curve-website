@@ -2,34 +2,8 @@
    intro, then a grid of blue gradient result cards (value, icon, title,
    description). 3 columns on desktop, 2 on tablet, 2 on mobile (1 without
    the --mobile-two modifier). Heading and intro use scale tokens
-   (DESIGN-SYSTEM.md §2); card sizes scale between the mobile and desktop
-   design values (see the fluid variables below); colours are brand tokens. */
+   (DESIGN-SYSTEM.md §2); colours are brand tokens. */
 .partner-detail-results {
-  --partner-detail-results-ring-fluid: clamp(70px, calc(47.619cqi - 0.48px), 150px);
-  --partner-detail-results-icon-fluid: clamp(23px, calc(16.071cqi - 0.79px), 50px);
-  --partner-detail-results-ring: var(--partner-detail-results-ring-fluid);
-  --partner-detail-results-icon: var(--partner-detail-results-icon-fluid);
-  --partner-detail-results-gap-x: clamp(18px, calc(2.4px + 4vw), 60px);
-  --partner-detail-results-gap-y: clamp(20px, calc(8.86px + 2.857vw), 50px);
-  --partner-detail-results-pad-top: clamp(7px, calc(2.17px + 1.238vw), 20px);
-  --partner-detail-results-pad-right: clamp(10px, calc(6.66px + 0.857vw), 19px);
-  --partner-detail-results-pad-bottom: clamp(12px, calc(4.57px + 1.905vw), 32px);
-  --partner-detail-results-pad-left: clamp(12px, calc(7.17px + 1.238vw), 25px);
-  --partner-detail-results-radius: clamp(14px, calc(8.06px + 1.524vw), 30px);
-  --partner-detail-results-title-gap: clamp(6px, calc(4.51px + 0.381vw), 10px);
-  --partner-detail-results-description-gap: clamp(6px, calc(4.14px + 0.476vw), 11px);
-  /* Off-scale on purpose: card text scales with the card's width, from the
-     mobile design sizes (170px card) up to the desktop ones (360px card). */
-  --partner-detail-results-value-fluid: clamp(18px, calc(13.095cqi - 1.38px), 40px);
-  --partner-detail-results-title-fluid: clamp(12px, calc(7.143cqi + 1.43px), 24px);
-  --partner-detail-results-description-fluid: clamp(8px, calc(4.762cqi + 0.95px), 16px);
-  --partner-detail-results-value-size: var(--partner-detail-results-value-fluid);
-  --partner-detail-results-title-size: var(--partner-detail-results-title-fluid);
-  --partner-detail-results-description-size: var(--partner-detail-results-description-fluid);
-  --partner-detail-results-sphere: clamp(62.34px, calc(19.469vw - 13.59px), 266.76px);
-  --partner-detail-results-sphere-x: clamp(5px, calc(2.667vw - 5.4px), 33px);
-  --partner-detail-results-sphere-y: clamp(-7px, calc(4.667vw - 25.2px), 42px);
-  --partner-detail-results-sphere-blur: clamp(4.95px, calc(0.771vw + 1.94px), 13.05px);
   position: relative;
   z-index: 1;
   isolation: isolate;
@@ -126,20 +100,16 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--partner-detail-results-gap-y) var(--partner-detail-results-gap-x);
+  gap: 50px 60px;
 }
 
 .partner-detail-results__card {
-  container-type: inline-size;
   min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 360px;
-  padding: var(--partner-detail-results-pad-top)
-    var(--partner-detail-results-pad-right)
-    var(--partner-detail-results-pad-bottom)
-    var(--partner-detail-results-pad-left);
-  border-radius: var(--partner-detail-results-radius);
+  padding: 20px 19px 32px 25px;
+  border-radius: 30px;
   background-image: linear-gradient(
     90deg,
     var(--color-brand) 1.64%,
@@ -158,23 +128,23 @@
 .partner-detail-results__icon {
   flex: 0 0 auto;
   display: block;
-  width: var(--partner-detail-results-icon);
-  height: var(--partner-detail-results-icon);
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 
 .partner-detail-results__card-title {
   max-width: 300px;
-  margin: var(--partner-detail-results-title-gap) 0 0;
-  font-size: var(--partner-detail-results-title-size);
+  margin: 10px 0 0;
+  font-size: var(--fs-heading-sm);
   font-weight: 700;
   line-height: 1.17;
 }
 
 .partner-detail-results__card-description {
   max-width: 300px;
-  margin: var(--partner-detail-results-description-gap) 0 0;
-  font-size: var(--partner-detail-results-description-size);
+  margin: 11px 0 0;
+  font-size: var(--fs-body-base);
   line-height: 1.25;
   white-space: pre-line;
 }
@@ -189,8 +159,8 @@
 }
 
 .partner-detail-results__metric--ring {
-  width: var(--partner-detail-results-ring);
-  height: var(--partner-detail-results-ring);
+  width: 150px;
+  height: 150px;
 }
 
 .partner-detail-results__ring {
@@ -218,7 +188,7 @@
 .partner-detail-results__value {
   position: relative;
   display: inline-grid;
-  font-size: var(--partner-detail-results-value-size);
+  font-size: var(--fs-heading-ml);
   font-weight: 700;
   line-height: 1.05;
 }
@@ -253,20 +223,15 @@
 .partner-detail-results__sphere {
   position: absolute;
   z-index: 0;
-  bottom: calc(
-    var(--partner-detail-results-sphere-y) - var(--partner-detail-results-sphere) / 2
-  );
-  left: calc(
-    (100% - 100vw) / 2 + var(--partner-detail-results-sphere-x) -
-      var(--partner-detail-results-sphere) / 2
-  );
-  width: var(--partner-detail-results-sphere);
+  bottom: -91.38px;
+  left: calc((100% - 100vw) / 2 - 100.38px);
+  width: 266.76px;
   aspect-ratio: 1;
   border-radius: 50%;
   background: linear-gradient(101.31deg, #f3f2f2 14.84%, #989898 86.71%);
   opacity: 0.71;
   transform: rotate(38.47deg);
-  filter: blur(var(--partner-detail-results-sphere-blur));
+  filter: blur(13.05px);
   pointer-events: none;
 }
 
@@ -280,10 +245,41 @@
 
   .partner-detail-results__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 32px;
   }
 
   .partner-detail-results__card {
     min-height: 0;
+    padding: 16px 16px 24px 20px;
+    border-radius: 20px;
+  }
+
+  .partner-detail-results__card-head {
+    gap: 12px;
+  }
+
+  .partner-detail-results__metric--ring {
+    width: 120px;
+    height: 120px;
+  }
+
+  .partner-detail-results__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .partner-detail-results__value {
+    font-size: var(--fs-heading-sm);
+  }
+
+  .partner-detail-results__card-title {
+    margin-top: 8px;
+    font-size: var(--fs-body-xl);
+  }
+
+  .partner-detail-results__card-description {
+    margin-top: 8px;
+    font-size: var(--fs-body-xs);
   }
 
   .partner-detail-results__card-title,
@@ -294,19 +290,20 @@
   .partner-detail-results__break {
     display: none;
   }
+
+  .partner-detail-results__sphere {
+    bottom: -57px;
+    left: calc((100% - 100vw) / 2 - 53px);
+    width: 136px;
+    filter: blur(8px);
+  }
 }
 
 /* --- Mobile ------------------------------------------------------------- */
 
+/* One column by default; --mobile-two is the two-column Figma phone grid
+   (170px cards, 70px ring, 23px icon). */
 @media (max-width: 575px) {
-  .partner-detail-results {
-    --partner-detail-results-ring: 96px;
-    --partner-detail-results-icon: 32px;
-    --partner-detail-results-value-size: var(--fs-heading-sm);
-    --partner-detail-results-title-size: var(--fs-body-lg);
-    --partner-detail-results-description-size: var(--fs-body-sm);
-  }
-
   .partner-detail-results__inner {
     gap: 32px;
   }
@@ -319,8 +316,13 @@
     line-height: 20px;
   }
 
+ 
   .partner-detail-results__sphere {
+    bottom: -38.17px;
+    left: calc((100% - 100vw) / 2 - 26.17px);
+    width: 62.34px;
     opacity: 0.89;
+    filter: blur(4.95px);
   }
 
   .partner-detail-results__grid {
@@ -330,55 +332,101 @@
 
   .partner-detail-results__card {
     padding: 16px 16px 24px;
+    border-radius: 14px;
   }
 
-  .partner-detail-results--mobile-two .partner-detail-results__break {
-    display: inline;
+  .partner-detail-results__metric--ring {
+    width: 96px;
+    height: 96px;
   }
 
-  .partner-detail-results--mobile-two {
-    --partner-detail-results-ring: var(--partner-detail-results-ring-fluid);
-    --partner-detail-results-icon: var(--partner-detail-results-icon-fluid);
-    --partner-detail-results-value-size: var(--partner-detail-results-value-fluid);
-    --partner-detail-results-title-size: var(--partner-detail-results-title-fluid);
-    --partner-detail-results-description-size: var(--partner-detail-results-description-fluid);
+  .partner-detail-results__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .partner-detail-results__value {
+    font-size: var(--fs-heading-sm);
+  }
+
+  .partner-detail-results__card-title {
+    margin-top: 6px;
+    font-size: var(--fs-body-lg);
+  }
+
+  .partner-detail-results__card-description {
+    margin-top: 6px;
+    font-size: var(--fs-body-sm);
   }
 
   .partner-detail-results--mobile-two .partner-detail-results__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--partner-detail-results-gap-y) var(--partner-detail-results-gap-x);
+    gap: 20px 18px;
   }
 
   .partner-detail-results--mobile-two .partner-detail-results__card {
     min-height: 175px;
-    padding: var(--partner-detail-results-pad-top)
-      var(--partner-detail-results-pad-right)
-      var(--partner-detail-results-pad-bottom)
-      var(--partner-detail-results-pad-left);
+    padding: 7px 10px 12px 12px;
   }
 
   .partner-detail-results--mobile-two .partner-detail-results__card-head {
     gap: 8px;
   }
-}
 
-/* Browsers without container units: fixed desktop / mobile design sizes. */
-@supports not (width: 1cqi) {
-  .partner-detail-results {
-    --partner-detail-results-ring-fluid: 150px;
-    --partner-detail-results-icon-fluid: 50px;
-    --partner-detail-results-value-fluid: 40px;
-    --partner-detail-results-title-fluid: 24px;
-    --partner-detail-results-description-fluid: 16px;
+  .partner-detail-results--mobile-two .partner-detail-results__metric--ring {
+    width: 70px;
+    height: 70px;
   }
 
-  @media (max-width: 575px) {
-    .partner-detail-results {
-      --partner-detail-results-ring-fluid: 70px;
-      --partner-detail-results-icon-fluid: 23px;
-      --partner-detail-results-value-fluid: 18px;
-      --partner-detail-results-title-fluid: 12px;
-      --partner-detail-results-description-fluid: 8px;
-    }
+  .partner-detail-results--mobile-two .partner-detail-results__icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  
+  .partner-detail-results--mobile-two .partner-detail-results__value {
+    font-size: 18px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-title {
+    font-size: 12px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-description {
+    font-size: 8px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__break {
+    display: inline;
+  }
+}
+
+/* Wider phones (440–575px), two columns: a step between the 390px Figma
+   sizes and tablet, so the cards don't jump straight from tablet to the
+   smallest phone sizes. Off-scale on purpose, like the 18/12/8px above.
+   The description stays at the Figma 8px. */
+@media (min-width: 440px) and (max-width: 575px) {
+  .partner-detail-results--mobile-two .partner-detail-results__card {
+    min-height: 220px;
+    padding: 12px 12px 18px 14px;
+    border-radius: 16px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__metric--ring {
+    width: 96px;
+    height: 96px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__value {
+    font-size: 22px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-title {
+    font-size: 14px;
   }
 }
