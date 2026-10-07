@@ -154,7 +154,7 @@ function ExploreMoreCard({ card, buttonText, buttonSolid, glow }) {
               variant={buttonSolid ? 'primary' : 'secondary'}
               className={
                 buttonSolid
-                  ? 'partner-explore-more__button'
+                  ? 'partner-explore-more__button partner-explore-more__button--solid'
                   : 'partner-explore-more__button partner-explore-more__button--outline'
               }
             >
@@ -181,7 +181,9 @@ export default function PartnerDetailExploreMoreSection({
   const title = fieldValue(section, 'title');
   const buttonText = fieldValue(section, 'button_text', 'button_label');
   const buttonSolid =
-    fieldValue(section, 'button_style')?.trim().toLowerCase() === 'solid';
+    fieldValue(section, 'button_style', 'button_styles')
+      ?.trim()
+      .toLowerCase() === 'solid';
 
   return (
     <section className="partner-explore-more">
