@@ -123,6 +123,11 @@
     --partner-testimonial-card-width: 100%;
   }
 
+    .partner-testimonial__who {
+    justify-content: flex-end;
+    padding: 0 0 13px 21px;
+  }
+
 }
 
 @media (max-width: 575px) {
