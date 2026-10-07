@@ -173,6 +173,61 @@
   }
 }
 
+/* Entrance: MetricsReveal adds --armed on mount (cards hidden, bars clipped to
+   nothing) and --revealed when the chart scrolls into view. Rows stagger by
+   --row; the faded bar trails the solid one. Clip-path rather than scaleX so
+   the rounded cap keeps its shape. Without JS or with reduced motion the
+   chart is never armed and shows as rendered. */
+.case-study-metrics__card,
+.case-study-metrics__bar {
+  --delay: calc(var(--row, 0) * 80ms);
+  transition:
+    opacity 0.6s ease-out var(--delay),
+    transform 0.6s ease-out var(--delay),
+    clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--delay) + 150ms);
+}
+
+.case-study-metrics__bar--fade {
+  transition-delay: var(--delay), var(--delay), calc(var(--delay) + 300ms);
+}
+
+.case-study-metrics__chart--armed .case-study-metrics__card {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.case-study-metrics__chart--armed .case-study-metrics__bar {
+  clip-path: inset(0 100% 0 0 round 0 100px 100px 0);
+}
+
+.case-study-metrics__chart--revealed .case-study-metrics__card {
+  opacity: 1;
+  transform: none;
+}
+
+.case-study-metrics__chart--revealed .case-study-metrics__bar {
+  clip-path: inset(0 0 0 0 round 0 100px 100px 0);
+}
+
+/* Hover: the row lifts and its bars brighten. Lives on the row and track, which
+   carry no entrance transition, so the stagger delay doesn't leak into it. */
+@media (hover: hover) {
+  .case-study-metrics__row,
+  .case-study-metrics__track {
+    transition:
+      transform 0.25s ease-out,
+      filter 0.25s ease-out;
+  }
+
+  .case-study-metrics__row:hover {
+    transform: translateY(-2px);
+  }
+
+  .case-study-metrics__row:hover .case-study-metrics__track {
+    filter: brightness(1.1) saturate(1.1);
+  }
+}
+
 /* The mobile design is the desktop chart scaled down to a ~357px frame: same
    side-by-side layout, smaller cards, tighter rhythm. */
 @media (max-width: 575px) {
