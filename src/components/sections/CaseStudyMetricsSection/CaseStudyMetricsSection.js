@@ -1,4 +1,5 @@
 import "./CaseStudyMetricsSection.css";
+import MetricsReveal from "./MetricsReveal";
 
 // The partner "How key metrics moved" section. It reads two metaobjects, both
 // fetched in lib/shopify/index.js — `section` by getCaseStudyMetrics(), `partner`
@@ -116,12 +117,16 @@ export default function CaseStudyMetricsSection({ section, partner }) {
           <p className="case-study-metrics__subtitle">{stripTags(subtitle)}</p>
         )}
 
-        <div className="case-study-metrics__chart">
+        <MetricsReveal className="case-study-metrics__chart">
           <div className="case-study-metrics__grid" aria-hidden="true" />
 
           <ul className="case-study-metrics__list">
-            {metrics.map((metric) => (
-              <li key={metric.id} className="case-study-metrics__row">
+            {metrics.map((metric, index) => (
+              <li
+                key={metric.id}
+                className="case-study-metrics__row"
+                style={{ "--row": index }}
+              >
                 <div className="case-study-metrics__card">
                   <span className="case-study-metrics__name">
                     {metric.name}
@@ -159,7 +164,7 @@ export default function CaseStudyMetricsSection({ section, partner }) {
               <li key={tick}>{tick}%</li>
             ))}
           </ol>
-        </div>
+        </MetricsReveal>
       </div>
     </section>
   );
