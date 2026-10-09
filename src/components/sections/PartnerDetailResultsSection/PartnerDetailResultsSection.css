@@ -1,0 +1,432 @@
+/* Partner Detail Results — "The Numbers That Matter": centred heading and
+   intro, then a grid of blue gradient result cards (value, icon, title,
+   description). 3 columns on desktop, 2 on tablet, 2 on mobile (1 without
+   the --mobile-two modifier). Heading and intro use scale tokens
+   (DESIGN-SYSTEM.md §2); colours are brand tokens. */
+.partner-detail-results {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.partner-detail-results__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding: 4rem var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+/* --- Heading + intro ---------------------------------------------------- */
+
+.partner-detail-results__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.partner-detail-results__title {
+  margin: 0;
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.partner-detail-results__accent {
+  font-weight: 600;
+}
+
+.partner-detail-results__accent--blue {
+  color: var(--color-brand);
+}
+
+.partner-detail-results__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-detail-results__accent--blue,
+  .partner-detail-results__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .partner-detail-results__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .partner-detail-results__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.partner-detail-results__description {
+  max-width: 1098px;
+  margin: 0;
+  font-size: var(--fs-body-base);
+  line-height: 22px;
+  color: var(--color-ink);
+  white-space: pre-line;
+}
+
+/* --- Card grid ---------------------------------------------------------- */
+
+.partner-detail-results__grid-wrap {
+  position: relative;
+}
+
+.partner-detail-results__grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 50px 60px;
+}
+
+.partner-detail-results__card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  padding: 20px 19px 32px 25px;
+  border-radius: 30px;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand) 1.64%,
+    var(--color-brand-dark) 107.8%
+  );
+  color: #ffffff;
+}
+
+.partner-detail-results__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.partner-detail-results__icon {
+  flex: 0 0 auto;
+  display: block;
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.partner-detail-results__card-title {
+  max-width: 300px;
+  margin: 10px 0 0;
+  font-size: var(--fs-heading-sm);
+  font-weight: 700;
+  line-height: 1.17;
+}
+
+.partner-detail-results__card-description {
+  max-width: 300px;
+  margin: 11px 0 0;
+  font-size: var(--fs-body-base);
+  line-height: 1.25;
+  white-space: pre-line;
+}
+
+/* --- Value + ring (ResultMetric) --------------------------------------- */
+
+.partner-detail-results__metric {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+}
+
+.partner-detail-results__metric--ring {
+  width: 150px;
+  height: 150px;
+}
+
+.partner-detail-results__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.partner-detail-results__ring-track,
+.partner-detail-results__ring-arc {
+  fill: none;
+  stroke-width: 9.09;
+}
+
+.partner-detail-results__ring-track {
+  opacity: 0.35;
+}
+
+.partner-detail-results__ring-arc {
+  stroke-linecap: round;
+}
+
+.partner-detail-results__value {
+  position: relative;
+  display: inline-grid;
+  font-size: var(--fs-heading-ml);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.partner-detail-results__value-final,
+.partner-detail-results__value-live {
+  grid-area: 1 / 1;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-detail-results__value-final,
+  .partner-detail-results__value-live {
+    background-image: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      rgba(189, 189, 189, 0.5) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.partner-detail-results__value-final--hidden {
+  opacity: 0;
+}
+
+/* --- Decorative sphere -------------------------------------------------- */
+
+.partner-detail-results__sphere {
+  position: absolute;
+  z-index: 0;
+  bottom: -91.38px;
+  left: calc((100% - 100vw) / 2 - 100.38px);
+  width: 266.76px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(101.31deg, #f3f2f2 14.84%, #989898 86.71%);
+  opacity: 0.71;
+  transform: rotate(38.47deg);
+  filter: blur(13.05px);
+  pointer-events: none;
+}
+
+/* --- Tablet ------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .partner-detail-results__inner {
+    padding: 3rem var(--space);
+    gap: 40px;
+  }
+
+  .partner-detail-results__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 32px;
+  }
+
+  .partner-detail-results__card {
+    min-height: 0;
+    padding: 16px 16px 24px 20px;
+    border-radius: 20px;
+  }
+
+  .partner-detail-results__card-head {
+    gap: 12px;
+  }
+
+  .partner-detail-results__metric--ring {
+    width: 120px;
+    height: 120px;
+  }
+
+  .partner-detail-results__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .partner-detail-results__value {
+    font-size: var(--fs-heading-sm);
+  }
+
+  .partner-detail-results__card-title {
+    margin-top: 8px;
+    font-size: var(--fs-body-xl);
+  }
+
+  .partner-detail-results__card-description {
+    margin-top: 8px;
+    font-size: var(--fs-body-xs);
+  }
+
+  .partner-detail-results__card-title,
+  .partner-detail-results__card-description {
+    max-width: none;
+  }
+
+  .partner-detail-results__break {
+    display: none;
+  }
+
+  .partner-detail-results__sphere {
+    bottom: -57px;
+    left: calc((100% - 100vw) / 2 - 53px);
+    width: 136px;
+    filter: blur(8px);
+  }
+}
+
+/* --- Mobile ------------------------------------------------------------- */
+
+/* One column by default; --mobile-two is the two-column Figma phone grid
+   (170px cards, 70px ring, 23px icon). */
+@media (max-width: 575px) {
+  .partner-detail-results__inner {
+    gap: 32px;
+  }
+
+  .partner-detail-results__title {
+    max-width: 300px;
+  }
+
+  .partner-detail-results__description {
+    line-height: 20px;
+  }
+
+ 
+  .partner-detail-results__sphere {
+    bottom: -38.17px;
+    left: calc((100% - 100vw) / 2 - 26.17px);
+    width: 62.34px;
+    opacity: 0.89;
+    filter: blur(4.95px);
+  }
+
+  .partner-detail-results__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .partner-detail-results__card {
+    padding: 16px 16px 24px;
+    border-radius: 14px;
+  }
+
+  .partner-detail-results__metric--ring {
+    width: 96px;
+    height: 96px;
+  }
+
+  .partner-detail-results__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .partner-detail-results__value {
+    font-size: var(--fs-heading-sm);
+  }
+
+  .partner-detail-results__card-title {
+    margin-top: 6px;
+    font-size: var(--fs-body-lg);
+  }
+
+  .partner-detail-results__card-description {
+    margin-top: 6px;
+    font-size: var(--fs-body-sm);
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 18px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card {
+    min-height: 175px;
+    padding: 7px 10px 12px 12px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-head {
+    gap: 8px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__metric--ring {
+    width: 70px;
+    height: 70px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  
+  .partner-detail-results--mobile-two .partner-detail-results__value {
+    font-size: 18px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-title {
+    font-size: 12px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-description {
+    font-size: 8px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__break {
+    display: inline;
+  }
+}
+
+/* Wider phones (440–575px), two columns: a step between the 390px Figma
+   sizes and tablet, so the cards don't jump straight from tablet to the
+   smallest phone sizes. Off-scale on purpose, like the 18/12/8px above.
+   The description stays at the Figma 8px. */
+@media (min-width: 440px) and (max-width: 575px) {
+  .partner-detail-results--mobile-two .partner-detail-results__card {
+    min-height: 220px;
+    padding: 12px 12px 18px 14px;
+    border-radius: 16px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__metric--ring {
+    width: 96px;
+    height: 96px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__value {
+    font-size: 22px;
+  }
+
+  .partner-detail-results--mobile-two .partner-detail-results__card-title {
+    font-size: 14px;
+  }
+}

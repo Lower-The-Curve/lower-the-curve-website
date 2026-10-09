@@ -170,6 +170,22 @@ Snapping to 48/32 and 24/18 was the alternative; the specified numbers were used
 instead, deliberately. **Tablet is interpolated** — only desktop and mobile were
 given. Don't reach for these outside that band.
 
+### The case-study metrics set — off the scale on purpose
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-metric` | 22px | 14px | 8px | metric card names and before/after values |
+| `--fs-metric-title` | 32px | 28px | 24px | the section heading |
+| `--fs-metric-subtitle` | 24px | 20px | 16px | the "Before/After" line |
+| `--fs-metric-scale` | 14px | 10px | 6px | the chart's 0–100% axis labels |
+
+Desktop and mobile come from the design. On mobile the chart is the desktop
+layout scaled down to a ~357px frame, so its type shrinks with it (8px and 6px —
+the same kind of tiny the team-card captions already use). **Tablet is
+interpolated.** The heading pair can't reuse `--fs-heading-md/sm`: those are flat
+32/24 at every tier and the design drops them to 24/16 on mobile. Don't reach for
+these outside `CaseStudyMetricsSection`.
+
 ### The footer pair — the one place the scale runs backwards
 
 | Token | Desktop | Tablet | Mobile | Use for |
@@ -1514,3 +1530,23 @@ smaller than any body step.
 - **6–8px is below any legibility floor** and is what the design asks for; flagged
   here in case design reconsiders.
 - Don't reach for these outside `TeamSection`.
+
+### Type scale addition: the approach timeline cards
+The partner Approach section's step cards are set at **24/16/16px** (title /
+copy / week pill) on desktop and **16/10/8px** on mobile. Nothing on the body
+scale goes below 12px and no heading step is 16px, so three off-scale tokens
+were added (all three tier blocks in `typography.css`).
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-approach-title` | 24px | 24px | 16px | step card title |
+| `--fs-approach-copy` | 16px | 16px | 10px | step card description |
+| `--fs-approach-pill` | 16px | 16px | 8px | week-range pill |
+
+- The step number reuses `--fs-heading-lg` (48px desktop, 32px mobile).
+- **Tablet was not specified** and keeps the desktop values: the cards stay
+  desktop-sized and the row swipes horizontally below 1025px.
+- **Mobile is a swipeable row**, per the Figma mobile frame, not the vertical
+  timeline the written brief describes.
+- 8px and 10px are below any legibility floor and are what the design asks for.
+- Don't reach for these outside `PartnerApproachSection`.
