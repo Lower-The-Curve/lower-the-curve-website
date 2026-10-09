@@ -1,17 +1,17 @@
-import { getShopifyAppsPage } from "@/lib/shopify";
+import { getShopifyAppsPage, getAppPopUps } from "@/lib/shopify";
 import HeroSection, {
   HERO_SECTION_TYPE,
 } from "@/components/sections/HeroSection/HeroSection";
-import ProjectRouteSection, {
-  PROJECT_ROUTE_TYPE,
-} from "@/components/sections/ProjectRouteSection/ProjectRouteSection";
+import AppCardsSection, {
+  APP_CARDS_SECTION_TYPE,
+} from "@/components/sections/AppCardsSection/AppCardsSection";
 import "./page.css";
 
 export const metadata = {
   title: "Shopify Apps",
 };
 
-const COMPONENT_SLOTS = ["sections", "component6"];
+const COMPONENT_SLOTS = ["sections", "component2"];
 
 function sectionsIn(slot) {
   if (!slot) return [];
@@ -23,7 +23,10 @@ function sectionsIn(slot) {
 }
 
 export default async function ShopifyAppsPage() {
-  const page = await getShopifyAppsPage();
+  const [page, popups] = await Promise.all([
+    getShopifyAppsPage(),
+    getAppPopUps(),
+  ]);
 
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
@@ -33,8 +36,14 @@ export default async function ShopifyAppsPage() {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return <HeroSection key={section.id} section={section} />;
-          case PROJECT_ROUTE_TYPE:
-            return <ProjectRouteSection key={section.id} section={section} />;
+          case APP_CARDS_SECTION_TYPE:
+            return (
+              <AppCardsSection
+                key={section.id}
+                section={section}
+                popups={popups}
+              />
+            );
           default:
             return null;
         }
