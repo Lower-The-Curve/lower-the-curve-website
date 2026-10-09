@@ -3,6 +3,8 @@ import {
   partnerApproachSectionFragment,
   caseStudyMetricsSectionFragment,
   partnerDetailSectionFragment,
+  partnerDetailExploreMoreSectionFragment,
+  partnerDetailExploreMoreCardFragment,
   partnerDetailResultsSectionFragment,
   partnerDetailProblemSectionFragment,
   whatWeBuiltSectionFragment,
@@ -14,6 +16,20 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
       nodes {
         ...PartnerDetailSectionFields
 
+        exploreMore: field(key: "explore_more") {
+          reference {
+            __typename
+            ...PartnerDetailExploreMoreSectionFields
+          }
+        }
+      }
+    }
+
+    # Every Delivered Card, for Explore More to pick from. Fetched by type so
+    # no card is hand-picked; the section drops the current partner's own card.
+    exploreMoreCards: metaobjects(type: "delivered_card", first: 50) {
+      nodes {
+        ...PartnerDetailExploreMoreCardFields
         results: field(key: "results") {
           reference {
             __typename
@@ -32,6 +48,8 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     }
   }
   ${partnerDetailSectionFragment}
+  ${partnerDetailExploreMoreSectionFragment}
+  ${partnerDetailExploreMoreCardFragment}
   ${partnerDetailResultsSectionFragment}
   ${partnerApproachSectionFragment}
   ${caseStudyMetricsSectionFragment}

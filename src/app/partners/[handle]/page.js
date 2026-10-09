@@ -11,6 +11,7 @@ import PartnerDetailProblemSection, {
   partnerNameOf,
 } from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
+import PartnerDetailExploreMoreSection from '@/components/sections/PartnerDetailExploreMoreSection/PartnerDetailExploreMoreSection';
 import PartnerDetailResultsSection, {
   partnerNameOf as resultsPartnerNameOf,
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
@@ -40,6 +41,9 @@ export default async function PartnerDetailPage({ params }) {
         partnerName={partnerNameOf(section)}
       />
       <WhatWeBuiltSection section={whatWeBuilt} />
+      <PartnerDetailExploreMoreSection
+        section={section.exploreMore?.reference}
+        cards={section.exploreMoreCards}
       <PartnerDetailResultsSection
         section={section.results?.reference}
         partnerName={resultsPartnerNameOf(section)}
