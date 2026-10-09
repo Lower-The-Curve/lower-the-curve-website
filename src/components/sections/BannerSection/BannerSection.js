@@ -12,6 +12,10 @@ import './BannerSection.css';
 //   - `collage`          : file_reference -> the client collage. The reader
 //                          accepts the list shape too, so retyping the field to
 //                          a list needs no code change.
+//   - `collage_mobile`   : file_reference -> an optional phone-shaped counterpart
+//                          to `collage`. When set it takes over on <= 1024px;
+//                          when absent the collage covers every width (see the
+//                          ART DIRECTION block in BannerSection.css).
 //   - `highlights`       : list.metaobject_reference -> the icon+label items,
 //                          each a `banner_highlight` entry carrying `label` and
 //                          `icon`.
@@ -71,8 +75,14 @@ function imageFrom(node, ...keys) {
   return null;
 }
 
-function collageImages(section) {
-  const collage = field(section, 'collage') ?? field(section, 'images');
+function collageImages(section, ...keys) {
+  let collage = null;
+
+  for (const key of keys) {
+    collage = field(section, key);
+
+    if (collage) break;
+  }
 
   if (!collage) return [];
 
@@ -125,7 +135,9 @@ export default function BannerSection({ section }) {
 
   const background = imageFrom(section, 'background_image', 'background');
 
-  const collage = collageImages(section);
+  const collage = collageImages(section, 'collage', 'images');
+
+  const collageMobile = collageImages(section, 'collage_mobile', 'mobile_collage');
 
   const items = toggledOn(section, 'show_highlights')
     ? highlightItems(section)
@@ -158,7 +170,22 @@ export default function BannerSection({ section }) {
                 alt={image.altText ?? ''}
                 width={image.width ?? 1000}
                 height={image.height ?? 1000}
-                className="banner__image"
+                className={`banner__image${
+                  collageMobile.length > 0 ? ' banner__image--wide' : ''
+                }`}
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                unoptimized={/\.svg(\?|$)/i.test(image.url)}
+              />
+            ))}
+
+            {collageMobile.map((image, i) => (
+              <Image
+                key={i}
+                src={image.url}
+                alt={image.altText ?? ''}
+                width={image.width ?? 1000}
+                height={image.height ?? 1000}
+                className="banner__image banner__image--narrow"
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 unoptimized={/\.svg(\?|$)/i.test(image.url)}
               />
