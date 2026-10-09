@@ -25,7 +25,7 @@ export const projectRouteSectionFragment = /* GraphQL */ `
           alt
         }
       }
-      references(first: 20) {
+      references(first: 50) {
         nodes {
           __typename
           ... on Metaobject {
@@ -36,7 +36,7 @@ export const projectRouteSectionFragment = /* GraphQL */ `
               key
               type
               value
-              references(first: 20) {
+              references(first: 50) {
                 nodes {
                   __typename
                   ... on Metaobject {
