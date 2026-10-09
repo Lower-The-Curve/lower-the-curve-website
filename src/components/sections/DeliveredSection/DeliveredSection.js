@@ -12,7 +12,6 @@ import "./DeliveredSection.css";
 //   - `selection_mode` : Manual | Latest | Random
 //   - `card_details`   : Hover | Always visible
 //   - `button_style`   : Outline | Solid
-//   - `card_count`     : number_integer
 //
 // Nested types (read through the reference lists, not dispatched on):
 //   delivered_card  title, description, image, tags, url
@@ -106,8 +105,6 @@ function pickCards(cards, partner, mode, count) {
 
 function selectCards(section, allCards, partner) {
   const mode = fieldValue(section, "selection_mode")?.trim().toLowerCase();
-  const count = Number.parseInt(fieldValue(section, "card_count"), 10);
-  const limit = count > 0 ? count : null;
   const listed = cardsFrom(section);
 
   // An empty Manual list falls back to Latest.
@@ -116,11 +113,11 @@ function selectCards(section, allCards, partner) {
       allCards,
       partner,
       AUTO_MODES.has(mode) ? mode : "latest",
-      limit ?? AUTO_CARD_COUNT,
+      AUTO_CARD_COUNT,
     );
   }
 
-  return limit ? listed.slice(0, limit) : listed;
+  return listed;
 }
 
 function tagsFrom(card) {
