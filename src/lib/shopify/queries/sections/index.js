@@ -19,7 +19,6 @@ export * from './featureCards';
 export * from './statsGrid';
 export * from './partnerDetail';
 export * from './partnerTestimonial';
-export * from './partnerDetailExploreMore';
 export * from './partnerDetailResults';
 export * from './partnerApproach';
 export * from './partnerDetailProblem';

@@ -31,6 +31,7 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
             ...PartnerDetailProblemSectionFields
           }
         }
+<<<<<<< Updated upstream
 
         exploreMore: field(key: "explore_more") {
           reference {
@@ -53,6 +54,8 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     exploreMoreCards: metaobjects(type: "delivered_card", first: 50) {
       nodes {
         ...PartnerDetailExploreMoreCardFields
+=======
+>>>>>>> Stashed changes
       }
     }
 
