@@ -16,7 +16,8 @@ import MetricsReveal from "./MetricsReveal";
 //                          order.
 //
 // Nested type (read through the reference list, not dispatched on):
-//   metric  name, before_value, after_value (display text, "3.8s")
+//   metric  name, before_value, after_value (display text, "3.8s"),
+//           max_value (optional, "10min": the value that fills the track)
 //
 // Its GraphQL fragment lives in lib/shopify/queries/sections/caseStudyMetrics.js.
 //
@@ -51,8 +52,21 @@ function percent(value) {
   return Math.min(100, Math.max(0, value));
 }
 
-// Multipliers to a base unit per family (time -> ms, size -> KB). Unknown/no unit = 1.
-const UNITS = { ms: 1, s: 1000, min: 60000, kb: 1, mb: 1024, gb: 1048576 };
+// Multipliers to a base unit per family (time -> ms, size -> KB, count -> 1).
+// Unknown/no unit = 1; currency symbols and other prefixes are ignored.
+const UNITS = {
+  ms: 1,
+  s: 1000,
+  min: 60000,
+  h: 3600000,
+  d: 86400000,
+  b: 1 / 1024,
+  kb: 1,
+  mb: 1024,
+  gb: 1048576,
+  k: 1000,
+  m: 1000000,
+};
 
 function number(text) {
   const m = String(text ?? "")
@@ -63,15 +77,21 @@ function number(text) {
   return Number.isFinite(n) ? Math.abs(n) : null;
 }
 
-// Both values are "%": the bars sit on the shared 0-100% axis. Any other metric
-// is scaled to its own larger value, so its row is flagged as relative.
+// Both values are "%", or both are bare scores out of 100 ("42" > "91"): the
+// bars sit on the shared 0-100 axis. Any other metric is scaled (see barWidths).
 function isPercent(metric) {
-  return /%/.test(metric.beforeValue) && /%/.test(metric.afterValue);
+  const { beforeValue: b, afterValue: a } = metric;
+  const bare = (v) => /^\s*\d+(\.\d+)?\s*$/.test(v) && parseFloat(v) <= 100;
+
+  return (/%/.test(b) && /%/.test(a)) || (bare(b) && bare(a));
 }
 
-// Bar widths computed from the card values ("3.8s" > "1.2s"). Both "%" values
-// plot as-is; otherwise the larger one fills the track and the other is scaled
-// to it. Unparseable values draw empty bars.
+// Bar widths computed from the card values. A `max_value` sets the 100% mark:
+// 3.7min > 1.3min against 10min is 37% and 13%. Without one, both "%" values
+// plot as-is, and any other metric has no natural 100%, so the larger value
+// fills the track and the other is drawn in proportion: 3.8s > 1.9s is 100% and
+// 50%. Units are converted, so "220s" works against "10min". Unparseable values
+// draw empty bars.
 function barWidths(metric) {
   const before = number(metric.beforeValue);
   const after = number(metric.afterValue);
@@ -80,7 +100,9 @@ function barWidths(metric) {
     return [0, 0];
   }
 
-  const max = isPercent(metric) ? 100 : Math.max(before, after) || 1;
+  const max =
+    number(metric.maxValue) ||
+    (isPercent(metric) ? 100 : Math.max(before, after) || 1);
 
   return [after, before].map((n) => percent((n / max) * 100));
 }
@@ -96,6 +118,7 @@ function metricsFrom(partner) {
       name: fieldValue(node, "name"),
       beforeValue: fieldValue(node, "before_value"),
       afterValue: fieldValue(node, "after_value"),
+      maxValue: fieldValue(node, "max_value"),
     }))
     .filter((metric) => metric.name);
 }
