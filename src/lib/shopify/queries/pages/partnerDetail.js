@@ -31,7 +31,6 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
             ...PartnerDetailProblemSectionFields
           }
         }
-<<<<<<< Updated upstream
 
         exploreMore: field(key: "explore_more") {
           reference {
@@ -39,23 +38,6 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
             ...DeliveredSectionFields
           }
         }
-
-        exploreMore: field(key: "explore_more") {
-          reference {
-            __typename
-            ...PartnerDetailExploreMoreSectionFields
-          }
-        }
-      }
-    }
-
-    # Every Delivered Card, for Explore More to pick from. Fetched by type so
-    # no card is hand-picked; the section drops the current partner's own card.
-    exploreMoreCards: metaobjects(type: "delivered_card", first: 50) {
-      nodes {
-        ...PartnerDetailExploreMoreCardFields
-=======
->>>>>>> Stashed changes
       }
     }
 

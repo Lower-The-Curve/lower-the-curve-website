@@ -445,7 +445,6 @@ export async function getPartnerDetailPage(partnerHandle, first = 50) {
   const nameHandle = (node) =>
     node?.fields?.find((field) => field.key === 'name')?.reference?.handle;
 
-<<<<<<< Updated upstream
   const node = nodes.find((node) => nameHandle(node) === partnerHandle);
 
   if (!node) return null;
@@ -454,9 +453,6 @@ export async function getPartnerDetailPage(partnerHandle, first = 50) {
     ...node,
     deliveredCards: body?.data?.deliveredCards?.nodes ?? [],
   };
-=======
-  return nodes.find((node) => nameHandle(node) === partnerHandle) ?? null;
->>>>>>> Stashed changes
 }
 
 /**

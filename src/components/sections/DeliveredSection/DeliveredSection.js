@@ -242,12 +242,15 @@ function DeliveredCardItem({ card, linkLabel, solidCta, order }) {
                 <span
                   className={
                     solidCta
-                      ? "btn btn--primary btn--sm delivered__cta delivered__cta--solid"
-                      : "btn btn--primary btn--sm delivered__cta"
+                      ? "btn btn--primary delivered__cta delivered__cta--solid"
+                      : "btn btn--primary delivered__cta delivered__cta--outline"
                   }
                 >
                   <span className="btn__label">{linkLabel}</span>
-                  <ArrowIcon className="btn__arrow btn__arrow--rise" />
+                  <ArrowIcon
+                    gradient={!solidCta}
+                    className="btn__arrow btn__arrow--rise"
+                  />
                 </span>
               )}
             </div>
