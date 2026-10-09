@@ -140,6 +140,11 @@ export default function WhatWeBuiltSection({ section }) {
                       aria-hidden='true'
                     />
                   )}
+            {items.map((item) => (
+              <li key={item.id} className='what-we-built__item'>
+                <div className='what-we-built__marker'>
+                  <WhatWeBuiltIcon iconKey={item.icon} />
+                  <span className='what-we-built__line' aria-hidden='true' />
                 </div>
 
                 <div className='what-we-built__content'>

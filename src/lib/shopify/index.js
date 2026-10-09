@@ -13,6 +13,8 @@ import {
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
   getPartnerTestimonialQuery,
+  getPartnerApproachIntroQuery,
+  getCaseStudyMetricsQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
@@ -430,7 +432,9 @@ export async function getAboutUsPage() {
  * @param {string} partnerHandle  e.g. "blackroll"
  * @param {number} [first=50]     entries to fetch before matching.
  * @returns {Promise<object|null>} The `partner_detail` node, or null if no
- *   entry references a partner with that handle.
+ *   entry references a partner with that handle. The node also carries
+ *   `exploreMore` (its `explore_more` reference) and `exploreMoreCards` (every
+ *   `delivered_card` entry) for PartnerDetailExploreMoreSection.
  */
 export async function getPartnerDetailPage(partnerHandle, first = 50) {
   const { body } = await shopifyFetch({
@@ -443,7 +447,91 @@ export async function getPartnerDetailPage(partnerHandle, first = 50) {
   const nameHandle = (node) =>
     node?.fields?.find((field) => field.key === 'name')?.reference?.handle;
 
-  return nodes.find((node) => nameHandle(node) === partnerHandle) ?? null;
+  const node = nodes.find((node) => nameHandle(node) === partnerHandle);
+
+  if (!node) return null;
+
+  // The Delivered Cards come back in the same request (see the
+  // `exploreMoreCards` alias in queries/pages/partnerDetail.js). They're
+  // carried on the node so the page has one object to hand its sections.
+  return {
+    ...node,
+    exploreMoreCards: body?.data?.exploreMoreCards?.nodes ?? [],
+  };
+}
+
+/**
+ * Fetch the `what_we_built` entry belonging to a partner.
+ *
+ * There is no reference field linking the two: the `partner` entry has no
+ * `what_we_built` field and neither does `partner_detail`. The only link in the
+ * live data is the parent's own `name` field ("Blackroll"), which matches the
+ * referenced `partner` entry's `name`. So the match is made here, case- and
+ * whitespace-insensitively, and a partner with no matching entry simply renders
+ * no section.
+ *
+ * The Storefront API has no field-value filter on `metaobjects`, so the query
+ * returns the entries and the match happens in code — same pattern as
+ * getPartnerDetailPage() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(), whose `name` reference carries the partner's name.
+ * @returns {Promise<object|null>} The `what_we_built` node, or null.
+ */
+export async function getWhatWeBuilt(partnerDetail) {
+  const partnerName = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.fields?.find((field) => field.key === 'name')?.value;
+
+  if (!partnerName) return null;
+
+  const { body } = await shopifyFetch({ query: getWhatWeBuiltQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameOf = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.value;
+
+  const wanted = partnerName.trim().toLowerCase();
+
+  return (
+    nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
+  );
+}
+
+/**
+ * Fetch the shared `approach` entry: the Approach section's heading and intro,
+ * identical for every partner. The per-partner steps live on the partner's
+ * `case_study_approach` entry instead.
+ *
+ * @returns {Promise<object|null>} The `approach` node, or null.
+ */
+export async function getPartnerApproachIntro() {
+  const { body } = await shopifyFetch({ query: getPartnerApproachIntroQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
+}
+
+/**
+ * Fetch the `case_study_metrics` entry — the title and subtitle of the
+ * "How key metrics moved" section.
+ *
+ * It is one shared entry: nothing links it to a partner (the partner's own
+ * `partner_detail` entry carries the metric rows, read in the component), so
+ * there is nothing to match on and the first entry is used. The Storefront API
+ * has no field-value filter on `metaobjects`, so the query returns the entries
+ * and the pick happens here — same pattern as getWhatWeBuilt() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(); a missing partner means no section.
+ * @returns {Promise<object|null>} The `case_study_metrics` node, or null.
+ */
+export async function getCaseStudyMetrics(partnerDetail) {
+  if (!partnerDetail) return null;
+
+  const { body } = await shopifyFetch({ query: getCaseStudyMetricsQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
 }
 
 /**

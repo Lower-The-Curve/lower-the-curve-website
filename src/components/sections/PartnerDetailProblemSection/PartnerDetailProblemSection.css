@@ -1,0 +1,352 @@
+/* Partner Detail Problem — "What we did for <partner>? / The Problem We Needed
+   to Solve". Type sizes are scale tokens only (DESIGN-SYSTEM.md §2); colours
+   are brand tokens.
+*/
+.partner-detail-problem {
+  --partner-detail-problem-icon: 75px;
+  --partner-detail-problem-sphere: clamp(110px, 18.525vw, 266.76px);
+  /* Blue dot: 54.12px at 1440, 13.13px at 390, linear in between. */
+  --partner-detail-problem-dot: clamp(13.13px, calc(3.904vw - 2.096px), 54.12px);
+  /* Arrow icon box (Figma): 20x20 at 1440, 10x10 at 390, linear between. */
+  --partner-detail-problem-arrow: clamp(10px, calc(6.29px + 0.952vw), 20px);
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.partner-detail-problem__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  /* 50px: the Figma gap between the hero frame (ends at 900) and this
+     section's heading (950). */
+  padding: 50px var(--space) 4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 469fr) minmax(0, 716fr);
+  grid-template-areas:
+    'title description'
+    'subtitle issues';
+  column-gap: 31px;
+  row-gap: 3rem;
+  align-items: start;
+}
+
+.partner-detail-problem__title,
+.partner-detail-problem__subtitle {
+  max-width: 400px;
+  margin: 0;
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.partner-detail-problem__title {
+  grid-area: title;
+}
+
+.partner-detail-problem__subtitle {
+  grid-area: subtitle;
+}
+
+
+@media (max-width: 1199px) {
+  .partner-detail-problem__subtitle br {
+    display: none;
+  }
+}
+
+.partner-detail-problem__description {
+  grid-area: description;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.partner-detail-problem__paragraph {
+  margin: 0;
+  line-height: 1.375;
+  color: var(--color-ink);
+  white-space: pre-line;
+}
+
+.partner-detail-problem__accent {
+  font-weight: 600;
+}
+
+.partner-detail-problem__accent--blue {
+  color: var(--color-brand);
+}
+
+.partner-detail-problem__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-detail-problem__accent--blue,
+  .partner-detail-problem__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .partner-detail-problem__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .partner-detail-problem__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+
+.partner-detail-problem__issues {
+  grid-area: issues;
+  position: relative;
+}
+
+.partner-detail-problem__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.partner-detail-problem__row {
+  display: grid;
+  grid-template-columns: var(--partner-detail-problem-icon) minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 20px;
+  min-height: 120px;
+  padding: 22px 20px 22px 31px;
+  border-radius: 20px;
+  background-color: var(--color-bg);
+  color: var(--color-brand);
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.partner-detail-problem__row--link:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (min-width: 1025px) {
+  .partner-detail-problem__row:hover {
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
+
+  /* Same swing as the Button's `rise` arrow. */
+  .partner-detail-problem__row:hover .partner-detail-problem__arrow {
+    transform: rotate(-45deg) translateX(3px);
+  }
+}
+
+
+.partner-detail-problem__tile {
+  display: block;
+  width: var(--partner-detail-problem-icon);
+  height: var(--partner-detail-problem-icon);
+}
+
+.partner-detail-problem__icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.partner-detail-problem__label {
+  /* Shrinks to its text, so the gradient spans the words, not the column. */
+  justify-self: start;
+  min-width: 0;
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .partner-detail-problem__label {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.partner-detail-problem__arrow {
+  display: block;
+  /* ArrowIcon's 17x14 viewBox holds a 10-unit icon box drawn at 45°, like the
+     Figma icon, so 1 box px = 1.7 / 1.4 px of SVG: 34x28 at 20, 17x14 at 10. */
+  width: calc(var(--partner-detail-problem-arrow) * 1.7);
+  height: calc(var(--partner-detail-problem-arrow) * 1.4);
+  /* The thicker stroke reaches 0.25 units past the viewBox at the tips. */
+  overflow: visible;
+  transition: transform 0.2s ease;
+}
+
+/* Figma border: a quarter of the box (5px at 20, 2.5px at 10). In the 10-unit
+   viewBox box that is 2.5 units, so it scales with the icon. Colour stays
+   ArrowIcon's brand gradient. */
+.partner-detail-problem__arrow path {
+  stroke-width: 2.5;
+}
+
+/* Figma "Ellipse 10" and the 54px blue dot. Both scale with the viewport:
+   full Figma size at 1440 (the vw factor is size / 1440), smaller on phones.
+   The sphere's Figma Left/Top are its rotated corner, not its box: its centre
+   sits 50px inside the right edge (31% of it off the page) and 231px below
+   the top of the content. Figma's -38.47° is clockwise, i.e. CSS rotate(38.47deg),
+   which puts the light stop top-left and the dark one bottom-right. */
+.partner-detail-problem__sphere,
+.partner-detail-problem__blue-dot {
+  position: absolute;
+  pointer-events: none;
+}
+
+.partner-detail-problem__sphere {
+  z-index: -1;
+  top: calc(281px - var(--partner-detail-problem-sphere) / 2);
+  right: calc(var(--partner-detail-problem-sphere) * -0.3126);
+  width: var(--partner-detail-problem-sphere);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f3f2f2, #989898);
+  opacity: 0.71;
+  transform: rotate(38.47deg);
+  filter: blur(calc(var(--partner-detail-problem-sphere) * 0.0489));
+}
+
+.partner-detail-problem__blue-dot {
+  z-index: 0;
+  width: var(--partner-detail-problem-dot);
+  height: var(--partner-detail-problem-dot);
+  top: calc(150px - var(--partner-detail-problem-dot) / 2);
+  left: calc(-16px - var(--partner-detail-problem-dot) / 2);
+  border-radius: 50%;
+  background: linear-gradient(
+    to left,
+    var(--color-brand-dark),
+    var(--color-brand)
+  );
+  opacity: 0.9;
+  /* Figma layer blur 4.5 at every size (CSS blur is about half of Figma's). */
+  filter: blur(2.25px);
+}
+
+/* Mobile values are the Figma 390 frame's: title -> paragraph 16px,
+   paragraph -> subtitle 56px, subtitle -> list 26px; paragraph 16/20. */
+@media (max-width: 1024px) {
+  .partner-detail-problem__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'title'
+      'description'
+      'subtitle'
+      'issues';
+    row-gap: 0;
+    padding: 50px var(--space) 3.5rem;
+  }
+
+  .partner-detail-problem__title,
+  .partner-detail-problem__subtitle,
+  .partner-detail-problem__description {
+    text-align: center;
+  }
+
+  /* 10em breaks the headings after "We" / "for", as in the mobile frame. */
+  .partner-detail-problem__title,
+  .partner-detail-problem__subtitle {
+    justify-self: center;
+    max-width: 10em;
+  }
+
+  .partner-detail-problem__title {
+    margin-bottom: 16px;
+  }
+
+  .partner-detail-problem__description {
+    margin-bottom: 56px;
+  }
+
+  .partner-detail-problem__subtitle {
+    margin-bottom: 26px;
+  }
+
+  .partner-detail-problem__paragraph {
+    line-height: 1.25;
+  }
+
+  .partner-detail-problem__row {
+    background-color: color-mix(in srgb, var(--color-ink) 2%, var(--color-bg));
+  }
+
+  /* Beside the subtitle's second line, 6px inside the content edge. */
+  .partner-detail-problem__blue-dot {
+    top: calc(-46px - var(--partner-detail-problem-dot) / 2);
+    left: calc(6px - var(--partner-detail-problem-dot) / 2);
+  }
+
+  /* Centred on the right edge, between the paragraph and the subtitle. */
+  .partner-detail-problem__sphere {
+    top: calc(43% - var(--partner-detail-problem-sphere) / 2);
+    right: calc(var(--partner-detail-problem-sphere) * -0.5);
+  }
+}
+
+/* Cards 358x60, radius 10, no gap; icon 30px at 16px; label 14/24 SemiBold
+   at 60px from the left, 18px from the top. */
+@media (max-width: 575px) {
+  .partner-detail-problem {
+    --partner-detail-problem-icon: 30px;
+  }
+
+  .partner-detail-problem__inner {
+    padding-top: 32px;
+  }
+
+  .partner-detail-problem__list {
+    gap: 0;
+  }
+
+  .partner-detail-problem__row {
+    column-gap: 14px;
+    min-height: 60px;
+    padding: 18px 12px 18px 16px;
+    border-radius: 10px;
+  }
+
+  .partner-detail-problem__label {
+    font-size: var(--fs-body-sm);
+    line-height: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-detail-problem__row,
+  .partner-detail-problem__arrow {
+    transition: none;
+  }
+}

@@ -7,6 +7,12 @@ import {
 import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
 import PartnerTestimonialSection from '@/components/sections/PartnerTestimonialSection/PartnerTestimonialSection';
+import { getPartnerDetailPage, getWhatWeBuilt } from '@/lib/shopify';
+import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
+import PartnerDetailProblemSection, {
+  partnerNameOf,
+} from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
+import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
 import './page.css';
 
 export const metadata = {
@@ -28,6 +34,11 @@ export default async function PartnerDetailTestPage({ searchParams }) {
       <PartnerDetailSection section={section} />
       <WhatWeBuiltSection section={whatWeBuilt} />
       <PartnerTestimonialSection section={partnerTestimonial} />
+      <PartnerDetailProblemSection
+        section={section.problem?.reference}
+        partnerName={partnerNameOf(section)}
+      />
+      <WhatWeBuiltSection section={whatWeBuilt} />
     </main>
   );
 }
