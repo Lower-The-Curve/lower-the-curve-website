@@ -11,11 +11,11 @@ import PartnerDetailProblemSection, {
   partnerNameOf,
 } from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
-import PartnerDetailExploreMoreSection from '@/components/sections/PartnerDetailExploreMoreSection/PartnerDetailExploreMoreSection';
 import PartnerDetailResultsSection, {
   partnerNameOf as resultsPartnerNameOf,
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
+import DeliveredSection from '@/components/sections/DeliveredSection/DeliveredSection';
 import './page.css';
 
 export default async function PartnerDetailPage({ params }) {
@@ -41,15 +41,17 @@ export default async function PartnerDetailPage({ params }) {
         partnerName={partnerNameOf(section)}
       />
       <WhatWeBuiltSection section={whatWeBuilt} />
-      <PartnerDetailExploreMoreSection
-        section={section.exploreMore?.reference}
-        cards={section.exploreMoreCards}
       <PartnerDetailResultsSection
         section={section.results?.reference}
         partnerName={resultsPartnerNameOf(section)}
       />
       <CaseStudyMetricsSection
         section={metrics}
+        partner={section}
+      />
+      <DeliveredSection
+        section={section.exploreMore?.reference}
+        allCards={section.deliveredCards}
         partner={section}
       />
     </main>

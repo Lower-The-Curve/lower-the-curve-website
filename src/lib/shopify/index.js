@@ -431,9 +431,7 @@ export async function getAboutUsPage() {
  * @param {string} partnerHandle  e.g. "blackroll"
  * @param {number} [first=50]     entries to fetch before matching.
  * @returns {Promise<object|null>} The `partner_detail` node, or null if no
- *   entry references a partner with that handle. The node also carries
- *   `exploreMore` (its `explore_more` reference) and `exploreMoreCards` (every
- *   `delivered_card` entry) for PartnerDetailExploreMoreSection.
+ *   entry references a partner with that handle.
  */
 export async function getPartnerDetailPage(partnerHandle, first = 50) {
   const { body } = await shopifyFetch({
@@ -450,12 +448,9 @@ export async function getPartnerDetailPage(partnerHandle, first = 50) {
 
   if (!node) return null;
 
-  // The Delivered Cards come back in the same request (see the
-  // `exploreMoreCards` alias in queries/pages/partnerDetail.js). They're
-  // carried on the node so the page has one object to hand its sections.
   return {
     ...node,
-    exploreMoreCards: body?.data?.exploreMoreCards?.nodes ?? [],
+    deliveredCards: body?.data?.deliveredCards?.nodes ?? [],
   };
 }
 
