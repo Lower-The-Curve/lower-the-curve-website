@@ -1,7 +1,4 @@
 import {
-  partnerDetailSectionFragment,
-  whatWeBuiltSectionFragment,
-  partnerTestimonialSectionFragment,
   partnerApproachIntroFragment,
   partnerApproachSectionFragment,
   caseStudyMetricsSectionFragment,
@@ -10,6 +7,7 @@ import {
   partnerDetailExploreMoreCardFragment,
   partnerDetailResultsSectionFragment,
   partnerDetailProblemSectionFragment,
+  partnerTestimonialSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
 
@@ -93,17 +91,6 @@ export const getCaseStudyMetricsQuery = `
     }
   }
   ${caseStudyMetricsSectionFragment}
-`;
-
-export const getWhatWeBuiltQuery = `
-  query GetWhatWeBuilt {
-    metaobjects(type: "what_we_built", first: 50) {
-      nodes {
-        ...WhatWeBuiltSectionFields
-      }
-    }
-  }
-  ${whatWeBuiltSectionFragment}
 `;
 
 export const getPartnerTestimonialQuery = `
