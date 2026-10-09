@@ -1,6 +1,12 @@
 import { notFound } from 'next/navigation';
 import {
   getPartnerDetailPage,
+  getWhatWeBuilt,
+  getPartnerTestimonial,
+} from '@/lib/shopify';
+import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
+import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
+import PartnerTestimonialSection from '@/components/sections/PartnerTestimonialSection/PartnerTestimonialSection';
   getPartnerApproachIntro,
   getWhatWeBuilt,
   getCaseStudyMetrics,
@@ -25,6 +31,8 @@ export default async function PartnerDetailPage({ params }) {
 
   if (!section) notFound();
 
+  const whatWeBuilt = await getWhatWeBuilt(section);
+  const partnerTestimonial = await getPartnerTestimonial(section);
   // `case_study_approach` is a list field; a partner has one approach entry.
   const approach = section.fields?.find((f) => f.key === 'case_study_approach')
     ?.references?.nodes?.[0];
@@ -35,6 +43,8 @@ export default async function PartnerDetailPage({ params }) {
   return (
     <main className="partner-detail-page">
       <PartnerDetailSection section={section} />
+      <WhatWeBuiltSection section={whatWeBuilt} />
+      <PartnerTestimonialSection section={partnerTestimonial} />
       <PartnerApproachSection section={approach} intro={approachIntro} />
       <PartnerDetailProblemSection
         section={section.problem?.reference}

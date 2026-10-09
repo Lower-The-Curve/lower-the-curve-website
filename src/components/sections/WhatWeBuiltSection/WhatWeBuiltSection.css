@@ -15,6 +15,9 @@
 }
 
 .what-we-built__glow--right {
+  top: 1rem;
+  right: -9rem;
+  width: clamp(13rem, 26.67vw, 24rem);
   top: 7rem;
   right: -10rem;
   width: clamp(13rem, 26.67vw, 20rem);
@@ -38,6 +41,13 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap: 1rem;
+}
+
+.what-we-built__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 600;
+  line-height: 1.2;
   gap: 20px;
 }
 
@@ -51,6 +61,10 @@
 
 .what-we-built__accent {
   color: var(--color-brand);
+}
+
+.what-we-built__lede {
+  max-width: 46.25rem;
   font-weight: 600;
 }
 
@@ -71,6 +85,7 @@
 
 .what-we-built__item {
   display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
   grid-template-columns: var(--what-we-built-icon) minmax(0, 1fr);
   column-gap: 1.5rem;
 }
@@ -84,12 +99,16 @@
 .what-we-built__icon {
   display: block;
   flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
   width: var(--what-we-built-icon);
   height: var(--what-we-built-icon);
 }
 
 .what-we-built__line {
   flex: 1 1 auto;
+  width: 3px;
+  margin-top: 0.625rem;
   width: 6px;
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -104,6 +123,13 @@
 .what-we-built__head {
   display: flex;
   align-items: center;
+  min-height: 2.5rem;
+}
+
+.what-we-built__item-title {
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 1.2;
   min-height: var(--what-we-built-icon);
 }
 
@@ -116,6 +142,7 @@
 }
 
 .what-we-built__body {
+  margin-top: 0.75rem;
   font-size: 16px;
   margin-top: 30px;
   font-weight: 400;

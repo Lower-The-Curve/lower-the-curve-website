@@ -12,6 +12,7 @@ import {
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
   getWhatWeBuiltQuery,
+  getPartnerTestimonialQuery,
   getPartnerApproachIntroQuery,
   getCaseStudyMetricsQuery,
   getHeaderQuery,
@@ -531,4 +532,64 @@ export async function getCaseStudyMetrics(partnerDetail) {
   const { body } = await shopifyFetch({ query: getCaseStudyMetricsQuery });
 
   return body?.data?.metaobjects?.nodes?.[0] ?? null;
+}
+
+/**
+ * Fetch the `what_we_built` entry belonging to a partner.
+ *
+ * There is no reference field linking the two: the `partner` entry has no
+ * `what_we_built` field and neither does `partner_detail`. The only link in the
+ * live data is the parent's own `name` field ("Blackroll"), which matches the
+ * referenced `partner` entry's `name`. So the match is made here, case- and
+ * whitespace-insensitively, and a partner with no matching entry simply renders
+ * no section.
+ *
+ * The Storefront API has no field-value filter on `metaobjects`, so the query
+ * returns the entries and the match happens in code — same pattern as
+ * getPartnerDetailPage() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(), whose `name` reference carries the partner's name.
+ * @returns {Promise<object|null>} The `what_we_built` node, or null.
+ */
+export async function getWhatWeBuilt(partnerDetail) {
+  const partnerName = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.fields?.find((field) => field.key === 'name')?.value;
+
+  if (!partnerName) return null;
+
+  const { body } = await shopifyFetch({ query: getWhatWeBuiltQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameOf = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.value;
+
+  const wanted = partnerName.trim().toLowerCase();
+
+  return (
+    nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
+  );
+}
+
+export async function getPartnerTestimonial(partnerDetail) {
+  const partnerHandle = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.handle?.trim()
+    .toLowerCase();
+
+  if (!partnerHandle) return null;
+
+  const { body } = await shopifyFetch({ query: getPartnerTestimonialQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  return (
+    nodes.find((node) => {
+      const handle = node?.handle?.toLowerCase() ?? '';
+
+      return handle === partnerHandle || handle.startsWith(`${partnerHandle}-`);
+    }) ?? null
+  );
 }
