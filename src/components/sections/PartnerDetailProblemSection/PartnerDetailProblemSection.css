@@ -48,14 +48,6 @@
   grid-area: subtitle;
 }
 
-/* "The Problem We Needed to" is ~432px, wider than the 400px cap, so from
-   1200px the subtitle doesn't wrap on its own: only the <br> breaks it.
-   Below 1200px every <br> in the subtitle is hidden and it wraps normally. */
-@media (min-width: 1200px) {
-  .partner-detail-problem__subtitle {
-    white-space: nowrap;
-  }
-}
 
 @media (max-width: 1199px) {
   .partner-detail-problem__subtitle br {
