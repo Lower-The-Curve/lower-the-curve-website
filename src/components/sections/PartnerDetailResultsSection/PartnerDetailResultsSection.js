@@ -5,7 +5,8 @@ import './PartnerDetailResultsSection.css';
 
 export const PARTNER_DETAIL_RESULTS_TYPE = 'partner_detail_results';
 
-const DEFAULT_RING_FILL = 0.9;
+const RING_MAX = { '%': 100, x: 10, '+': 20 };
+const SUFFIXES = Object.keys(RING_MAX);
 
 const PARTNER_TOKEN = /\{partner\}/gi;
 
@@ -51,12 +52,16 @@ function iconFrom(node, ...keys) {
   return null;
 }
 
-function ringFillFrom(node) {
-  const parsed = Number.parseInt(fieldValue(node, 'ring_fill') ?? '', 10);
+function numberFrom(node, key) {
+  const parsed = Number.parseInt(fieldValue(node, key) ?? '', 10);
 
-  if (!Number.isFinite(parsed)) return DEFAULT_RING_FILL;
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : null;
+}
 
-  return Math.min(100, Math.max(0, parsed)) / 100;
+function suffixFrom(node) {
+  const suffix = fieldValue(node, 'suffix')?.trim();
+
+  return SUFFIXES.includes(suffix) ? suffix : SUFFIXES[0];
 }
 
 export function partnerNameOf(partnerDetail) {
@@ -84,13 +89,13 @@ function resultItems(section) {
     .filter(Boolean)
     .map((node) => ({
       id: node.id,
-      value: fieldValue(node, 'value'),
+      value: numberFrom(node, 'value'),
+      suffix: suffixFrom(node),
       title: fieldValue(node, 'title'),
       description: fieldValue(node, 'description'),
       icon: iconFrom(node, 'icon'),
-      fill: ringFillFrom(node),
     }))
-    .filter((result) => result.value || result.title);
+    .filter((result) => result.value !== null || result.title);
 }
 
 export default function PartnerDetailResultsSection({ section, partnerName }) {
@@ -138,10 +143,11 @@ export default function PartnerDetailResultsSection({ section, partnerName }) {
               {results.map((result) => (
                 <li key={result.id} className="partner-detail-results__card">
                   <div className="partner-detail-results__card-head">
-                    {result.value && (
+                    {result.value !== null && (
                       <ResultMetric
                         value={result.value}
-                        fill={result.fill}
+                        suffix={result.suffix}
+                        max={RING_MAX[result.suffix]}
                         showRing={showRings}
                         animate={animate}
                       />
