@@ -302,6 +302,74 @@
   transform: rotate(-45deg) translateX(3px);
 }
 
+.delivered__cta--solid {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  color: var(--color-bg);
+  border-color: transparent;
+}
+
+.delivered__cta--solid:hover {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-brand-dark),
+    var(--color-brand-darker)
+  );
+  color: var(--color-bg);
+  border-color: transparent;
+}
+
+/* --- OPEN (card_details = Always visible) ------------------------------ */
+.delivered--open {
+  overflow-x: clip;
+}
+
+.delivered--open .delivered__glow {
+  top: 332px;
+  right: -30px;
+  width: 291px;
+}
+
+.delivered--open .delivered__grid {
+  align-items: stretch;
+}
+
+.delivered--open .delivered__column {
+  display: contents;
+}
+
+.delivered--open .delivered__item {
+  display: flex;
+}
+
+.delivered--open .delivered__panel {
+  flex: 1 1 auto;
+}
+
+.delivered--open .delivered__cta {
+  margin-top: auto;
+}
+
+@media (min-width: 1025px) {
+  .delivered--open .delivered__grid {
+    row-gap: 3rem;
+  }
+
+  .delivered--open .delivered__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+
+  .delivered--open .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+}
+
 /* --- TABLET (<= 1024px) ----------------------------------------------- */
 
 @media (max-width: 1024px) {
@@ -323,6 +391,25 @@
     display: none;
   }
 
+  .delivered--open .delivered__grid {
+    grid-auto-rows: 1fr;
+  }
+
+  .delivered--open .delivered__glow {
+    top: -3px;
+    right: -78px;
+    width: 142px;
+    transform: rotate(90deg);
+  }
+
+  .delivered--open .delivered__cta {
+    display: inline-flex;
+  }
+
+  .delivered--open .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+
   .delivered__panel {
     opacity: 1;
     visibility: visible;
@@ -336,6 +423,10 @@
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 
 @media (max-width: 575px) {
+  .delivered--open .delivered__accent {
+    display: block;
+  }
+
   .delivered__glow {
     top: -1rem;
     right: -2rem;

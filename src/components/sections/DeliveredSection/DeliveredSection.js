@@ -9,6 +9,9 @@ import "./DeliveredSection.css";
 //   - `description` : multi_line_text_field, the centred intro
 //   - `link_label`  : single_line_text_field, the shared pill copy
 //   - `cards`       : list.metaobject_reference -> delivered_card
+//   - `selection_mode` : Manual | Latest | Random
+//   - `card_details`   : Hover | Always visible
+//   - `button_style`   : Outline | Solid
 //
 // Nested types (read through the reference lists, not dispatched on):
 //   delivered_card  title, description, image, tags, url
@@ -48,6 +51,73 @@ function cardsFrom(section) {
       ?.nodes ??
     []
   );
+}
+
+function pathOf(url) {
+  if (!url) return null;
+
+  try {
+    return (
+      new URL(url, "https://placeholder.invalid").pathname.replace(/\/+$/, "") ||
+      "/"
+    );
+  } catch {
+    return null;
+  }
+}
+
+function shuffled(list) {
+  const copy = [...list];
+
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+const AUTO_MODES = new Set(["latest", "random"]);
+const AUTO_CARD_COUNT = 2;
+
+function pickCards(cards, partner, mode, count) {
+  const ownCardId = field(partner, "delivered_card")?.reference?.id ?? null;
+  const ownHandle = field(partner, "name")?.reference?.handle ?? null;
+  const ownPath = ownHandle ? `/partners/${ownHandle}` : null;
+
+  const eligible = (cards ?? []).filter(
+    (card) =>
+      card &&
+      card.id !== ownCardId &&
+      (!ownPath || pathOf(fieldValue(card, "url", "link")) !== ownPath) &&
+      fieldValue(card, "title"),
+  );
+
+  const ordered =
+    mode === "random"
+      ? shuffled(eligible)
+      : [...eligible].sort(
+          (a, b) => Date.parse(b.updatedAt ?? 0) - Date.parse(a.updatedAt ?? 0),
+        );
+
+  return ordered.slice(0, count);
+}
+
+function selectCards(section, allCards, partner) {
+  const mode = fieldValue(section, "selection_mode")?.trim().toLowerCase();
+  const listed = cardsFrom(section);
+
+  // An empty Manual list falls back to Latest.
+  if (allCards && (AUTO_MODES.has(mode) || !listed.length)) {
+    return pickCards(
+      allCards,
+      partner,
+      AUTO_MODES.has(mode) ? mode : "latest",
+      AUTO_CARD_COUNT,
+    );
+  }
+
+  return listed;
 }
 
 function tagsFrom(card) {
@@ -116,7 +186,7 @@ function CardShell({ href, hasCta, children }) {
   );
 }
 
-function DeliveredCardItem({ card, linkLabel, order }) {
+function DeliveredCardItem({ card, linkLabel, solidCta, order }) {
   const cardTitle = fieldValue(card, "title");
   const cardDescription = fieldValue(card, "description");
   const url = fieldValue(card, "url", "link");
@@ -169,7 +239,13 @@ function DeliveredCardItem({ card, linkLabel, order }) {
                 <p className="delivered__card-copy">{cardDescription}</p>
               )}
               {url && linkLabel && (
-                <span className="btn btn--primary btn--sm delivered__cta">
+                <span
+                  className={
+                    solidCta
+                      ? "btn btn--primary btn--sm delivered__cta delivered__cta--solid"
+                      : "btn btn--primary btn--sm delivered__cta"
+                  }
+                >
                   <span className="btn__label">{linkLabel}</span>
                   <ArrowIcon className="btn__arrow btn__arrow--rise" />
                 </span>
@@ -190,19 +266,24 @@ function cardsByColumn(cards) {
   return columns;
 }
 
-export default function DeliveredSection({ section }) {
+export default function DeliveredSection({ section, allCards, partner }) {
   if (!section) return null;
 
   const title = fieldValue(section, "title");
   const description = fieldValue(section, "description");
-  const linkLabel = fieldValue(section, "link_label");
-  const cards = cardsFrom(section);
+  const linkLabel = fieldValue(section, "link_label", "button_text");
+  const cards = selectCards(section, allCards, partner);
+  const alwaysOpen =
+    fieldValue(section, "card_details")?.trim().toLowerCase() ===
+    "always visible";
+  const solidCta =
+    fieldValue(section, "button_style")?.trim().toLowerCase() === "solid";
   const greenGlow = fileFrom(section, "green_glow");
   const blueGlow = fileFrom(section, "blue_glow");
   if (!cards.length) return null;
 
   return (
-    <section className="delivered">
+    <section className={alwaysOpen ? "delivered delivered--open" : "delivered"}>
       {greenGlow?.image && (
         <Image
           src={greenGlow.image.url}
@@ -249,6 +330,7 @@ export default function DeliveredSection({ section }) {
                   key={card.id}
                   card={card}
                   linkLabel={linkLabel}
+                  solidCta={solidCta}
                   order={index}
                 />
               ))}

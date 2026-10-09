@@ -3,10 +3,10 @@ import {
   partnerApproachSectionFragment,
   caseStudyMetricsSectionFragment,
   partnerDetailSectionFragment,
-  partnerDetailExploreMoreSectionFragment,
-  partnerDetailExploreMoreCardFragment,
   partnerDetailResultsSectionFragment,
   partnerDetailProblemSectionFragment,
+  deliveredSectionFragment,
+  deliveredCardFragment,
   partnerTestimonialSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
@@ -16,6 +16,7 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
     metaobjects(type: "partner_detail", first: $first) {
       nodes {
         ...PartnerDetailSectionFields
+        ...CaseStudyMetricsSectionFields
 
         results: field(key: "results") {
           reference {
@@ -23,12 +24,18 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
             ...PartnerDetailResultsSectionFields
           }
         }
-        ...CaseStudyMetricsSectionFields
 
         problem: field(key: "problem") {
           reference {
             __typename
             ...PartnerDetailProblemSectionFields
+          }
+        }
+
+        exploreMore: field(key: "explore_more") {
+          reference {
+            __typename
+            ...DeliveredSectionFields
           }
         }
 
@@ -48,14 +55,21 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
         ...PartnerDetailExploreMoreCardFields
       }
     }
+
+    # All Delivered Cards, for Latest / Random.
+    deliveredCards: metaobjects(type: "delivered_card", first: 50) {
+      nodes {
+        ...DeliveredCardFields
+      }
+    }
   }
   ${partnerDetailSectionFragment}
-  ${partnerDetailExploreMoreSectionFragment}
-  ${partnerDetailExploreMoreCardFragment}
   ${partnerDetailResultsSectionFragment}
   ${partnerApproachSectionFragment}
   ${caseStudyMetricsSectionFragment}
   ${partnerDetailProblemSectionFragment}
+  ${deliveredSectionFragment}
+  ${deliveredCardFragment}
 `;
 
 export const getWhatWeBuiltQuery = `

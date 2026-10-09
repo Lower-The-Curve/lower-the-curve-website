@@ -18,6 +18,7 @@ import PartnerDetailResultsSection, {
   partnerNameOf as resultsPartnerNameOf,
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
+import DeliveredSection from '@/components/sections/DeliveredSection/DeliveredSection';
 import './page.css';
 
 export default async function PartnerDetailPage({ params }) {
@@ -56,6 +57,11 @@ export default async function PartnerDetailPage({ params }) {
       />
       <CaseStudyMetricsSection
         section={metrics}
+        partner={section}
+      />
+      <DeliveredSection
+        section={section.exploreMore?.reference}
+        allCards={section.deliveredCards}
         partner={section}
       />
     </main>

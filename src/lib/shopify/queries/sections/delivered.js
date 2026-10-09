@@ -65,3 +65,44 @@ export const deliveredSectionFragment = /* GraphQL */ `
     }
   }
 `;
+
+// A delivered_card with updatedAt, for Latest / Random.
+export const deliveredCardFragment = /* GraphQL */ `
+  fragment DeliveredCardFields on Metaobject {
+    id
+    type
+    handle
+    updatedAt
+    fields {
+      key
+      type
+      value
+      reference {
+        __typename
+        ... on MediaImage {
+          image {
+            url
+            altText
+            width
+            height
+          }
+        }
+      }
+      references(first: 20) {
+        nodes {
+          __typename
+          ... on Metaobject {
+            id
+            type
+            handle
+            fields {
+              key
+              type
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
