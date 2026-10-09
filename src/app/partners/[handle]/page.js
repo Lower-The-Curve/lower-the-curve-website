@@ -54,6 +54,8 @@ export default async function PartnerDetailPage({ params }) {
       <PartnerDetailExploreMoreSection
         section={section.exploreMore?.reference}
         cards={section.exploreMoreCards}
+        partner={section}
+      />
       <PartnerDetailResultsSection
         section={section.results?.reference}
         partnerName={resultsPartnerNameOf(section)}
