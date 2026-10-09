@@ -156,6 +156,7 @@
   --fs-approach-title: 24px;
   --fs-approach-copy: 16px;
   --fs-approach-pill: 16px;
+  --fs-app-pill: 8px;
 }
 
 /* --- TABLET (576–1024px) -------------------------------------------------- */
@@ -195,6 +196,7 @@
     --fs-approach-title: 24px;
     --fs-approach-copy: 16px;
     --fs-approach-pill: 16px;
+    --fs-app-pill: 8px;
   }
 }
 
@@ -249,6 +251,7 @@
     --fs-approach-title: 16px;
     --fs-approach-copy: 10px;
     --fs-approach-pill: 8px;
+    --fs-app-pill: 8px;
   }
 }
 
