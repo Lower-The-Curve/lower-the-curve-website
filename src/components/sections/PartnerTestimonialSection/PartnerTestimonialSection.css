@@ -5,7 +5,9 @@
 .partner-testimonial__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 0 var(--space) 6rem;
+  /* Figma gap: 70px from the Key Metrics section above, 0 to Delivered below
+     (it owns its own 70px top padding). */
+  padding: 70px var(--space) 0;
   --partner-testimonial-card-width: 62rem;
 }
 
@@ -132,7 +134,10 @@
 
 @media (max-width: 575px) {
   .partner-testimonial__inner {
-    padding: 0 var(--space) 4rem;
+    /* Top stays 0 (Metrics owns that gap via its own bottom); bottom goes to
+       0 too — Delivered now owns the Testimonial-to-Delivered gap via its
+       own 50px top. */
+    padding: 0 var(--space);
     --partner-testimonial-card-width: 100%;
   }
 

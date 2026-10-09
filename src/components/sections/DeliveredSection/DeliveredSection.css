@@ -18,7 +18,10 @@
 .delivered__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  /* Figma gap: 70px from the Testimonial section above; 70px below to the
+     footer's Book a Call frame — this section owns that gap fully since the
+     footer isn't page-specific. */
+  padding: 70px var(--space);
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -512,7 +515,10 @@
   }
 
   .delivered__inner {
-    padding: 3rem var(--space);
+    /* 50px to Testimonial above (its own bottom is zeroed); 50px below to
+       the footer, which this section owns fully since the footer isn't
+       page-specific. */
+    padding: 50px var(--space);
     gap: 2rem;
   }
 

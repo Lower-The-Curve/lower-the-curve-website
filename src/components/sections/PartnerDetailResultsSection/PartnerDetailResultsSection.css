@@ -13,7 +13,9 @@
 .partner-detail-results__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  /* Figma gap: 70px from the What We Built section above, 0 to Key Metrics
+     below (it owns its own 70px top padding). */
+  padding: 70px var(--space) 0;
   display: flex;
   flex-direction: column;
   gap: 50px;
@@ -305,6 +307,10 @@
    (170px cards, 70px ring, 23px icon). */
 @media (max-width: 575px) {
   .partner-detail-results__inner {
+    /* 50px to What We Built above, 0 to Key Metrics below (it owns its own
+       50px top). Tablet's 3rem (both sides) is left as is above this. */
+    padding-top: 50px;
+    padding-bottom: 0;
     gap: 32px;
   }
 
