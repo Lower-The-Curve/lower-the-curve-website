@@ -3,6 +3,7 @@ import {
   getPartnerDetailPage,
   getPartnerApproachIntro,
   getWhatWeBuilt,
+  getPartnerTestimonial,
   getCaseStudyMetrics,
 } from '@/lib/shopify';
 import PartnerDetailSection from '@/components/sections/PartnerDetailSection/PartnerDetailSection';
@@ -11,6 +12,8 @@ import PartnerDetailProblemSection, {
   partnerNameOf,
 } from '@/components/sections/PartnerDetailProblemSection/PartnerDetailProblemSection';
 import WhatWeBuiltSection from '@/components/sections/WhatWeBuiltSection/WhatWeBuiltSection';
+import PartnerTestimonialSection from '@/components/sections/PartnerTestimonialSection/PartnerTestimonialSection';
+import PartnerDetailExploreMoreSection from '@/components/sections/PartnerDetailExploreMoreSection/PartnerDetailExploreMoreSection';
 import PartnerDetailResultsSection, {
   partnerNameOf as resultsPartnerNameOf,
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
@@ -30,6 +33,7 @@ export default async function PartnerDetailPage({ params }) {
     ?.references?.nodes?.[0];
   const approachIntro = await getPartnerApproachIntro();
   const whatWeBuilt = await getWhatWeBuilt(section);
+  const partnerTestimonial = await getPartnerTestimonial(section);
   const metrics = await getCaseStudyMetrics(section);
 
   return (
@@ -41,6 +45,12 @@ export default async function PartnerDetailPage({ params }) {
         partnerName={partnerNameOf(section)}
       />
       <WhatWeBuiltSection section={whatWeBuilt} />
+      <PartnerTestimonialSection section={partnerTestimonial} />
+      <PartnerDetailExploreMoreSection
+        section={section.exploreMore?.reference}
+        cards={section.exploreMoreCards}
+        partner={section}
+      />
       <PartnerDetailResultsSection
         section={section.results?.reference}
         partnerName={resultsPartnerNameOf(section)}
