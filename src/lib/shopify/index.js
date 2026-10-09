@@ -8,6 +8,7 @@ import {
   getHomePageQuery,
   getServicesPageQuery,
   getShopifyAppsPageQuery,
+  getAppPopUpsQuery,
   getCaseStudiesPageQuery,
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
@@ -377,6 +378,32 @@ export async function getShopifyAppsPage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Shopify Apps popups
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch every `app_pop_up` entry, one per Shopify Apps card's dialog.
+ *
+ * These are a by-type fetch on purpose — the page's `content` entry doesn't
+ * reference them; each card's `button1` field does. See the comment in
+ * queries/appPopUp.js for why reading them through the page query was rejected
+ * (nested variant measured 1449; standalone 73, verified live).
+ *
+ * @param {number} [first=10]  entries to fetch. Matches the measured 73 cost;
+ *   raise it when more than ten apps are authored.
+ * @returns {Promise<Array<object>>} Raw metaobject nodes — the components read
+ *   them by field key. Empty array if the definition has no entries.
+ */
+export async function getAppPopUps(first = 10) {
+  const { body } = await shopifyFetch({
+    query: getAppPopUpsQuery,
+    variables: { type: 'app_pop_up', first },
+  });
+
+  return body?.data?.metaobjects?.nodes ?? [];
 }
 
 /**
