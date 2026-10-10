@@ -198,6 +198,17 @@
   display: block;
 }
 
+/* Label with a <strong> run (Figma: 14/16, regular + SemiBold). A label
+   without one keeps the all-SemiBold style above. */
+.hero__scroll-text--mixed {
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.hero__scroll-strong {
+  font-weight: 600;
+}
+
 /* --- CONTENT ALIGNMENT --------------------------------------------------
    Driven by the metaobject's `content_align` field. The measure wrappers stay
    centred on the page either way; only the text inside them moves.
@@ -218,6 +229,38 @@
 .hero--align-right .hero__scroll {
   align-items: flex-end;
   text-align: right;
+}
+
+/* Scroll cue overrides (scroll_align / scroll_color). After the rules above
+   so they win at equal specificity. */
+.hero--scroll-center .hero__scroll {
+  align-items: center;
+  text-align: center;
+}
+
+.hero--scroll-left .hero__scroll {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero--scroll-right .hero__scroll {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hero--scroll-white .hero__scroll {
+  color: var(--color-bg);
+}
+
+/* Figma "White gradient for logos" on the chevrons: white on the left to
+   #BDBDBD at 50% on the right. The icon's gradient runs right → left, so the
+   first stop is the right end. */
+.hero--scroll-white .hero__scroll-icon stop:first-child {
+  stop-color: rgb(189 189 189 / 0.5);
+}
+
+.hero--scroll-white .hero__scroll-icon stop:last-child {
+  stop-color: var(--color-bg);
 }
 
 /* --- MOBILE (<= 575px) --------------------------------------------------

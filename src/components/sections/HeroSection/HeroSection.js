@@ -15,6 +15,8 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
+//   scroll_align         -> optional "Left" | "Center" | "Right"; empty follows content_align
+//   scroll_color         -> optional "Blue" | "White"; empty is Blue
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
 export const HERO_SECTION_TYPE = 'hero_section';
@@ -64,6 +66,18 @@ const ALIGN_CLASSES = {
 function alignClass(section) {
   const authored = fieldValue(section, 'content_align')?.trim().toLowerCase();
   return ALIGN_CLASSES[authored] ?? ALIGN_CLASSES.center;
+}
+
+// Scroll cue overrides: alignment and colour, independent of the headline.
+function scrollClasses(section) {
+  const align = fieldValue(section, 'scroll_align')?.trim().toLowerCase();
+  const color = fieldValue(section, 'scroll_color')?.trim().toLowerCase();
+  return [
+    ALIGN_CLASSES[align] && `hero--scroll-${align}`,
+    color === 'white' && 'hero--scroll-white',
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 // The design accents part of the headline — a green run and a blue one — and
@@ -116,6 +130,27 @@ function accentedTitle(title) {
   return parts;
 }
 
+// The scroll label may bold part of itself, as in the design:
+//   Scroll down to <strong>Explore more</strong>
+// Only <strong>/<b> are understood; the rest renders as text.
+const SCROLL_STRONG = /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+
+function scrollLabel(text) {
+  const parts = [];
+  let cursor = 0;
+  for (const match of text.matchAll(SCROLL_STRONG)) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+    parts.push(
+      <strong key={match.index} className="hero__scroll-strong">
+        {match[2]}
+      </strong>
+    );
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return parts;
+}
+
 export default function HeroSection({ section }) {
   if (!section) return null;
 
@@ -141,7 +176,7 @@ export default function HeroSection({ section }) {
 
   return (
     <section
-      className={`hero ${alignClass(section)}`}
+      className={`hero ${alignClass(section)} ${scrollClasses(section)}`.trim()}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -188,7 +223,15 @@ export default function HeroSection({ section }) {
 
       {scrollText && (
         <div className="hero__scroll">
-          <span className="hero__scroll-text">{scrollText}</span>
+          <span
+            className={
+              /<(strong|b)\b/i.test(scrollText)
+                ? 'hero__scroll-text hero__scroll-text--mixed'
+                : 'hero__scroll-text'
+            }
+          >
+            {scrollLabel(scrollText)}
+          </span>
           <ChevronsDownIcon className="hero__scroll-icon" />
         </div>
       )}
