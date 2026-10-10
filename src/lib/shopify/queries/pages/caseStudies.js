@@ -1,4 +1,8 @@
-import { bannerSectionFragment, deliveredSectionFragment } from '../sections';
+import {
+  heroSectionFragment,
+  bannerSectionFragment,
+  deliveredSectionFragment,
+} from '../sections';
 
 // Case Studies page content. Same shape as the home and services pages: a
 // `content` metaobject with one reference field per component slot, and the
@@ -51,17 +55,20 @@ export const getCaseStudiesPageQuery = /* GraphQL */ `
     value
     reference {
       __typename
+      ...HeroSectionFields
       ...BannerSectionFields
       ...DeliveredSectionFields
     }
     references(first: 20) {
       nodes {
         __typename
+        ...HeroSectionFields
         ...BannerSectionFields
         ...DeliveredSectionFields
       }
     }
   }
+  ${heroSectionFragment}
   ${bannerSectionFragment}
   ${deliveredSectionFragment}
 `;

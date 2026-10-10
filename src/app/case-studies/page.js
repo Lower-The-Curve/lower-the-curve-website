@@ -1,4 +1,7 @@
 import { getCaseStudiesPage } from '@/lib/shopify';
+import HeroSection, {
+  HERO_SECTION_TYPE,
+} from '@/components/sections/HeroSection/HeroSection';
 import BannerSection, {
   BANNER_TYPE,
 } from '@/components/sections/BannerSection/BannerSection';
@@ -46,6 +49,8 @@ export default async function CaseStudiesPage() {
     <main className="case-studies-page">
       {sections.map((section) => {
         switch (section.type) {
+          case HERO_SECTION_TYPE:
+            return <HeroSection key={section.id} section={section} />;
           case BANNER_TYPE:
             return <BannerSection key={section.id} section={section} />;
           case DELIVERED_TYPE:
