@@ -43,6 +43,30 @@
   pointer-events: none;
 }
 
+/* glow = Blue. Figma: 291.34 circle, left 1229.89 rotated -38.47° (Figma's
+   left/top is the rotated corner, so the centre lands at x ≈ 1435 of 1440 and
+   ~140px runs off the right edge), top ~67, brand gradient, layer blur 20.1
+   (≈ CSS 10px). Anchored to the cards, not the viewport: its left edge sits
+   ~39px (0.134 × size) inside the right card at every width. */
+.feature-cards__glow--blue {
+  --glow-size: clamp(112px, 20.23vw, 291.34px);
+  left: auto;
+  bottom: auto;
+  top: clamp(26px, 4.65vw, 67px);
+  right: calc(
+    (100% - min(100%, var(--max-width))) / 2 + var(--space) -
+      var(--glow-size) * 0.866
+  );
+  /* Light at the top, dark at the bottom, as in Figma. */
+  background: linear-gradient(
+    180deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  opacity: 1;
+  filter: blur(clamp(4px, 0.7vw, 10px));
+}
+
 .feature-cards__title {
   width: 100%;
   max-width: 780px;

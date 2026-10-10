@@ -108,16 +108,19 @@
 .banner--story .banner__title {
   grid-column: 1;
   grid-row: 1;
+  /* Figma "Our Story": 32/40, Regular with a SemiBold accent. */
+  font-size: var(--fs-heading-md);
+  line-height: 1.25;
+}
+
+.banner--story .banner__accent {
+  font-weight: 600;
 }
 
 .banner--story .banner__copy,
 .banner--story .banner__highlights,
 .banner--story .banner__button {
   grid-column: 2;
-}
-
-.banner--story .banner__accent {
-  font-style: italic;
 }
 
 .banner__highlights {
