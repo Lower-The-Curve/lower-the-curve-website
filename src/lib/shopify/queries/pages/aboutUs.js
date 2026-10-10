@@ -1,4 +1,6 @@
 import {
+  heroSectionFragment,
+  bannerSectionFragment,
   featureCardsSectionFragment,
   statsGridSectionFragment,
   teamSectionFragment,
@@ -38,6 +40,8 @@ export const getAboutUsPageQuery = `
     value
     reference {
       __typename
+      ...HeroSectionFields
+      ...BannerSectionFields
       ...FeatureCardsSectionFields
       ...StatsGridSectionFields
       ...TeamSectionFields
@@ -45,12 +49,16 @@ export const getAboutUsPageQuery = `
     references(first: 20) {
       nodes {
         __typename
+        ...HeroSectionFields
+        ...BannerSectionFields
         ...FeatureCardsSectionFields
         ...StatsGridSectionFields
         ...TeamSectionFields
       }
     }
   }
+  ${heroSectionFragment}
+  ${bannerSectionFragment}
   ${featureCardsSectionFragment}
   ${statsGridSectionFragment}
   ${teamSectionFragment}

@@ -1,4 +1,10 @@
 import { getAboutUsPage } from '@/lib/shopify';
+import HeroSection, {
+  HERO_SECTION_TYPE,
+} from '@/components/sections/HeroSection/HeroSection';
+import BannerSection, {
+  BANNER_TYPE,
+} from '@/components/sections/BannerSection/BannerSection';
 import FeatureCardsSection, {
   FEATURE_CARDS_TYPE,
 } from '@/components/sections/FeatureCardsSection/FeatureCardsSection';
@@ -42,6 +48,10 @@ export default async function AboutUsPage() {
     <main className="about-us-page">
       {sections.map((section) => {
         switch (section.type) {
+          case HERO_SECTION_TYPE:
+            return <HeroSection key={section.id} section={section} />;
+          case BANNER_TYPE:
+            return <BannerSection key={section.id} section={section} />;
           case FEATURE_CARDS_TYPE:
             return <FeatureCardsSection key={section.id} section={section} />;
           case STATS_GRID_TYPE:
