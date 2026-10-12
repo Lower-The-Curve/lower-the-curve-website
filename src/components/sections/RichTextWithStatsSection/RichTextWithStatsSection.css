@@ -394,6 +394,159 @@
   }
 }
 
+/* Backdrop art (background_svg / green_glow) behind the image.  */
+.rich-text-with-stats--backdrop-art {
+  --art-w: 100%;
+  overflow-x: clip;
+}
+
+.rich-text-with-stats__vector {
+  position: absolute;
+  top: 40.5%;
+  left: calc(var(--art-w) * 0.012);
+  width: calc(var(--art-w) * 0.865);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 776 / 194;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.rich-text-with-stats__glow {
+  position: absolute;
+  top: 27%;
+  left: calc(var(--art-w) * 0.126);
+  width: calc(var(--art-w) * 0.223);
+  height: 10%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.rich-text-with-stats__glow {
+  filter: blur(13px);
+}
+
+.rich-text-with-stats__vector {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%);
+}
+
+
+@media (max-width: 1024px) {
+  .rich-text-with-stats--backdrop-art {
+    --art-w: 96.9vw;
+  }
+
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__media {
+    margin-left: calc(10.5vw - var(--space));
+    margin-top: 3px;
+  }
+
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__image {
+    width: calc(var(--art-w) * 0.781);
+    max-width: none;
+    -webkit-mask-image: linear-gradient(to left, transparent, #000 7%);
+    mask-image: linear-gradient(to left, transparent, #000 7%);
+  }
+
+  .rich-text-with-stats__glow {
+    filter: blur(1.3vw);
+  }
+
+  
+  .rich-text-with-stats__vector {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%);
+    mask-image: linear-gradient(to bottom, transparent, #000 10%);
+  }
+}
+
+/* image_position = Left with backdrop art: the same composition at the same
+   size as Right, moved into the left column — shifted so its right-most
+   point (the ellipse tip, 0.877 of the box) meets the column's inner edge,
+   which lets it run off the left page edge the way Right runs off the
+   right. --art-x is that shift; every left offset in the art adds it. */
+@media (min-width: 1025px) {
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .rich-text-with-stats--backdrop-art:not(.rich-text-with-stats--media-right) {
+    --art-x: calc(100% - var(--art-w) * 0.877);
+  }
+
+  .rich-text-with-stats--backdrop-art:not(.rich-text-with-stats--media-right)
+    .rich-text-with-stats__image {
+    margin-left: var(--art-x);
+  }
+
+  .rich-text-with-stats--backdrop-art:not(.rich-text-with-stats--media-right)
+    .rich-text-with-stats__vector {
+    left: calc(var(--art-x) + var(--art-w) * 0.012);
+  }
+
+  .rich-text-with-stats--backdrop-art:not(.rich-text-with-stats--media-right)
+    .rich-text-with-stats__glow {
+    left: calc(var(--art-x) + var(--art-w) * 0.126);
+  }
+}
+
+@media (min-width: 1025px) {
+  .rich-text-with-stats--backdrop-art {
+    --art-w: min(
+      153.6%,
+      calc(
+        (100% + (100vw - min(100vw, var(--max-width))) / 2 + var(--space) -
+            16px) / 0.781
+      )
+    );
+  }
+
+
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__image {
+    width: calc(var(--art-w) * 0.781);
+    max-width: none;
+    -webkit-mask-image: linear-gradient(to left, transparent, #000 7%);
+    mask-image: linear-gradient(to left, transparent, #000 7%);
+  }
+}
+
+/* image_position = Right on the arch layout (Services): the same design
+   mirrored — identical column sizes (copy 7fr, laptop 5fr), the laptop's
+   12px nudge goes towards the right page edge instead, and the arch is
+   anchored to the right of the row so it sits behind the laptop. */
+@media (min-width: 1025px) {
+  .rich-text-with-stats--figma-art.rich-text-with-stats--media-right
+    .rich-text-with-stats__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .rich-text-with-stats--figma-art.rich-text-with-stats--media-right
+    .rich-text-with-stats__art-stage {
+    transform: translate(
+      calc(-1 * var(--figma-mac-offset-x)),
+      var(--figma-mac-offset-y)
+    );
+  }
+
+  .rich-text-with-stats--figma-art.rich-text-with-stats--media-right
+    .rich-text-with-stats__backdrop {
+    left: auto;
+    right: 0;
+    transform-origin: 100% 100%;
+  }
+}
+
+/* image_position = Right: copy left, media right, equal columns. */
+@media (min-width: 1025px) {
+  .rich-text-with-stats--media-right .rich-text-with-stats__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .rich-text-with-stats--media-right .rich-text-with-stats__media {
+    order: 2;
+  }
+}
+
 @media (max-width: 1024px) {
   .rich-text-with-stats--has-media .rich-text-with-stats__inner,
   .rich-text-with-stats--has-media.rich-text-with-stats--with-stats

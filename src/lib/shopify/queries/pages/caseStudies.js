@@ -2,6 +2,7 @@ import {
   heroSectionFragment,
   bannerSectionFragment,
   deliveredSectionFragment,
+  richTextWithStatsSectionFragment,
 } from '../sections';
 
 // Case Studies page content. Same shape as the home and services pages: a
@@ -58,6 +59,7 @@ export const getCaseStudiesPageQuery = /* GraphQL */ `
       ...HeroSectionFields
       ...BannerSectionFields
       ...DeliveredSectionFields
+      ...RichTextWithStatsSectionFields
     }
     references(first: 20) {
       nodes {
@@ -65,10 +67,12 @@ export const getCaseStudiesPageQuery = /* GraphQL */ `
         ...HeroSectionFields
         ...BannerSectionFields
         ...DeliveredSectionFields
+        ...RichTextWithStatsSectionFields
       }
     }
   }
   ${heroSectionFragment}
   ${bannerSectionFragment}
   ${deliveredSectionFragment}
+  ${richTextWithStatsSectionFragment}
 `;

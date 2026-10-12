@@ -8,6 +8,9 @@ import BannerSection, {
 import DeliveredSection, {
   DELIVERED_TYPE,
 } from '@/components/sections/DeliveredSection/DeliveredSection';
+import RichTextWithStatsSection, {
+  RICH_TEXT_WITH_STATS_TYPE,
+} from '@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection';
 import './page.css';
 
 export const metadata = {
@@ -55,6 +58,10 @@ export default async function CaseStudiesPage() {
             return <BannerSection key={section.id} section={section} />;
           case DELIVERED_TYPE:
             return <DeliveredSection key={section.id} section={section} />;
+          case RICH_TEXT_WITH_STATS_TYPE:
+            return (
+              <RichTextWithStatsSection key={section.id} section={section} />
+            );
           default:
             return null;
         }
