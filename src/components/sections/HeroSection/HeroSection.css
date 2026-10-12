@@ -17,6 +17,7 @@
      section rendered without the fields set at all. */
   margin-top: var(--hero-margin-top, 0px);
   margin-bottom: var(--hero-margin-bottom, 0px);
+  --hero-side-inset: 58px;
   /* The artwork reaches up under the header, so the section only needs the rest
      of the first screen. svh keeps mobile browser chrome from adding a scroll.
 
@@ -45,7 +46,7 @@
      taking it out of flow, so it can never overlap the headline on a short
      viewport. */
   grid-template-rows: 1fr auto;
-  padding: 0 var(--space) 3rem;
+  padding: 0 var(--hero-side-inset) 3rem;
 }
 
 /* --- BACKDROP -----------------------------------------------------------
@@ -77,8 +78,6 @@
   grid-row: 1;
   align-self: center;
   width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -95,6 +94,22 @@
      design's three-line break ("Let’s Launch a / Shopify Store / with us")
      holds at 64px, 52px and 40px without a media query. */
   max-width: 13ch;
+}
+
+.hero__title--sentences {
+  max-width: none;
+}
+
+.hero__title-line {
+  display: block;
+}
+
+@media (max-width: 575px) {
+  .hero__title--sentences {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
+  }
 }
 
 /* The accented runs in the headline. The weight lives on .hero__accent rather than on
@@ -173,14 +188,13 @@
 .hero__scroll {
   grid-row: 2;
   width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  /* Colours the label only — the chevrons below carry their own brand gradient
-     rather than inheriting currentColor. */
+  /* The blue default, from `scroll_color`'s "Blue" (or an empty field). Only
+     the white modifier below changes this; the chevrons carry their own brand
+     gradient and don't inherit it. */
   color: var(--color-brand);
 }
 
@@ -198,26 +212,43 @@
   display: block;
 }
 
-/* --- CONTENT ALIGNMENT --------------------------------------------------
-   Driven by the metaobject's `content_align` field. The measure wrappers stay
-   centred on the page either way; only the text inside them moves.
+/* --- ALIGNMENT ----------------------------------------------------------
+   Two independent authored alignments. `content_align` moves the headline and
+   description; `scroll_align` moves the scroll cue on its own. The wrappers
+   fill the section's padded box either way; only their contents move.
    ---------------------------------------------------------------------- */
-.hero--align-center .hero__content,
-.hero--align-center .hero__scroll {
+.hero--align-center .hero__content {
   align-items: center;
   text-align: center;
 }
 
-.hero--align-left .hero__content,
-.hero--align-left .hero__scroll {
+.hero--align-left .hero__content {
   align-items: flex-start;
   text-align: left;
 }
 
-.hero--align-right .hero__content,
-.hero--align-right .hero__scroll {
+.hero--align-right .hero__content {
   align-items: flex-end;
   text-align: right;
+}
+
+.hero--scroll-align-center .hero__scroll {
+  align-items: center;
+  text-align: center;
+}
+
+.hero--scroll-align-left .hero__scroll {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero--scroll-align-right .hero__scroll {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hero--scroll-color-white .hero__scroll {
+  color: #ffffff;
 }
 
 /* --- MOBILE (<= 575px) --------------------------------------------------
@@ -244,6 +275,7 @@
 @media (max-width: 575px) {
   .hero {
     --hero-fold-gutter: 2rem;
+    --hero-side-inset: var(--space);
     /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
        tight under the headline — this gives the gutter back to the content. */
     padding-bottom: 2rem;

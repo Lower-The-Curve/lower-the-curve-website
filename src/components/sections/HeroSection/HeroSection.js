@@ -7,13 +7,19 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //
 // Its GraphQL fragment lives in lib/shopify/queries/sections/hero.js. Every
 // field on the definition comes through that one selection:
-//   title                -> single_line_text_field, the headline
+//   title                -> single_line_text_field, the headline; more than one
+//                           sentence renders one sentence per line
 //   description          -> multi_line_text_field, optional lede under it
 //   image                -> file_reference, the full-bleed background artwork
 //   image_mobile         -> file_reference, an optional phone-shaped counterpart
 //                           to `image`; see mobileImage below for what happens
 //                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
+//   scroll_align         -> single_line_text_field, "Left" | "Center" | "Right";
+//                           the scroll cue's alignment, separate from
+//                           content_align's; empty follows content_align
+//   scroll_color         -> single_line_text_field, "Blue" | "White"; the cue's
+//                           colour, label and chevrons alike
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
@@ -66,6 +72,25 @@ function alignClass(section) {
   return ALIGN_CLASSES[authored] ?? ALIGN_CLASSES.center;
 }
 
+const SCROLL_ALIGN_CLASSES = {
+  left: 'hero--scroll-align-left',
+  center: 'hero--scroll-align-center',
+  right: 'hero--scroll-align-right',
+};
+
+function scrollAlignClass(section) {
+  const authored = fieldValue(
+    section,
+    'scroll_align',
+    'content_align'
+  )?.trim().toLowerCase();
+  return SCROLL_ALIGN_CLASSES[authored] ?? SCROLL_ALIGN_CLASSES.center;
+}
+
+function isWhiteScroll(section) {
+  return fieldValue(section, 'scroll_color')?.trim().toLowerCase() === 'white';
+}
+
 // The design accents part of the headline — a green run and a blue one — and
 // those runs are also the only bold text in it, against a regular-weight
 // heading. Which words they are is editorial, so it's authored in the metafield
@@ -78,6 +103,7 @@ function alignClass(section) {
 // Only <span> carrying a class in the map below produces an element, so a stray
 // tag or a pasted <script> can't turn into markup. A title with no spans renders
 // as plain text, and an unrecognised class keeps its words but drops the accent.
+
 const ACCENT_CLASSES = {
   'green-gradient': 'hero__accent--green',
   'blue-gradient': 'hero__accent--blue',
@@ -86,12 +112,47 @@ const ACCENT_CLASSES = {
 const ACCENT_SPAN =
   /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>/gi;
 
-function accentedTitle(title) {
-  const parts = [];
+const SENTENCE_BREAK = /[.!?](?:<\/span>)?\s+/;
+
+const SENTENCE_SPLIT = /([.!?])\s+/g;
+
+function hasSentenceBreak(title) {
+  return SENTENCE_BREAK.test(title);
+}
+
+function titleSentenceLines(title) {
+  const lines = [];
+  let line = [];
   let cursor = 0;
+  let atSentenceEnd = false;
+
+  const endLine = () => {
+    if (line.length) lines.push(line);
+    line = [];
+  };
+
+  const pushText = (text) => {
+    if (atSentenceEnd && /^\s/.test(text)) {
+      endLine();
+      text = text.replace(/^\s+/, '');
+      atSentenceEnd = false;
+    }
+
+    let last = 0;
+    for (const match of text.matchAll(SENTENCE_SPLIT)) {
+      line.push(text.slice(last, match.index + 1));
+      endLine();
+      last = match.index + match[0].length;
+    }
+
+    const tail = text.slice(last);
+    if (tail) line.push(tail);
+
+    atSentenceEnd = /[.!?]\s*$/.test(text);
+  };
 
   for (const match of title.matchAll(ACCENT_SPAN)) {
-    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+    if (match.index > cursor) pushText(title.slice(cursor, match.index));
 
     // Tolerates extra classes on the span (`class="green-gradient wide"`).
     const accent = match[1]
@@ -99,7 +160,7 @@ function accentedTitle(title) {
       .map((name) => ACCENT_CLASSES[name])
       .find(Boolean);
 
-    parts.push(
+    line.push(
       accent ? (
         <span key={match.index} className={`hero__accent ${accent}`}>
           {match[2]}
@@ -109,11 +170,22 @@ function accentedTitle(title) {
       )
     );
 
+    atSentenceEnd = /[.!?]\s*$/.test(match[2]);
+
     cursor = match.index + match[0].length;
   }
 
-  if (cursor < title.length) parts.push(title.slice(cursor));
-  return parts;
+  if (cursor < title.length) pushText(title.slice(cursor));
+  endLine();
+  return lines;
+}
+
+function accentedTitle(title) {
+  return titleSentenceLines(title).map((parts, i) => (
+    <span key={i} className="hero__title-line">
+      {parts}
+    </span>
+  ));
 }
 
 export default function HeroSection({ section }) {
@@ -138,10 +210,14 @@ export default function HeroSection({ section }) {
     'scroll_botttom_text',
     'scroll_bottom_text'
   );
+  
+  const whiteScroll = isWhiteScroll(section);
 
   return (
     <section
-      className={`hero ${alignClass(section)}`}
+      className={`hero ${alignClass(section)} ${scrollAlignClass(section)}${
+        whiteScroll ? ' hero--scroll-color-white' : ''
+      }`}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -182,14 +258,25 @@ export default function HeroSection({ section }) {
       )}
 
       <div className="hero__content">
-        {title && <h1 className="hero__title">{accentedTitle(title)}</h1>}
+        {title && (
+          <h1
+            className={`hero__title${
+              hasSentenceBreak(title) ? ' hero__title--sentences' : ''
+            }`}
+          >
+            {accentedTitle(title)}
+          </h1>
+        )}
         {description && <p className="hero__description">{description}</p>}
       </div>
 
       {scrollText && (
         <div className="hero__scroll">
           <span className="hero__scroll-text">{scrollText}</span>
-          <ChevronsDownIcon className="hero__scroll-icon" />
+          <ChevronsDownIcon
+            className="hero__scroll-icon"
+            gradient={!whiteScroll}
+          />
         </div>
       )}
     </section>

@@ -18,7 +18,10 @@
 //
 // Note the gradient runs dark-on-the-RIGHT (x1 is the larger x), matching the
 // hero headline's blue accent rather than the buttons' dark-on-left order.
-export default function ChevronsDownIcon({ className }) {
+
+export default function ChevronsDownIcon({ className, gradient = true }) {
+  const stroke = gradient ? 'url(#ltcChevronGradient)' : 'currentColor';
+
   return (
     <svg
       className={className}
@@ -32,38 +35,40 @@ export default function ChevronsDownIcon({ className }) {
     >
       <path
         d="M22.5 35.5L12.5 45.5L2.5 35.5"
-        stroke="url(#ltcChevronGradient)"
+        stroke={stroke}
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M22.5 19L12.5 29L2.5 19"
-        stroke="url(#ltcChevronGradient)"
+        stroke={stroke}
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M22.5 2.5L12.5 12.5L2.5 2.5"
-        stroke="url(#ltcChevronGradient)"
+        stroke={stroke}
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <defs>
-        <linearGradient
-          id="ltcChevronGradient"
-          x1="24.0625"
-          y1="24"
-          x2="2.82864"
-          y2="24"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="var(--color-brand-dark)" />
-          <stop offset="1" stopColor="var(--color-brand)" />
-        </linearGradient>
-      </defs>
+      {gradient && (
+        <defs>
+          <linearGradient
+            id="ltcChevronGradient"
+            x1="24.0625"
+            y1="24"
+            x2="2.82864"
+            y2="24"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="var(--color-brand-dark)" />
+            <stop offset="1" stopColor="var(--color-brand)" />
+          </linearGradient>
+        </defs>
+      )}
     </svg>
   );
 }
