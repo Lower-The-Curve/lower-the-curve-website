@@ -65,12 +65,21 @@
   pointer-events: none;
 }
 
-/* `cover` rather than `contain`: the artwork is a soft gradient wash with no
-   detail to protect, so filling the screen matters more than showing all of it.
+/* `cover` on phones and tablets: the artwork is a soft gradient wash with no
+   detail to protect, so filling the screen matters more than showing all of it,
+   and the mobile design wants the blobs large and bleeding off the edges.
    Anchored to the top, which is where the blobs that frame the header live. */
 .hero__image {
   object-fit: cover;
   object-position: center top;
+}
+
+
+@media (min-width: 1025px) {
+  .hero__image--portrait {
+    object-fit: none;
+    object-position: calc(100% - 53.21px) center;
+  }
 }
 
 /* --- CONTENT ------------------------------------------------------------ */

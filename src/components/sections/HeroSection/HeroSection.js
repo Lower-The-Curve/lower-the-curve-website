@@ -205,6 +205,7 @@ export default function HeroSection({ section }) {
   // If setting it has no effect, check the field is published to the Storefront
   // API rather than assuming the key is wrong.
   const mobileImage = imageFrom(section, 'image_mobile', 'mobile_image');
+  const portraitArt = Number(image?.width) < Number(image?.height);
   const scrollText = fieldValue(
     section,
     'scroll_botttom_text',
@@ -239,7 +240,9 @@ export default function HeroSection({ section }) {
             fill
             sizes="100vw"
             priority
-            className={`hero__image ${mobileImage ? 'hero__image--wide' : ''}`}
+            className={`hero__image${
+              mobileImage ? ' hero__image--wide' : ''
+            }${portraitArt ? ' hero__image--portrait' : ''}`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
 
