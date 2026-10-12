@@ -363,8 +363,8 @@
 
   .app-cards__card-title,
   .app-cards__card-description {
-    font-size: 8px;
-    line-height: 10px;
+    font-size: 10px;
+    line-height: 12px;
   }
 }
 
