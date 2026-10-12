@@ -796,3 +796,24 @@
   -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 76%);
   mask-image: linear-gradient(to bottom, #000 62%, transparent 76%);
 }
+
+/* Backdrop-art entries (Growth): a CMS-authored phone-only break,
+   `<br class="rich-text-with-stats__break--phone">`, shows on phones only. */
+@media (max-width: 575px) {
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__break--phone {
+    display: revert;
+  }
+}
+
+/* Tablet and phone: centre the backdrop-art composition (laptop image +
+   vector, which together span art-w × 0.877) in the column. */
+@media (max-width: 1024px) {
+  .rich-text-with-stats--backdrop-art .rich-text-with-stats__media {
+    margin-left: calc((100% - var(--art-w) * 0.877) / 2);
+  }
+}
+
+/* Growth entry: a little more room before the next section. */
+.rich-text-with-stats--backdrop-art {
+  margin-bottom: 24px;
+}

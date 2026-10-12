@@ -306,6 +306,38 @@
     padding-bottom: 2rem;
   }
 
+  /* `content_position_mobile` — "Top …": the headline sits under the header,
+     as in the Figma mobile frame, and the free space falls between it and the
+     scroll cue instead of above it. The gap scales with the screen height. */
+  .hero--mobile-top .hero__content {
+    align-self: start;
+    padding-top: 12svh;
+  }
+
+  /* "Top Left" sits a little lower than "Top Center". */
+  .hero--mobile-top.hero--mobile-align-left .hero__content {
+    padding-top: 15svh;
+  }
+
+  /* "Center …": still centred, but nudged a bit above the true middle.
+     Bottom padding shifts the centred block up by half its value. */
+  .hero--mobile-center .hero__content {
+    padding-bottom: 10svh;
+  }
+
+  /* "… Left | Center": headline only; the scroll cue keeps its own
+     alignment. `.hero` doubled up so these beat the desktop content_align
+     rules regardless of source order. */
+  .hero.hero--mobile-align-left .hero__content {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero.hero--mobile-align-center .hero__content {
+    align-items: center;
+    text-align: center;
+  }
+
   /* The landscape artwork is cropped hard on a phone: it zooms in (so the
      grain reads much stronger) and loses its own soft bottom, ending in a
      hard line. Softened here so it sits like the desktop hero; a dedicated

@@ -17,6 +17,9 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
 //   scroll_align         -> optional "Left" | "Center" | "Right"; empty follows content_align
 //   scroll_color         -> optional "Blue" | "White"; empty is Blue
+//   content_position_mobile -> optional choice list, phones only (≤575px):
+//                           "Top Left" | "Top Center" | "Center Left" |
+//                           "Center Center". Empty keeps the desktop placement
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
 export const HERO_SECTION_TYPE = 'hero_section';
@@ -76,6 +79,32 @@ function scrollClasses(section) {
     ALIGN_CLASSES[align] && `hero--scroll-${align}`,
     color === 'white' && 'hero--scroll-white',
   ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Phone-only placement of the headline block, from `content_position_mobile`:
+// "Top Left" | "Top Center" | "Center Left" | "Center Center" (any casing).
+// The first word is the vertical position, the second the text alignment.
+// Only the headline moves — the scroll cue keeps its own alignment. Empty or
+// unrecognised values leave the desktop behaviour.
+const MOBILE_VERTICAL = {
+  top: 'hero--mobile-top',
+  center: 'hero--mobile-center',
+};
+const MOBILE_ALIGN = {
+  left: 'hero--mobile-align-left',
+  center: 'hero--mobile-align-center',
+};
+
+function mobilePositionClasses(section) {
+  const [vertical, horizontal] = (
+    fieldValue(section, 'content_position_mobile') ?? ''
+  )
+    .trim()
+    .toLowerCase()
+    .split(/\s+/);
+  return [MOBILE_VERTICAL[vertical], MOBILE_ALIGN[horizontal]]
     .filter(Boolean)
     .join(' ');
 }
@@ -183,9 +212,15 @@ export default function HeroSection({ section, fadeBottom = false }) {
 
   return (
     <section
-      className={`hero ${alignClass(section)} ${scrollClasses(section)} ${
-        fadeBottom ? 'hero--fade-bottom' : ''
-      }`.trim()}
+      className={[
+        'hero',
+        alignClass(section),
+        scrollClasses(section),
+        mobilePositionClasses(section),
+        fadeBottom && 'hero--fade-bottom',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
