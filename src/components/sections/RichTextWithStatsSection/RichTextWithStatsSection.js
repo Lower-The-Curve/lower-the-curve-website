@@ -167,17 +167,24 @@ export default function RichTextWithStatsSection({ section }) {
         <div className="rich-text-with-stats__inner">
           {image && (
             <div className="rich-text-with-stats__media">
-              {backgroundSvg && (
-                <Image
-                  src={backgroundSvg}
-                  alt=""
-                  width={900}
-                  height={180}
-                  className="rich-text-with-stats__vector"
-                  aria-hidden="true"
-                  unoptimized
-                />
-              )}
+              {/* The ellipse twice: a blurred copy for its upper part (under
+                  Figma's blur layer) and the sharp one for its lower part. */}
+              {backgroundSvg &&
+                [
+                  'rich-text-with-stats__vector rich-text-with-stats__vector--soft',
+                  'rich-text-with-stats__vector',
+                ].map((className) => (
+                  <Image
+                    key={className}
+                    src={backgroundSvg}
+                    alt=""
+                    width={900}
+                    height={180}
+                    className={className}
+                    aria-hidden="true"
+                    unoptimized
+                  />
+                ))}
               {greenGlow && (
                 <Image
                   src={greenGlow}

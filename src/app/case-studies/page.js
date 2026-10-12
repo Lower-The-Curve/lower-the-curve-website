@@ -53,7 +53,9 @@ export default async function CaseStudiesPage() {
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
-            return <HeroSection key={section.id} section={section} />;
+            return (
+              <HeroSection key={section.id} section={section} fadeBottom />
+            );
           case BANNER_TYPE:
             return <BannerSection key={section.id} section={section} />;
           case DELIVERED_TYPE:

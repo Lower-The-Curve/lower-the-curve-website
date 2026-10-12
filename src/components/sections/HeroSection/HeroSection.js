@@ -98,7 +98,7 @@ const ACCENT_CLASSES = {
 };
 
 const ACCENT_SPAN =
-  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>/gi;
+  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
 
 function accentedTitle(title) {
   const parts = [];
@@ -106,6 +106,13 @@ function accentedTitle(title) {
 
   for (const match of title.matchAll(ACCENT_SPAN)) {
     if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+
+    // <br>: an authored line break.
+    if (match[1] === undefined) {
+      parts.push(<br key={match.index} />);
+      cursor = match.index + match[0].length;
+      continue;
+    }
 
     // Tolerates extra classes on the span (`class="green-gradient wide"`).
     const accent = match[1]
@@ -151,7 +158,7 @@ function scrollLabel(text) {
   return parts;
 }
 
-export default function HeroSection({ section }) {
+export default function HeroSection({ section, fadeBottom = false }) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
@@ -176,7 +183,9 @@ export default function HeroSection({ section }) {
 
   return (
     <section
-      className={`hero ${alignClass(section)} ${scrollClasses(section)}`.trim()}
+      className={`hero ${alignClass(section)} ${scrollClasses(section)} ${
+        fadeBottom ? 'hero--fade-bottom' : ''
+      }`.trim()}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -217,7 +226,17 @@ export default function HeroSection({ section }) {
       )}
 
       <div className="hero__content">
-        {title && <h1 className="hero__title">{accentedTitle(title)}</h1>}
+        {title && (
+          <h1
+            className={
+              /<br\s*\/?>/i.test(title)
+                ? 'hero__title hero__title--manual'
+                : 'hero__title'
+            }
+          >
+            {accentedTitle(title)}
+          </h1>
+        )}
         {description && <p className="hero__description">{description}</p>}
       </div>
 

@@ -46,17 +46,14 @@
 /* glow = Blue. Figma: 291.34 circle, left 1229.89 rotated -38.47° (Figma's
    left/top is the rotated corner, so the centre lands at x ≈ 1435 of 1440 and
    ~140px runs off the right edge), top ~67, brand gradient, layer blur 20.1
-   (≈ CSS 10px). Anchored to the cards, not the viewport: its left edge sits
-   ~39px (0.134 × size) inside the right card at every width. */
+   (≈ CSS 10px). Anchored to the page's right edge like the green glow is to
+   the left, so on wider screens it moves out to the side with it. */
 .feature-cards__glow--blue {
   --glow-size: clamp(112px, 20.23vw, 291.34px);
   left: auto;
   bottom: auto;
   top: clamp(26px, 4.65vw, 67px);
-  right: calc(
-    (100% - min(100%, var(--max-width))) / 2 + var(--space) -
-      var(--glow-size) * 0.866
-  );
+  right: calc(var(--glow-size) * -0.48);
   /* Light at the top, dark at the bottom, as in Figma. */
   background: linear-gradient(
     180deg,
@@ -249,5 +246,15 @@
 
   .feature-cards__description {
     line-height: 16px;
+  }
+}
+
+/* Mobile Figma: the blue circle sits by the last card on the right edge,
+   about half of it off screen. After the base rule so it wins. */
+@media (max-width: 575px) {
+  .feature-cards__glow--blue {
+    top: auto;
+    bottom: calc(var(--pad-bottom) - var(--glow-size) * 0.35);
+    right: calc(var(--glow-size) * -0.55);
   }
 }

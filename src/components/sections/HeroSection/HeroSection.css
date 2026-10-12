@@ -64,6 +64,15 @@
   pointer-events: none;
 }
 
+/* Opt-in per page (the `fadeBottom` prop — Case Studies). Figma's 1440×528
+   white "background blur adjustment layer" across the hero's bottom: the
+   artwork dissolves into the next section's white instead of meeting it in a
+   hard line. */
+.hero--fade-bottom .hero__backdrop {
+  -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent);
+  mask-image: linear-gradient(to bottom, #000 65%, transparent);
+}
+
 /* `cover` rather than `contain`: the artwork is a soft gradient wash with no
    detail to protect, so filling the screen matters more than showing all of it.
    Anchored to the top, which is where the blobs that frame the header live. */
@@ -95,6 +104,11 @@
      design's three-line break ("Let’s Launch a / Shopify Store / with us")
      holds at 64px, 52px and 40px without a media query. */
   max-width: 13ch;
+}
+
+/* Authored <br>s set the lines, so the measure is dropped. */
+.hero__title--manual {
+  max-width: none;
 }
 
 /* The accented runs in the headline. The weight lives on .hero__accent rather than on
@@ -290,6 +304,16 @@
     /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
        tight under the headline — this gives the gutter back to the content. */
     padding-bottom: 2rem;
+  }
+
+  /* The landscape artwork is cropped hard on a phone: it zooms in (so the
+     grain reads much stronger) and loses its own soft bottom, ending in a
+     hard line. Softened here so it sits like the desktop hero; a dedicated
+     `image_mobile` export is still the proper fix. */
+  .hero--fade-bottom .hero__backdrop {
+    opacity: 0.7;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
   }
 }
 
