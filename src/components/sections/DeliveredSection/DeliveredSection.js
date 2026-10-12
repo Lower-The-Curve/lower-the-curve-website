@@ -58,8 +58,10 @@ function pathOf(url) {
 
   try {
     return (
-      new URL(url, "https://placeholder.invalid").pathname.replace(/\/+$/, "") ||
-      "/"
+      new URL(url, "https://placeholder.invalid").pathname.replace(
+        /\/+$/,
+        "",
+      ) || "/"
     );
   } catch {
     return null;
@@ -186,7 +188,7 @@ function CardShell({ href, hasCta, children }) {
   );
 }
 
-function DeliveredCardItem({ card, linkLabel, solidCta, order }) {
+function DeliveredCardItem({ card, linkLabel, solidCta, order, blueGlow }) {
   const cardTitle = fieldValue(card, "title");
   const cardDescription = fieldValue(card, "description");
   const url = fieldValue(card, "url", "link");
@@ -195,6 +197,17 @@ function DeliveredCardItem({ card, linkLabel, solidCta, order }) {
 
   return (
     <li className="delivered__item" style={{ order }}>
+      {blueGlow?.image && (
+        <Image
+          src={blueGlow.image.url}
+          alt=""
+          width={blueGlow.image.width ?? 300}
+          height={blueGlow.image.height ?? 300}
+          className="delivered__blue-glow"
+          aria-hidden="true"
+          unoptimized
+        />
+      )}
       <CardShell href={url} hasCta={Boolean(url && linkLabel)}>
         <div className="delivered__preview">
           {image && (
@@ -298,17 +311,6 @@ export default function DeliveredSection({ section, allCards, partner }) {
           unoptimized
         />
       )}
-      {blueGlow?.image && (
-        <Image
-          src={blueGlow.image.url}
-          alt=""
-          width={blueGlow.image.width ?? 300}
-          height={blueGlow.image.height ?? 300}
-          className="delivered__blue-glow"
-          aria-hidden="true"
-          unoptimized
-        />
-      )}
       <div className="delivered__inner">
         {(title || description) && (
           <div className="delivered__intro">
@@ -335,6 +337,7 @@ export default function DeliveredSection({ section, allCards, partner }) {
                   linkLabel={linkLabel}
                   solidCta={solidCta}
                   order={index}
+                  blueGlow={index === cards.length - 1 ? blueGlow : null}
                 />
               ))}
             </ul>
