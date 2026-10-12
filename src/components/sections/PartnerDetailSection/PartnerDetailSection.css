@@ -165,6 +165,18 @@
   }
 }
 @media (max-width: 575px) {
+  .partner-detail__tags {
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    max-width: 100%;
+  }
+  .partner-detail__tag {
+    flex-shrink: 1;
+    min-width: 0;
+    padding: 0.375rem 0.625rem;
+    white-space: normal;
+    text-align: center;
+  }
   .partner-detail__media {
     width: 140%;
     margin-left: -45.8%;
