@@ -8,13 +8,30 @@ import ProjectRouteSection, {
 import RichTextWithStatsSection, {
   RICH_TEXT_WITH_STATS_TYPE,
 } from "@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection";
+import SolutionsSection, {
+  SOLUTIONS_TYPE,
+} from "@/components/sections/SolutionsSection/SolutionsSection";
+import CaseStudiesSection, {
+  CASE_STUDIES_TYPE,
+} from "@/components/sections/CaseStudiesSection/CaseStudiesSection";
 import "./page.css";
 
 export const metadata = {
   title: "Services",
 };
 
-const COMPONENT_SLOTS = ["sections", "component3", "component6"];
+// The services `content` entry's component slots, in the order the admin shows
+// them (Component 1 … Component 6). The query aliases the live field keys onto
+// these names — see queries/pages/services.js for why the keys don't match
+// their labels.
+const COMPONENT_SLOTS = [
+  "component1",
+  "component2",
+  "component3",
+  "component4",
+  "component5",
+  "component6",
+];
 
 function sectionsIn(slot) {
   if (!slot) return [];
@@ -42,6 +59,10 @@ export default async function ServicesPage() {
             return (
               <RichTextWithStatsSection key={section.id} section={section} />
             );
+          case SOLUTIONS_TYPE:
+            return <SolutionsSection key={section.id} section={section} />;
+          case CASE_STUDIES_TYPE:
+            return <CaseStudiesSection key={section.id} section={section} />;
           default:
             return null;
         }

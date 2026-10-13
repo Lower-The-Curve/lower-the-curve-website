@@ -15,6 +15,11 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
+//   scroll_align         -> optional "Left" | "Center" | "Right"; empty follows content_align
+//   scroll_color         -> optional "Blue" | "White"; empty is Blue
+//   content_position_mobile -> optional choice list, phones only (≤575px):
+//                           "Top Left" | "Top Center" | "Center Left" |
+//                           "Center Center". Empty keeps the desktop placement
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
 export const HERO_SECTION_TYPE = 'hero_section';
@@ -66,6 +71,44 @@ function alignClass(section) {
   return ALIGN_CLASSES[authored] ?? ALIGN_CLASSES.center;
 }
 
+// Scroll cue overrides: alignment and colour, independent of the headline.
+function scrollClasses(section) {
+  const align = fieldValue(section, 'scroll_align')?.trim().toLowerCase();
+  const color = fieldValue(section, 'scroll_color')?.trim().toLowerCase();
+  return [
+    ALIGN_CLASSES[align] && `hero--scroll-${align}`,
+    color === 'white' && 'hero--scroll-white',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Phone-only placement of the headline block, from `content_position_mobile`:
+// "Top Left" | "Top Center" | "Center Left" | "Center Center" (any casing).
+// The first word is the vertical position, the second the text alignment.
+// Only the headline moves — the scroll cue keeps its own alignment. Empty or
+// unrecognised values leave the desktop behaviour.
+const MOBILE_VERTICAL = {
+  top: 'hero--mobile-top',
+  center: 'hero--mobile-center',
+};
+const MOBILE_ALIGN = {
+  left: 'hero--mobile-align-left',
+  center: 'hero--mobile-align-center',
+};
+
+function mobilePositionClasses(section) {
+  const [vertical, horizontal] = (
+    fieldValue(section, 'content_position_mobile') ?? ''
+  )
+    .trim()
+    .toLowerCase()
+    .split(/\s+/);
+  return [MOBILE_VERTICAL[vertical], MOBILE_ALIGN[horizontal]]
+    .filter(Boolean)
+    .join(' ');
+}
+
 // The design accents part of the headline — a green run and a blue one — and
 // those runs are also the only bold text in it, against a regular-weight
 // heading. Which words they are is editorial, so it's authored in the metafield
@@ -84,7 +127,7 @@ const ACCENT_CLASSES = {
 };
 
 const ACCENT_SPAN =
-  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>/gi;
+  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
 
 function accentedTitle(title) {
   const parts = [];
@@ -92,6 +135,13 @@ function accentedTitle(title) {
 
   for (const match of title.matchAll(ACCENT_SPAN)) {
     if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+
+    // <br>: an authored line break.
+    if (match[1] === undefined) {
+      parts.push(<br key={match.index} />);
+      cursor = match.index + match[0].length;
+      continue;
+    }
 
     // Tolerates extra classes on the span (`class="green-gradient wide"`).
     const accent = match[1]
@@ -116,7 +166,28 @@ function accentedTitle(title) {
   return parts;
 }
 
-export default function HeroSection({ section }) {
+// The scroll label may bold part of itself, as in the design:
+//   Scroll down to <strong>Explore more</strong>
+// Only <strong>/<b> are understood; the rest renders as text.
+const SCROLL_STRONG = /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+
+function scrollLabel(text) {
+  const parts = [];
+  let cursor = 0;
+  for (const match of text.matchAll(SCROLL_STRONG)) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+    parts.push(
+      <strong key={match.index} className="hero__scroll-strong">
+        {match[2]}
+      </strong>
+    );
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return parts;
+}
+
+export default function HeroSection({ section, fadeBottom = false }) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
@@ -141,7 +212,15 @@ export default function HeroSection({ section }) {
 
   return (
     <section
-      className={`hero ${alignClass(section)}`}
+      className={[
+        'hero',
+        alignClass(section),
+        scrollClasses(section),
+        mobilePositionClasses(section),
+        fadeBottom && 'hero--fade-bottom',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -182,13 +261,31 @@ export default function HeroSection({ section }) {
       )}
 
       <div className="hero__content">
-        {title && <h1 className="hero__title">{accentedTitle(title)}</h1>}
+        {title && (
+          <h1
+            className={
+              /<br\s*\/?>/i.test(title)
+                ? 'hero__title hero__title--manual'
+                : 'hero__title'
+            }
+          >
+            {accentedTitle(title)}
+          </h1>
+        )}
         {description && <p className="hero__description">{description}</p>}
       </div>
 
       {scrollText && (
         <div className="hero__scroll">
-          <span className="hero__scroll-text">{scrollText}</span>
+          <span
+            className={
+              /<(strong|b)\b/i.test(scrollText)
+                ? 'hero__scroll-text hero__scroll-text--mixed'
+                : 'hero__scroll-text'
+            }
+          >
+            {scrollLabel(scrollText)}
+          </span>
           <ChevronsDownIcon className="hero__scroll-icon" />
         </div>
       )}

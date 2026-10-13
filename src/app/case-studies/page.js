@@ -1,10 +1,16 @@
 import { getCaseStudiesPage } from '@/lib/shopify';
+import HeroSection, {
+  HERO_SECTION_TYPE,
+} from '@/components/sections/HeroSection/HeroSection';
 import BannerSection, {
   BANNER_TYPE,
 } from '@/components/sections/BannerSection/BannerSection';
 import DeliveredSection, {
   DELIVERED_TYPE,
 } from '@/components/sections/DeliveredSection/DeliveredSection';
+import RichTextWithStatsSection, {
+  RICH_TEXT_WITH_STATS_TYPE,
+} from '@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection';
 import './page.css';
 
 export const metadata = {
@@ -46,10 +52,18 @@ export default async function CaseStudiesPage() {
     <main className="case-studies-page">
       {sections.map((section) => {
         switch (section.type) {
+          case HERO_SECTION_TYPE:
+            return (
+              <HeroSection key={section.id} section={section} fadeBottom />
+            );
           case BANNER_TYPE:
             return <BannerSection key={section.id} section={section} />;
           case DELIVERED_TYPE:
             return <DeliveredSection key={section.id} section={section} />;
+          case RICH_TEXT_WITH_STATS_TYPE:
+            return (
+              <RichTextWithStatsSection key={section.id} section={section} />
+            );
           default:
             return null;
         }

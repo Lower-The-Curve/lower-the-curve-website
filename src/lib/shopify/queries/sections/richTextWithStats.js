@@ -18,8 +18,12 @@ export const richTextWithStatsSectionFragment = `
             height
           }
         }
+        ... on GenericFile {
+          url
+          alt
+        }
       }
-      references(first: 20) {
+      references(first: 50) {
         nodes {
           __typename
           ... on Metaobject {
