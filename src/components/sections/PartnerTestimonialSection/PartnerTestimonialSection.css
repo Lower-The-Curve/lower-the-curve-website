@@ -138,7 +138,10 @@
 
 @media (max-width: 575px) {
   .partner-testimonial__inner {
-    padding: 0 var(--space) 4rem;
+    /* Top stays 0 (Metrics owns that gap via its own bottom); bottom goes to
+       0 too — Delivered now owns the Testimonial-to-Delivered gap via its
+       own 50px top. */
+    padding: 0 var(--space);
     --partner-testimonial-card-width: 100%;
   }
 

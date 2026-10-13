@@ -18,8 +18,9 @@
   max-width: var(--max-width);
   margin-inline: auto;
   /* 50px: the Figma gap between the hero frame (ends at 900) and this
-     section's heading (950). */
-  padding: 50px var(--space) 4rem;
+     section's heading (950). Bottom is 0 — the gap to the next section is
+     owned by its own top padding, not split across both. */
+  padding: 50px var(--space) 0;
   display: grid;
   grid-template-columns: minmax(0, 469fr) minmax(0, 716fr);
   grid-template-areas:
@@ -324,7 +325,8 @@
   }
 
   .partner-detail-problem__inner {
-    padding-top: 32px;
+    /* 50px to Hero above, 0 to Approach below (it owns its own 50px top). */
+    padding: 50px var(--space) 0;
   }
 
   .partner-detail-problem__list {
