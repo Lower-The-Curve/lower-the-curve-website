@@ -149,6 +149,7 @@ export default function AppCardDialog({
   const panelRef = useRef(null);
   const galleryCloseRef = useRef(null);
   const moreButtonRef = useRef(null);
+  const lightboxTriggerRef = useRef(null);
   const stripRef = useRef(null);
   const wasGalleryOpen = useRef(false);
   const [galleryIndex, setGalleryIndex] = useState(-1);
@@ -166,6 +167,7 @@ export default function AppCardDialog({
   useEffect(() => {
     setGalleryIndex(-1);
     setLightboxOpen(false);
+    lightboxTriggerRef.current = null;
     if (panelRef.current) panelRef.current.scrollTop = 0;
   }, [card?.id]);
 
@@ -173,7 +175,7 @@ export default function AppCardDialog({
     if (lightboxOpen) {
       galleryCloseRef.current?.focus();
     } else if (wasGalleryOpen.current) {
-      moreButtonRef.current?.focus();
+      (lightboxTriggerRef.current ?? moreButtonRef.current)?.focus();
     }
     wasGalleryOpen.current = lightboxOpen;
   }, [lightboxOpen]);
@@ -419,7 +421,11 @@ export default function AppCardDialog({
                             : "app-card-dialog__thumb"
                         }
                         aria-label={`Show image ${index + 1}`}
-                        onClick={() => setGalleryIndex(index)}
+                        onClick={(event) => {
+                          lightboxTriggerRef.current = event.currentTarget;
+                          setGalleryIndex(index);
+                          setLightboxOpen(true);
+                        }}
                       >
                         <Image
                           src={image.url}
@@ -444,7 +450,10 @@ export default function AppCardDialog({
                             type="button"
                             className="app-card-dialog__more-count"
                             aria-label={`Show all ${gallery.length} photos`}
-                            onClick={() => setLightboxOpen(true)}
+                            onClick={(event) => {
+                              lightboxTriggerRef.current = event.currentTarget;
+                              setLightboxOpen(true);
+                            }}
                           >
                             +{gallery.length - 4}
                           </button>
@@ -455,7 +464,10 @@ export default function AppCardDialog({
                           arrow="diagonal"
                           size="sm"
                           ref={moreButtonRef}
-                          onClick={() => setLightboxOpen(true)}
+                          onClick={(event) => {
+                            lightboxTriggerRef.current = event.currentTarget;
+                            setLightboxOpen(true);
+                          }}
                         >
                           More Photos
                         </Button>
