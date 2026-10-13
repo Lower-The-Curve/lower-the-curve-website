@@ -37,7 +37,7 @@ export default async function ShopifyAppsPage() {
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
-            return <HeroSection key={section.id} section={section} />;
+            return <HeroSection key={section.id} section={section} appIcons />;
           // AppCardsSection and ProjectRouteSection both render the
           // `project_route` metaobject type, so the type alone can't pick the
           // renderer: cards with pop-ups are the app grid, everything else is

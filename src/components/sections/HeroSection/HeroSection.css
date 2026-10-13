@@ -92,9 +92,17 @@
   line-height: 1.2;
   margin: 0;
   /* A measure, not a fixed width. `ch` scales with the heading token, so the
-     design's three-line break ("Let’s Launch a / Shopify Store / with us")
-     holds at 64px, 52px and 40px without a media query. */
-  max-width: 13ch;
+     design's three-line break ("Building Apps that / power Shopify stores /
+     worldwide") holds at 64px, 52px and 40px without a media query.
+
+     18.5ch sits between the two bounds that set the break: the longest line
+     that has to fit — "power Shopify stores" (~17ch) — and the shortest run
+     that must NOT fit on the first line — "Building Apps that power"
+     (~20.1ch). Measured against Poppins' own advances, so the break is the
+     same at every tier the viewport can fit these lines. A materially
+     different headline moves both bounds — this is a measure, not a
+     guarantee. */
+  max-width: 18.5ch;
 }
 
 /* The accented runs in the headline. The weight lives on .hero__accent rather than on
@@ -155,6 +163,61 @@
       var(--color-brand),
       var(--color-brand-dark)
     );
+  }
+}
+
+
+.hero__heading {
+  position: relative;
+}
+
+.hero__icons {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(
+    calc(3.328125 * var(--fs-heading-xl)),
+    calc((100vw - 2 * var(--space) - 100%) / 2 - 0.25rem)
+  );
+}
+
+.hero__icons img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hero__icons--left {
+  right: calc(100% + 0.25rem);
+}
+
+.hero__icons--right {
+  left: calc(100% + 0.25rem);
+}
+
+@media (max-width: 767px) {
+  .hero__icons {
+    display: none;
+  }
+}
+
+.hero__icons-row {
+  display: none;
+}
+
+.hero__icons-row img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 767px) {
+  .hero__icons-row {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    margin-bottom: 1.75rem;
   }
 }
 
