@@ -23,13 +23,13 @@
 }
 
 /* Figma places the glow 183px above the heading and 138px off the left edge,
-   which is 119px above this section once its 64px of top padding is counted,
+   which is 133px above this section once its 50px of top padding is counted,
    so it straddles the section above. The page's `isolation` keeps z-index -1
    behind that section's content. */
 .partner-approach__glow {
   position: absolute;
   z-index: -1;
-  top: -119px;
+  top: -133px;
   left: -138px;
   width: 329px;
   height: auto;
@@ -42,7 +42,9 @@
      side padding is 1216px, so the cap is restated to fit it. */
   max-width: calc(1220px + var(--space) * 2);
   margin-inline: auto;
-  padding: 4rem var(--space) 6rem;
+  /* Figma gap: 50px from the Problem section above, 0 to What We Built below
+     (it owns its own 50px top padding). */
+  padding: 50px var(--space) 0;
   display: flex;
   flex-direction: column;
   gap: 70px;
@@ -284,10 +286,10 @@
 }
 
 @media (max-width: 575px) {
-  /* Figma: 21px above the heading, 51px off the left edge, so 27px below the
-     top of this section (48px of padding less 21px). */
+  /* Figma: 21px above the heading, 51px off the left edge, so 29px below the
+     top of this section (50px of padding less 21px). */
   .partner-approach__glow {
-    top: 27px;
+    top: 29px;
     left: -51px;
     width: 102px;
   }
@@ -303,7 +305,9 @@
   }
 
   .partner-approach__inner {
-    padding: 3rem var(--space) 4rem;
+    /* 50px to Problem above, 0 to What We Built below (it owns its own
+       50px top). */
+    padding: 50px var(--space) 0;
     gap: 30px;
   }
 

@@ -1,7 +1,9 @@
 .case-study-metrics__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space) 6rem;
+  /* Figma gap: 70px from the Results section above, 0 to Testimonial below
+     (it owns its own 70px top padding). */
+  padding: 70px var(--space) 0;
 }
 
 .case-study-metrics__title {
@@ -232,7 +234,9 @@
    side-by-side layout, smaller cards, tighter rhythm. */
 @media (max-width: 575px) {
   .case-study-metrics__inner {
-    padding-block: 2rem 3rem;
+    /* 50px to Results above; 50px to Testimonial below — Testimonial's own
+       top stays 0 at this width, so this section owns that gap fully. */
+    padding-block: 50px;
   }
 
   .case-study-metrics__title {

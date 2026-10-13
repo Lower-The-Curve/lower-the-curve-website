@@ -18,7 +18,10 @@
 .delivered__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  /* Figma gap: 70px from the Testimonial section above; 70px below to the
+     footer's Book a Call frame — this section owns that gap fully since the
+     footer isn't page-specific. */
+  padding: 70px var(--space);
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -228,6 +231,15 @@
 /* --- DESKTOP HOVER ------------------------------------------------------ */
 
 @media (min-width: 1025px) {
+  /* Half-tucked behind the second card's right edge, as in the open variant. */
+  .delivered {
+    overflow-x: clip;
+  }
+
+  .delivered__glow {
+    right: calc(max(0px, (100% - var(--max-width)) / 2) + var(--space) - 150px);
+  }
+
   .delivered__panel {
     grid-template-rows: 0fr;
     opacity: 0;
@@ -329,7 +341,9 @@
 
 .delivered--open .delivered__glow {
   top: 332px;
-  right: -30px;
+  /* Track the second card's right edge (centred max-width column), so the
+     glow stays half-tucked behind it at any desktop width. */
+  right: calc(max(0px, (100% - var(--max-width)) / 2) + var(--space) - 135px);
   width: 291px;
 }
 
@@ -500,19 +514,29 @@
     width: 5rem;
   }
 
+  .delivered__item {
+    position: relative;
+  }
+
+  /* Figma: 88px, centred in the row gap above the last card, half off the
+     left viewport edge (left: -43px). */
   .delivered__blue-glow {
     display: block;
     position: absolute;
     z-index: -1;
-    left: -3.5rem;
-    top: 72%;
-    width: 10rem;
+    left: calc(-1 * var(--space) - 44px);
+    top: calc(-0.75rem - 44px);
+    width: 88px;
     height: auto;
+    opacity: 0.9;
     pointer-events: none;
   }
 
   .delivered__inner {
-    padding: 3rem var(--space);
+    /* 50px to Testimonial above (its own bottom is zeroed); 50px below to
+       the footer, which this section owns fully since the footer isn't
+       page-specific. */
+    padding: 50px var(--space);
     gap: 2rem;
   }
 

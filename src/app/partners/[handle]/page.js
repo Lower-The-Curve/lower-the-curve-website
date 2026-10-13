@@ -38,13 +38,12 @@ export default async function PartnerDetailPage({ params }) {
   return (
     <main className="partner-detail-page">
       <PartnerDetailSection section={section} />
-      <PartnerApproachSection section={approach} intro={approachIntro} />
       <PartnerDetailProblemSection
         section={section.problem?.reference}
         partnerName={partnerNameOf(section)}
       />
+      <PartnerApproachSection section={approach} intro={approachIntro} />
       <WhatWeBuiltSection section={whatWeBuilt} />
-      <PartnerTestimonialSection section={partnerTestimonial} />
       <PartnerDetailResultsSection
         section={section.results?.reference}
         partnerName={resultsPartnerNameOf(section)}
@@ -53,6 +52,7 @@ export default async function PartnerDetailPage({ params }) {
         section={metrics}
         partner={section}
       />
+      <PartnerTestimonialSection section={partnerTestimonial} />
       <DeliveredSection
         section={section.exploreMore?.reference}
         allCards={section.deliveredCards}
