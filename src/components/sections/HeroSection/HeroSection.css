@@ -316,7 +316,7 @@
 
   /* "Top Left" sits a little lower than "Top Center". */
   .hero--mobile-top.hero--mobile-align-left .hero__content {
-    padding-top: 15svh;
+    padding-top: 90px;
   }
 
   /* "Center …": still centred, but nudged a bit above the true middle.
