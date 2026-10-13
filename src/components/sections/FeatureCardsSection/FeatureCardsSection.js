@@ -45,12 +45,23 @@ export default function FeatureCardsSection({ section }) {
     ? fieldValue(section, 'title')
     : null;
   const cards = referencesFrom(section, 'cards');
+  // `glow`: Green (default) | Blue | None.
+  const glow = fieldValue(section, 'glow')?.trim().toLowerCase();
 
   if (!cards.length) return null;
 
   return (
     <section className="feature-cards">
-      <span className="feature-cards__glow" aria-hidden="true" />
+      {glow !== 'none' && (
+        <span
+          className={
+            glow === 'blue'
+              ? 'feature-cards__glow feature-cards__glow--blue'
+              : 'feature-cards__glow'
+          }
+          aria-hidden="true"
+        />
+      )}
 
       <div className="feature-cards__inner">
         {title && (

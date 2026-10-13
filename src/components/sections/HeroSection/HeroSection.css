@@ -64,6 +64,15 @@
   pointer-events: none;
 }
 
+/* Opt-in per page (the `fadeBottom` prop — Case Studies). Figma's 1440×528
+   white "background blur adjustment layer" across the hero's bottom: the
+   artwork dissolves into the next section's white instead of meeting it in a
+   hard line. */
+.hero--fade-bottom .hero__backdrop {
+  -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent);
+  mask-image: linear-gradient(to bottom, #000 65%, transparent);
+}
+
 /* `cover` rather than `contain`: the artwork is a soft gradient wash with no
    detail to protect, so filling the screen matters more than showing all of it.
    Anchored to the top, which is where the blobs that frame the header live. */
@@ -95,6 +104,11 @@
      design's three-line break ("Let’s Launch a / Shopify Store / with us")
      holds at 64px, 52px and 40px without a media query. */
   max-width: 13ch;
+}
+
+/* Authored <br>s set the lines, so the measure is dropped. */
+.hero__title--manual {
+  max-width: none;
 }
 
 /* The accented runs in the headline. The weight lives on .hero__accent rather than on
@@ -198,6 +212,17 @@
   display: block;
 }
 
+/* Label with a <strong> run (Figma: 14/16, regular + SemiBold). A label
+   without one keeps the all-SemiBold style above. */
+.hero__scroll-text--mixed {
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.hero__scroll-strong {
+  font-weight: 600;
+}
+
 /* --- CONTENT ALIGNMENT --------------------------------------------------
    Driven by the metaobject's `content_align` field. The measure wrappers stay
    centred on the page either way; only the text inside them moves.
@@ -218,6 +243,38 @@
 .hero--align-right .hero__scroll {
   align-items: flex-end;
   text-align: right;
+}
+
+/* Scroll cue overrides (scroll_align / scroll_color). After the rules above
+   so they win at equal specificity. */
+.hero--scroll-center .hero__scroll {
+  align-items: center;
+  text-align: center;
+}
+
+.hero--scroll-left .hero__scroll {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero--scroll-right .hero__scroll {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hero--scroll-white .hero__scroll {
+  color: var(--color-bg);
+}
+
+/* Figma "White gradient for logos" on the chevrons: white on the left to
+   #BDBDBD at 50% on the right. The icon's gradient runs right → left, so the
+   first stop is the right end. */
+.hero--scroll-white .hero__scroll-icon stop:first-child {
+  stop-color: rgb(189 189 189 / 0.5);
+}
+
+.hero--scroll-white .hero__scroll-icon stop:last-child {
+  stop-color: var(--color-bg);
 }
 
 /* --- MOBILE (<= 575px) --------------------------------------------------
@@ -247,6 +304,48 @@
     /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
        tight under the headline — this gives the gutter back to the content. */
     padding-bottom: 2rem;
+  }
+
+  /* `content_position_mobile` — "Top …": the headline sits under the header,
+     as in the Figma mobile frame, and the free space falls between it and the
+     scroll cue instead of above it. The gap scales with the screen height. */
+  .hero--mobile-top .hero__content {
+    align-self: start;
+    padding-top: 12svh;
+  }
+
+  /* "Top Left" sits a little lower than "Top Center". */
+  .hero--mobile-top.hero--mobile-align-left .hero__content {
+    padding-top: 15svh;
+  }
+
+  /* "Center …": still centred, but nudged a bit above the true middle.
+     Bottom padding shifts the centred block up by half its value. */
+  .hero--mobile-center .hero__content {
+    padding-bottom: 10svh;
+  }
+
+  /* "… Left | Center": headline only; the scroll cue keeps its own
+     alignment. `.hero` doubled up so these beat the desktop content_align
+     rules regardless of source order. */
+  .hero.hero--mobile-align-left .hero__content {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero.hero--mobile-align-center .hero__content {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* The landscape artwork is cropped hard on a phone: it zooms in (so the
+     grain reads much stronger) and loses its own soft bottom, ending in a
+     hard line. Softened here so it sits like the desktop hero; a dedicated
+     `image_mobile` export is still the proper fix. */
+  .hero--fade-bottom .hero__backdrop {
+    opacity: 0.7;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
   }
 }
 
