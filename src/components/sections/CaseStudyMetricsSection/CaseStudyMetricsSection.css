@@ -1,3 +1,7 @@
+.case-study-metrics {
+  margin-bottom: var(--case-study-metrics-margin-bottom, 0px);
+}
+
 .case-study-metrics__inner {
   max-width: var(--max-width);
   margin-inline: auto;
