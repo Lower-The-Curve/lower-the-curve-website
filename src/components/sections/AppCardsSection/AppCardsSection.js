@@ -27,3 +27,29 @@ export { default } from "./AppCardsTabs";
 // string to dispatch on. Its GraphQL fragment lives in
 // lib/shopify/queries/sections/projectRoute.js (shared with ProjectRouteSection).
 export const APP_CARDS_SECTION_TYPE = "project_route";
+
+// This section and ProjectRouteSection render the SAME `project_route`
+// metaobject type, so the page cannot tell them apart by `section.type` alone:
+// an app-cards section is the one whose cards carry a `button1` (or legacy
+// `button`) reference — that is what its Learn More button opens. Every other
+// project_route is the process section and goes to ProjectRouteSection.
+// Exported so the page's switch can dispatch on the data, not the type.
+export function isAppCardsSection(section) {
+  const steps =
+    (section?.fields ?? []).find((field) => field.key === "steps")?.references
+      ?.nodes ?? [];
+
+  return steps.some((step) =>
+    (step.fields ?? [])
+      .filter((field) => field.key === "cards")
+      .some((cardsField) =>
+        (cardsField.references?.nodes ?? []).some((card) =>
+          (card.fields ?? []).some(
+            (field) =>
+              (field.key === "button1" || field.key === "button") &&
+              Boolean(field.reference)
+          )
+        )
+      )
+  );
+}

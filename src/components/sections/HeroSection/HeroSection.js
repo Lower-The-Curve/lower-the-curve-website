@@ -187,7 +187,11 @@ function scrollLabel(text) {
   return parts;
 }
 
-export default function HeroSection({ section, fadeBottom = false }) {
+export default function HeroSection({
+  section,
+  appIcons = false,
+  fadeBottom = false,
+}) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
@@ -261,17 +265,56 @@ export default function HeroSection({ section, fadeBottom = false }) {
       )}
 
       <div className="hero__content">
-        {title && (
-          <h1
-            className={
-              /<br\s*\/?>/i.test(title)
-                ? 'hero__title hero__title--manual'
-                : 'hero__title'
-            }
-          >
-            {accentedTitle(title)}
-          </h1>
-        )}
+        <div className="hero__heading">
+          {appIcons && (
+            <div className="hero__icons-row" aria-hidden="true">
+              <Image
+                src="/assets/Shopify apps logos frame.svg"
+                alt=""
+                width={329}
+                height={54}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--left" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416.svg"
+                alt=""
+                width={213}
+                height={434}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {title && (
+            <h1
+              className={
+                /<br\s*\/?>/i.test(title)
+                  ? 'hero__title hero__title--manual'
+                  : 'hero__title'
+              }
+            >
+              {accentedTitle(title)}
+            </h1>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--right" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416 (1).svg"
+                alt=""
+                width={213}
+                height={428}
+                unoptimized
+              />
+            </div>
+          )}
+        </div>
+
         {description && <p className="hero__description">{description}</p>}
       </div>
 
