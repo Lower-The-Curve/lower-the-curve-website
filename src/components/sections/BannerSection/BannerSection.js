@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
 import BannerHighlights from './BannerHighlights';
+import BannerLines from './BannerLines';
 import './BannerSection.css';
 
 // The banner section is a single `banner` metaobject with:
@@ -160,6 +161,8 @@ export default function BannerSection({ section }) {
       }`}
       style={backgroundStyle(background)}
     >
+      {/* Figma lines for tablet and phone — see BannerLines.js. */}
+      {!isStory && <BannerLines />}
       <div className="banner__inner">
         {hasMedia && (
           <div className="banner__media">

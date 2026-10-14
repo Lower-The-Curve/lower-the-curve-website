@@ -246,3 +246,30 @@
     display: block;
   }
 }
+
+/* --- MOBILE LINES (<= 1024px, spotlight layout) --------------------------
+   The desktop background image is a landscape artwork; `cover` scales it up
+   to fill a tall tablet/phone banner, so its lines come out thick and
+   misplaced. Below desktop the image is dropped (the brand blue behind it stays) and the Figma
+   mobile lines are drawn instead, pinned to the top of the banner at full
+   width. The export already carries the lines' faint opacity. */
+.banner__lines-mobile {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .banner:not(.banner--story)::before {
+    background-image: none;
+  }
+
+  .banner__lines-mobile {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+}

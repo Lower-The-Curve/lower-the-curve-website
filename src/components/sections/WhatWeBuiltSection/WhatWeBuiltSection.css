@@ -52,8 +52,26 @@
 }
 
 .what-we-built__accent {
+  /* Flat brand blue is the fallback for browsers without background-clip: text. */
   color: var(--color-brand);
   font-weight: 600;
+}
+
+/* Figma paints "Built" in the brand gradient, the same one the Approach
+   heading's accent uses just above this section. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .what-we-built__accent {
+    background-image: linear-gradient(
+      to right,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .what-we-built__lede {
