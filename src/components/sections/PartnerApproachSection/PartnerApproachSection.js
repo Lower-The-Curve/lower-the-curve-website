@@ -83,6 +83,16 @@ export default function PartnerApproachSection({ section, intro }) {
           unoptimized
         />
       )}
+    
+      <Image
+        src="/assets/blue-ellipse.svg"
+        alt=""
+        width={262}
+        height={262}
+        className="partner-approach__circle"
+        aria-hidden="true"
+        unoptimized
+      />
       <div className="partner-approach__inner">
         {(title || description) && (
           <div className="partner-approach__intro">

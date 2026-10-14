@@ -126,13 +126,11 @@
 }
 
 @media (max-width: 1395px) {
-  
-  .what-we-built__glow {
-    display: none;
+  .what-we-built__glow--right {
+    width: 192px;
+    right: -128px;
   }
-
 }
-
 
 @media (max-width: 1024px) {
   .what-we-built__inner {
