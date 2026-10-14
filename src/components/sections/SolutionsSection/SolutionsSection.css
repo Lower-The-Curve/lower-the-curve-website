@@ -489,7 +489,7 @@
 /* The vertical rule between the icon and the copy. Runs the height of the copy
    block, which is what the reference shows. */
 .solutions__body {
-  border-left: 1px solid #e3e3e3;
+  border-left: 3px solid #e3e3e3;
   padding-left: 1.75rem;
   display: flex;
   flex-direction: column;
@@ -637,6 +637,35 @@
   }
 
   .solutions__body {
+    border-left-width: 2.5px;
     padding-left: 1.25rem;
+  }
+
+  /* The narrow reference has no card tint: plain white. */
+  .solutions__item,
+  .solutions--no-stats .solutions__item {
+    background: #ffffff;
+  }
+
+  /* 14px label (--fs-body-sm is 14px on a phone; the sm button's --fs-body-xs
+     drops to 12px) and a 3px brand-gradient outline. The gradient border is a
+     transparent border over a white padding-box fill and a gradient border-box. */
+  .solutions__item-button.btn--secondary {
+    font-size: var(--fs-body-sm);
+    border-width: 3px;
+    background-image: linear-gradient(#ffffff, #ffffff),
+      linear-gradient(135deg, var(--color-brand-dark), var(--color-brand));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  /* Hover fills with the same gradient (the shared rule only sets a colour). */
+  .solutions__item-button.btn--secondary:hover {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-dark),
+      var(--color-brand)
+    );
+    background-clip: border-box;
   }
 }

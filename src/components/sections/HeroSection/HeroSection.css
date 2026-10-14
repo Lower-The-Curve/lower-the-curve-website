@@ -73,6 +73,31 @@
   mask-image: linear-gradient(to bottom, #000 65%, transparent);
 }
 
+/* Opt-in per page (the `fadeTop` prop — About Us). The artwork's top edge is a
+   visible line against the page; this dissolves it in from white instead. */
+.hero--fade-top .hero__backdrop {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 15%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(0, 0, 0, 0.65) 60%,
+    rgba(0, 0, 0, 0.9) 75%,
+    #000 90%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 15%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(0, 0, 0, 0.65) 60%,
+    rgba(0, 0, 0, 0.9) 75%,
+    #000 90%
+  );
+}
+
 /* `cover` rather than `contain`: the artwork is a soft gradient wash with no
    detail to protect, so filling the screen matters more than showing all of it.
    Anchored to the top, which is where the blobs that frame the header live. */
@@ -377,9 +402,11 @@
     padding-top: 12svh;
   }
 
-  /* "Top Left" sits a little lower than "Top Center". */
+  /* "Top Left": the title sits 94px under the menu capsule, per Figma. The
+     capsule ends 12px above the header's flow box (.site-header's bottom
+     padding), so 94 - 12 = 82px. */
   .hero--mobile-top.hero--mobile-align-left .hero__content {
-    padding-top: 90px;
+    padding-top: 82px;
   }
 
   /* "Center …": still centred, but nudged a bit above the true middle.

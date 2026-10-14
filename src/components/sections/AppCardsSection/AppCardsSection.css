@@ -90,7 +90,9 @@
   max-width: 70rem;
   font-size: 16px;
   line-height: 1.375;
-  color: var(--color-text-muted);
+  /* Design sets this lede near-black, not the muted grey. One consumer so far —
+     promote to a token on the second. */
+  color: #0d0d0d;
 }
 
 .app-cards__scroller {
@@ -312,6 +314,10 @@
   .app-cards__inner {
     padding: 3rem var(--space);
     gap: 1.875rem;
+  }
+
+  .app-cards__title {
+    line-height: 38px;
   }
 
   .app-cards__description {

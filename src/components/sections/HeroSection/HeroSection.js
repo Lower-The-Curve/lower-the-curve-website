@@ -191,6 +191,7 @@ export default function HeroSection({
   section,
   appIcons = false,
   fadeBottom = false,
+  fadeTop = false,
 }) {
   if (!section) return null;
 
@@ -222,6 +223,7 @@ export default function HeroSection({
         scrollClasses(section),
         mobilePositionClasses(section),
         fadeBottom && 'hero--fade-bottom',
+        fadeTop && 'hero--fade-top',
       ]
         .filter(Boolean)
         .join(' ')}

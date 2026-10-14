@@ -143,6 +143,12 @@
   margin-top: 0.5rem;
 }
 
+/* 3px outline at every width, to match the reference. Compound selector so it
+   beats .btn's 2px regardless of stylesheet order. */
+.case-studies__button.btn--secondary {
+  border-width: 3px;
+}
+
 /* --- TABLET (<= 1024px) -------------------------------------------------
    One centred column, image on top. The image is first in the DOM, so the stack
    order needs no `order` property.
@@ -171,5 +177,11 @@
 
   .case-studies__copy {
     gap: 1.25rem;
+  }
+
+  /* 16px label (the md button's --fs-body-sm drops to 14px on a phone). The
+     compound selector beats .btn--md regardless of stylesheet order. */
+  .case-studies__button.btn--secondary {
+    font-size: var(--fs-body-base);
   }
 }
