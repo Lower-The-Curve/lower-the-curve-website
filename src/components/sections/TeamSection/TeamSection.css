@@ -11,8 +11,6 @@
   --team-radius: 25px;
   --team-card-radius: var(--team-radius);
   --team-gap: 1.25rem;
-  /* Row's left inset at the design's 1440px frame: (1440 - 1248) / 2 + 16. */
-  --team-track-inset: 7rem;
   --team-ease: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   /* Caption placement from the design's 1440px frame: inset from the card's left
      edge, distance from its bottom edge to the role's baseline box, and the gap
@@ -96,16 +94,13 @@
   gap: var(--team-gap);
   margin: 40px 0 0;
   padding: 0 var(--space) 70px;
-  /* Tracks the content edge of every other section (half the free space either
-     side of --max-width, plus the gutter) but stops growing at --team-track-inset,
-     so on a wide screen the row keeps the design's 1440px gap instead of drifting
-     inward with the content measure. */
+  /* Tracks the content edge of every other section at every width: half the
+     free space either side of --max-width, plus the gutter. This used to stop
+     growing at 7rem, which only matched up to ~1440px; on wider screens the row
+     stayed pinned to the left while the centred heading moved with the page. */
   padding-inline: max(
     var(--space),
-    min(
-      var(--team-track-inset),
-      calc((100% - var(--max-width)) / 2 + var(--space))
-    )
+    calc((100% - var(--max-width)) / 2 + var(--space))
   );
   list-style: none;
   overflow-x: auto;
