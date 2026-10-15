@@ -161,8 +161,7 @@ export default function BannerSection({ section }) {
       }`}
       style={backgroundStyle(background)}
     >
-      {/* Figma lines for tablet and phone — see BannerLines.js. */}
-      {!isStory && <BannerLines />}
+      <BannerLines story={isStory} />
       <div className="banner__inner">
         {hasMedia && (
           <div className="banner__media">
