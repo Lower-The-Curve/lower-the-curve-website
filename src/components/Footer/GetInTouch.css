@@ -173,3 +173,44 @@
     transform: translateX(-50%);
   }
 }
+
+/* Case studies page only, desktop only: a brand-blue glow clipped by the left
+   edge (Figma: 101px circle, left -42px, 0.9 opacity). The footer is rendered
+   once in the root layout, so the band cannot know the route — it keys off the
+   page's own <main> class instead.
+
+   Two stacked copies of the same circle: ::after is crisp but only shows the top
+   35%, ::before is blurred and only shows the rest. z-index 0 rather than -1 so
+   they land above the backdrop's grey left blob; they sit on the left edge, clear
+   of the centred content. */
+@media (min-width: 576px) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 10%;
+    left: -42px;
+    width: 101px;
+    height: 101px;
+    border-radius: 50%;
+    background: linear-gradient(
+      270deg,
+      var(--color-brand-dark),
+      var(--color-brand)
+    );
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  /* clip-path, not mask: it applies after the blur, so the blurred copy can
+     spill past its own box (negative insets) instead of being cut at the edge. */
+  body:has(.case-studies-page) .get-in-touch::after {
+    clip-path: inset(0 0 65% 0);
+  }
+
+  body:has(.case-studies-page) .get-in-touch::before {
+    filter: blur(6.1px);
+    clip-path: inset(35% -30px -30px -30px);
+  }
+}
