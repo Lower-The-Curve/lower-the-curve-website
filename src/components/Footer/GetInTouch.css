@@ -201,9 +201,7 @@
    once in the root layout, so the band cannot know the route — it keys off the
    page's own <main> class instead.
 
-   Two stacked copies of the same circle: ::after is crisp but only shows the top
-   35%, ::before is blurred and only shows the rest. z-index 0 rather than -1 so
-   they land above the backdrop's grey left blob; they sit on the left edge, clear
+   Drawn on ::before, fully blurred. z-index 0 rather than -1 so it lands above the backdrop's grey left blob; they sit on the left edge, clear
    of the centred content. */
 @media (min-width: 576px) {
   body:has(.case-studies-page) .get-in-touch::before,
@@ -225,14 +223,75 @@
     pointer-events: none;
   }
 
-  /* clip-path, not mask: it applies after the blur, so the blurred copy can
-     spill past its own box (negative insets) instead of being cut at the edge. */
+  /* Fully blurred: only ::before is drawn, with no clip. (Figma had a crisp top
+     35% via a second, clipped copy — ::after — which is now switched off.) */
   body:has(.case-studies-page) .get-in-touch::after {
-    clip-path: inset(0 0 65% 0);
+    display: none;
   }
 
   body:has(.case-studies-page) .get-in-touch::before {
     filter: blur(6.1px);
-    clip-path: inset(35% -30px -30px -30px);
+  }
+}
+
+/* Ambient drift on the blue ellipse inside the artwork. It is an SVG <g>, so the
+   individual `translate` / `scale` apply in the SVG's user units (1 unit ≈ 1px
+   at the 1440 design width, scaling with the stretched artwork). `fill-box`
+   makes the scale pivot on the ellipse itself instead of the SVG's top-left
+   corner. The filter travels with the group, so the blur stays attached. */
+@keyframes get-in-touch-blue-glow-drift {
+  25% {
+    translate: -90px -30px;
+    scale: 1.06;
+  }
+  50% {
+    translate: -30px -60px;
+    scale: 0.96;
+  }
+  75% {
+    translate: 80px -20px;
+    scale: 1.04;
+  }
+}
+
+.get-in-touch__blue-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: get-in-touch-blue-glow-drift 16s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .get-in-touch__blue-glow {
+    animation: none;
+  }
+}
+
+/* Case studies page: drift the small blue circle. */
+@keyframes get-in-touch-case-studies-glow-drift {
+  25% {
+    translate: 2.5rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: 4rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: 1.5rem 2.5rem;
+    scale: 1.08;
+  }
+}
+
+@media (min-width: 576px) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    animation: get-in-touch-case-studies-glow-drift 16s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    animation: none;
   }
 }
