@@ -78,7 +78,7 @@
   z-index: 1;
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  padding: var(--section-pad-y, 4rem) var(--space);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -343,7 +343,7 @@
   }
 
   .project-route__inner {
-    padding: 3rem var(--space);
+    padding: var(--section-pad-y, 3rem) var(--space);
     /* 20px title→lede lives on __heading; 30px heading→tabs here. */
     gap: 1.875rem;
   }

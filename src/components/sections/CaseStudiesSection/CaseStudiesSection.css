@@ -21,7 +21,7 @@
      See DESIGN-SYSTEM.md §5. */
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  padding: var(--section-pad-y, 4rem) var(--space);
   display: grid;
   /* One column by default, so a section with no image doesn't leave an empty
      grid cell and half the measure unused. */
@@ -171,7 +171,7 @@
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 @media (max-width: 575px) {
   .case-studies__inner {
-    padding: 3rem var(--space);
+    padding: var(--section-pad-y, 3rem) var(--space);
     gap: 2rem;
   }
 

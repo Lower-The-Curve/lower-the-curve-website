@@ -6,3 +6,29 @@
 .shopify-apps-page {
   display: block;
 }
+
+/* Gaps between sections (1→2 and 2→3 are 70, 3→4 is 50). Section vertical
+   padding is zeroed so these margins ARE the visible gaps. Mobile: 50 / 50 / 20. */
+.shopify-apps-page {
+  --section-pad-y: 0px;
+}
+
+.shopify-apps-page > :nth-child(2),
+.shopify-apps-page > :nth-child(3) {
+  margin-top: 70px;
+}
+
+.shopify-apps-page > :nth-child(4) {
+  margin-top: 50px;
+}
+
+@media (max-width: 575px) {
+  .shopify-apps-page > :nth-child(2),
+  .shopify-apps-page > :nth-child(3) {
+    margin-top: 50px;
+  }
+
+  .shopify-apps-page > :nth-child(4) {
+    margin-top: 20px;
+  }
+}

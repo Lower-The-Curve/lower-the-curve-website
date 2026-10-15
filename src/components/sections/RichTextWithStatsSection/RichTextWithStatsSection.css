@@ -19,7 +19,7 @@
 .rich-text-with-stats__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 64px var(--space);
+  padding: var(--section-pad-y, 64px) var(--space);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 48px;
@@ -590,7 +590,7 @@
   }
 
   .rich-text-with-stats--figma-art .rich-text-with-stats__inner {
-    padding: 64px var(--space);
+    padding: var(--section-pad-y, 64px) var(--space);
     row-gap: 32px;
   }
 
@@ -740,7 +740,7 @@
 
 @media (max-width: 575px) {
   .rich-text-with-stats__inner {
-    padding: 48px var(--space);
+    padding: var(--section-pad-y, 48px) var(--space);
     gap: 32px;
   }
 
