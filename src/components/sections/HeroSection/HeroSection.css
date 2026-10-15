@@ -81,7 +81,7 @@
    way to size the artwork here because next/image's `fill` pins the box itself
    with an inline `width: 100%` that a class can't override. */
 .hero__image--asset {
-  object-fit: none;
+  object-fit: cover;
   object-position: right top;
 }
 
