@@ -237,6 +237,13 @@
 /* The mobile design is the desktop chart scaled down to a ~357px frame: same
    side-by-side layout, smaller cards, tighter rhythm. */
 @media (max-width: 575px) {
+  /* The admin's margin_bottom is one value for every screen; at full size it
+     stacked on the 50px below to leave a ~150px hole on a phone. Halved here,
+     so desktop keeps the authored gap. */
+  .case-study-metrics {
+    margin-bottom: calc(var(--case-study-metrics-margin-bottom, 0px) / 2);
+  }
+
   .case-study-metrics__inner {
     /* 50px to Results above; 50px to Testimonial below — Testimonial's own
        top stays 0 at this width, so this section owns that gap fully. */
