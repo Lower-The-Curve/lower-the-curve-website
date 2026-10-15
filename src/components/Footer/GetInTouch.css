@@ -131,6 +131,28 @@
   margin-top: 0.5rem;
 }
 
+/* Hover: the Figma 270deg brand gradient (darker right, lighter left), white label, arrow swings from ↗ to →. The compound
+   selectors out-rank .btn--inverse:hover and .btn:hover .btn__arrow--diagonal
+   whatever the stylesheet order. */
+.get-in-touch__button.btn--inverse:hover {
+  background-color: var(--color-brand);
+  background-image: linear-gradient(
+    270deg,
+    var(--color-brand-dark) -7.81%,
+    var(--color-brand) 98.36%
+  );
+  background-origin: border-box;
+  color: #ffffff;
+}
+
+.get-in-touch__button.btn:hover .btn__arrow.btn__arrow--diagonal {
+  transform: translateX(3px);
+}
+
+.get-in-touch__button.btn:hover .btn__arrow path {
+  stroke: #ffffff;
+}
+
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 @media (max-width: 575px) {
   .get-in-touch {
