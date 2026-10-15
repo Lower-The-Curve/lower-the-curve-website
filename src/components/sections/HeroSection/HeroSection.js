@@ -188,12 +188,23 @@ function accentedTitle(title) {
   ));
 }
 
-export default function HeroSection({ section }) {
+export default function HeroSection({ section, artwork }) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
   const description = fieldValue(section, 'description');
-  const image = imageFrom(section, 'image');
+  // The desktop artwork: the metaobject's `image` when one is authored, otherwise
+  // the local asset path the page hands in via `artwork`. Shopify can't host SVG
+  // files, so a design that ships as SVG lives in `public/assets/` and its path
+  // is passed here — it behaves exactly like an uploaded image, and an upload to
+  // the `image` field still wins, so taking over from the admin needs no code
+  // change. Example: the services hero's `Headline section (2).svg`, whose export
+  // needed one fix: Figma painted the white fade rect UNDER the blobs and clipped
+  // them flat at y=815, leaving a hard edge through the grey blob — painting the
+  // rect last reproduces the design's soft fade.
+  const authoredImage = imageFrom(section, 'image');
+  const localArtwork = authoredImage ? null : artwork;
+  const image = authoredImage ?? (localArtwork ? { url: localArtwork } : null);
   // The phone-shaped artwork. The live `hero_section` entry has no value for this
   // today, so it resolves to null and `image` covers every width — the hero is
   // never left with no artwork. Set `image_mobile` on the metaobject and it takes
@@ -218,7 +229,7 @@ export default function HeroSection({ section }) {
     <section
       className={`hero ${alignClass(section)} ${scrollAlignClass(section)}${
         whiteScroll ? ' hero--scroll-color-white' : ''
-      }`}
+      }${artwork ? ' hero--asset' : ''}`}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -228,7 +239,11 @@ export default function HeroSection({ section }) {
           so the artwork starts at the very top of the page and the transparent
           header renders over it — see HeroSection.css. */}
       {image && (
-        <div className="hero__backdrop">
+        <div
+          className={`hero__backdrop${
+            localArtwork ? ' hero__backdrop--asset' : ''
+          }`}
+        >
           {/* Two elements rather than one with a swapped src: this is a Server
               Component, so there is no viewport to branch on at render time and
               the choice has to be made in CSS. When no mobile artwork is
@@ -242,7 +257,9 @@ export default function HeroSection({ section }) {
             priority
             className={`hero__image${
               mobileImage ? ' hero__image--wide' : ''
-            }${portraitArt ? ' hero__image--portrait' : ''}`}
+            }${portraitArt ? ' hero__image--portrait' : ''}${
+              localArtwork ? ' hero__image--asset' : ''
+            }`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
 

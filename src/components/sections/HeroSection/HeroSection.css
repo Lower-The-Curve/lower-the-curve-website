@@ -74,6 +74,34 @@
   object-position: center top;
 }
 
+/* The local-SVG artwork is STUCK at its natural 1440px and hangs off the right
+   edge: `object-fit: none` draws it at 1:1 inside the full-width image box, so
+   a narrower screen crops it instead of shrinking it and a wider one reveals
+   more white to its left. Same technique as the portrait rule below; it is the
+   way to size the artwork here because next/image's `fill` pins the box itself
+   with an inline `width: 100%` that a class can't override. */
+.hero__image--asset {
+  object-fit: none;
+  object-position: right top;
+}
+
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .hero__image--asset {
+    object-position: right 6rem;
+  }
+}
+
+.hero__backdrop--asset::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 15%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+}
+
 
 @media (min-width: 1025px) {
   .hero__image--portrait {
@@ -325,5 +353,21 @@
 
   .hero__image--narrow {
     display: block;
+  }
+}
+
+@media (max-width: 1199px) {
+  .hero--asset .hero__image--wide {
+    display: none;
+  }
+
+  .hero--asset .hero__image--narrow {
+    display: block;
+    object-fit: contain;
+    object-position: right top;
+  }
+
+  .hero__backdrop--asset::after {
+    display: none;
   }
 }
