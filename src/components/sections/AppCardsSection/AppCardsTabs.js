@@ -1,11 +1,20 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import accentedTitle from "@/components/ui/accentedTitle";
 import Button from "@/components/ui/Button/Button";
 import AppCardDialog from "./AppCardDialog";
 import "./AppCardsSection.css";
+
+// Learn More button: 0.45s in, a beat held, 0.45s back out.
+const PRESSED_MS = 900;
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;
@@ -94,7 +103,16 @@ export default function AppCardsTabs({ section, popups }) {
 
   const [active, setActive] = useState(initial);
   const [activeCardId, setActiveCardId] = useState(null);
+  // Card whose Learn More just got clicked: it plays the outline state and then
+  // reverts on its own.
+  const [pressedCardId, setPressedCardId] = useState(null);
   const scrollerRef = useRef(null);
+
+  useEffect(() => {
+    if (!pressedCardId) return;
+    const timer = setTimeout(() => setPressedCardId(null), PRESSED_MS);
+    return () => clearTimeout(timer);
+  }, [pressedCardId]);
 
   useLayoutEffect(() => {
     const scroller = scrollerRef.current;
@@ -283,13 +301,21 @@ export default function AppCardsTabs({ section, popups }) {
                   )}
                   {showButton && (
                     <Button
-                      className="app-cards__card-button"
+                      className={
+                        pressedCardId === card.id
+                          ? "app-cards__card-button app-cards__card-button--pressed"
+                          : "app-cards__card-button"
+                      }
                       variant="primary"
                       arrow="diagonal"
                       size="md"
                       aria-haspopup="dialog"
                       onClick={() => {
-                        if (popup) setActiveCardId(card.id);
+                        setPressedCardId(card.id);
+                        // A transition, so the pressed state commits and paints
+                        // first instead of waiting on the dialog's render.
+                        if (popup)
+                          startTransition(() => setActiveCardId(card.id));
                       }}
                     >
                       Learn More

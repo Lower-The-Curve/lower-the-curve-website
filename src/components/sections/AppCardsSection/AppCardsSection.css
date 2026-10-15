@@ -1,3 +1,15 @@
+@property --app-button-from {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --app-button-to {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 @property --indicator-left {
   syntax: '<length>';
   inherits: true;
@@ -246,6 +258,43 @@
 .app-cards__card-button {
   margin-top: auto;
   align-self: flex-end;
+  /* The fill is rebuilt from two registered colours because browsers cannot
+     animate between background-images — this lets the gradient fade out. */
+  --app-button-from: var(--color-brand-dark);
+  --app-button-to: var(--color-brand);
+  background-color: transparent;
+  background-image: linear-gradient(
+    135deg,
+    var(--app-button-from),
+    var(--app-button-to)
+  );
+  transition: --app-button-from 0.45s ease, --app-button-to 0.45s ease,
+    border-color 0.45s ease, color 0.45s ease, transform 0.2s ease;
+}
+
+.app-cards__card-button:hover {
+  --app-button-from: var(--color-brand-darker);
+  --app-button-to: var(--color-brand-dark);
+}
+
+.app-cards__card-button .btn__arrow {
+  transition: transform 0.45s ease;
+}
+
+/* Clicked: outline pill with a straight arrow, fading in then back out (the
+   class is added on click and removed after PRESSED_MS in AppCardsTabs.js).
+   Written here rather than as a Button variant because it is a transient state
+   of this one button. */
+.app-cards__card-button--pressed,
+.app-cards__card-button--pressed:hover {
+  --app-button-from: transparent;
+  --app-button-to: transparent;
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.app-cards__card-button--pressed .btn__arrow {
+  transform: none;
 }
 
 .app-cards__card-expand {
