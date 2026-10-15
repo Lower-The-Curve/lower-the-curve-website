@@ -197,6 +197,7 @@
 
   .banner--story .banner__content {
     grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     gap: 2rem;
   }
 
