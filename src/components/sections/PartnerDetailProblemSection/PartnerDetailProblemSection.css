@@ -353,20 +353,19 @@
   }
 }
 
-/* Ambient drift on the sphere and blue dot — individual `translate` / `scale` so
-   it composes with the sphere's rotate. --drift scales the travel for the small
-   dot. */
+/* Ambient drift on the sphere — individual `translate` / `scale` so it composes
+   with the sphere's rotate. */
 @keyframes partner-detail-problem-glow-drift {
   25% {
-    translate: calc(var(--drift, 1) * -3rem) calc(var(--drift, 1) * 2rem);
+    translate: -3rem 2rem;
     scale: 1.12;
   }
   50% {
-    translate: calc(var(--drift, 1) * -1rem) calc(var(--drift, 1) * 4.5rem);
+    translate: -1rem 4.5rem;
     scale: 0.94;
   }
   75% {
-    translate: calc(var(--drift, 1) * 2.5rem) calc(var(--drift, 1) * 1.5rem);
+    translate: 2.5rem 1.5rem;
     scale: 1.08;
   }
 }
@@ -375,14 +374,8 @@
   animation: partner-detail-problem-glow-drift 16s ease-in-out infinite;
 }
 
-.partner-detail-problem__blue-dot {
-  --drift: 0.5;
-  animation: partner-detail-problem-glow-drift 20s ease-in-out infinite reverse;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .partner-detail-problem__sphere,
-  .partner-detail-problem__blue-dot {
+  .partner-detail-problem__sphere {
     animation: none;
   }
 }
