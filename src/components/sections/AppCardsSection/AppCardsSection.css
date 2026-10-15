@@ -429,3 +429,52 @@
     transition: none;
   }
 }
+
+/* Ambient drift on the glows — individual `translate` / `scale` / `opacity` so
+   it composes with any `transform`. Same treatment as the services page: the
+   grey glow moves vertically only (its right edge is clipped art), the green
+   one wanders, scaled down because it is a small disc. */
+@keyframes app-cards-gray-glow-drift {
+  25% {
+    translate: 0 5rem;
+    opacity: 0.6;
+  }
+  50% {
+    translate: 0 10rem;
+    opacity: 1;
+  }
+  75% {
+    translate: 0 4rem;
+    opacity: 0.6;
+  }
+}
+
+@keyframes app-cards-green-glow-drift {
+  25% {
+    translate: 2rem -1.5rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: 0.5rem -3rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: -1.5rem -1rem;
+    scale: 1.1;
+  }
+}
+
+.app-cards__glow--gray {
+  animation: app-cards-gray-glow-drift 16s ease-in-out infinite;
+}
+
+.app-cards__glow--green {
+  animation: app-cards-green-glow-drift 20s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-cards__glow--gray,
+  .app-cards__glow--green {
+    animation: none;
+  }
+}

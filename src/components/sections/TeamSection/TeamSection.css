@@ -321,3 +321,30 @@
     transition: none;
   }
 }
+
+/* Ambient drift on the glow — individual `translate` / `scale` so it composes
+   with the positioning above. */
+@keyframes team-glow-drift {
+  25% {
+    translate: 3rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: 1rem 5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: -2rem 1.5rem;
+    scale: 1.08;
+  }
+}
+
+.team__glow {
+  animation: team-glow-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team__glow {
+    animation: none;
+  }
+}

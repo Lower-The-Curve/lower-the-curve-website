@@ -598,3 +598,36 @@
     line-height: 16px;
   }
 }
+
+/* Ambient drift on the glows — individual `translate` / `scale` so it composes
+   with the `transform` the layouts set (the mobile rotate). Different durations
+   keep the two out of step. */
+@keyframes delivered-glow-drift {
+  25% {
+    translate: -3rem 2rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: -1rem 4.5rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.1;
+  }
+}
+
+.delivered__glow {
+  animation: delivered-glow-drift 16s ease-in-out infinite;
+}
+
+.delivered__blue-glow {
+  animation: delivered-glow-drift 20s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delivered__glow,
+  .delivered__blue-glow {
+    animation: none;
+  }
+}

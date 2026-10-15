@@ -417,9 +417,57 @@
   }
 }
 
+/* Slow ambient drift on the glows. Uses the individual `translate` / `scale` /
+   `opacity` properties so it composes with the `transform` the layouts already
+   set to position them (a transform keyframe would overwrite that). The grey
+   glow moves vertically only, so its right-hand edge stays put. Offset
+   durations keep the two glows from moving in lockstep. */
+@keyframes project-route-glow-drift {
+  25% {
+    translate: 0 5rem;
+    opacity: 0.6;
+  }
+  50% {
+    translate: 0 10rem;
+    opacity: 1;
+  }
+  75% {
+    translate: 0 4rem;
+    opacity: 0.6;
+  }
+}
+
+@keyframes project-route-green-glow-drift {
+  25% {
+    translate: -4rem 2.5rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: -1.5rem 6rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: 3rem 2rem;
+    scale: 1.1;
+  }
+}
+
+.project-route__glow {
+  animation: project-route-glow-drift 16s ease-in-out infinite;
+}
+
+.project-route__green-glow {
+  animation: project-route-green-glow-drift 20s ease-in-out infinite reverse;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .project-route__indicator,
   .project-route__tab {
     transition: none;
+  }
+
+  .project-route__glow,
+  .project-route__green-glow {
+    animation: none;
   }
 }

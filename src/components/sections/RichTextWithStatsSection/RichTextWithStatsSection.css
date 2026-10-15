@@ -856,3 +856,30 @@
 .rich-text-with-stats--backdrop-art {
   margin-bottom: 24px;
 }
+
+/* Ambient drift on the green glow — `translate` / `scale` so it composes with
+   the layout's own positioning. */
+@keyframes rich-text-with-stats-glow-drift {
+  25% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: 0.5rem 3rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: -2rem 1rem;
+    scale: 1.1;
+  }
+}
+
+.rich-text-with-stats__glow {
+  animation: rich-text-with-stats-glow-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rich-text-with-stats__glow {
+    animation: none;
+  }
+}
