@@ -9,9 +9,12 @@
   height: 800px;
   max-height: 90vh;
   padding: 0;
-  border: 0;
-  border-radius: 1.5rem;
-  background: #f2f2f2;
+  border: 5px solid transparent;
+  border-radius: 50px;
+  /* gradient border: border-image would square off the rounded corners */
+  background:
+    linear-gradient(#ededed, #ededed) padding-box,
+    linear-gradient(90deg, #ffffff 0%, rgb(189 189 189 / 0.5) 100%) border-box;
   color: var(--color-text);
   overflow: hidden;
 }
@@ -26,7 +29,12 @@
   overflow-y: auto;
   overflow-x: clip;
   overscroll-behavior: contain;
-  padding: 2rem 3rem;
+  scrollbar-width: none;
+  padding: 63px 65px 18px 60px;
+}
+
+.app-card-dialog__panel::-webkit-scrollbar {
+  display: none;
 }
 
 .app-card-dialog__top {
@@ -86,16 +94,18 @@
 }
 
 .app-card-dialog__name {
-  font-size: 24px;
+  font-size: var(--fs-heading-sm);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1;
   margin: 0;
 }
 
 .app-card-dialog__subtitle {
-  font-size: 16px;
+  font-size: var(--fs-body-base);
+  font-weight: 300;
+  line-height: 1;
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--color-ink);
 }
 
 .app-card-dialog__badge {
@@ -113,14 +123,17 @@
 }
 
 .app-card-dialog__block-label {
-  font-size: 24px;
+  font-size: var(--fs-heading-sm);
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 24px;
   margin: 0 0 0.25rem;
 }
 
 .app-card-dialog__block-text {
-  font-size: 16px;
+  font-size: var(--fs-body-base);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--color-ink);
   margin: 0;
 }
 
@@ -142,14 +155,13 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-right: 1.5rem;
 }
 
 .app-card-dialog__thumbs {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6.01px;
 }
 
 .app-card-dialog__thumb-wrap {
@@ -209,8 +221,9 @@
 
 .app-card-dialog__thumb-image {
   display: block;
-  width: 154.11279296875px;
-  height: 86.68844604492188px;
+  /* outer size 154.11 x 86.69 incl. the 2px border, so 4 thumbs + 3 gaps = hero height */
+  width: calc(154.11279296875px - 4px);
+  height: calc(86.68844604492188px - 4px);
   object-fit: cover;
 }
 
@@ -235,20 +248,26 @@
 }
 
 .app-card-dialog__title {
-  font-size: 24px;
+  font-size: var(--fs-heading-sm);
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 24px;
   margin: 0 0 0.5rem;
 }
 
 .app-card-dialog__story {
-  font-size: 16px;
+  font-size: var(--fs-body-base);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--color-ink);
   margin: 0 0 0.75rem;
   white-space: pre-line;
 }
 
 .app-card-dialog__bullets {
-  font-size: 16px;
+  font-size: var(--fs-body-base);
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--color-ink);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -256,10 +275,14 @@
   padding-left: 1.25rem;
 }
 
+.app-card-dialog__view-more {
+  margin-top: 40px;
+}
+
 .app-card-dialog__view-more-title {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.4;
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 24px;
   margin: 0 0 0.75rem;
 }
 
@@ -525,6 +548,7 @@
 }
 .app-card-dialog__block-text{
   font-size: 8px;
+  line-height: 10px;
 }
   .app-card-dialog__hero{
     width: 357px;
@@ -552,7 +576,7 @@
 
   .app-card-dialog__name {
     font-size: 14px;
-    line-height: 1.25;
+    line-height: 1;
   }
   .app-card-dialog__title {
     font-size: 10px;
@@ -560,6 +584,7 @@
   }
   .app-card-dialog__story {
     font-size: 8px;
+    line-height: 10px;
   }
   .app-card-dialog__badge{
     font-size: 6px;
@@ -569,9 +594,11 @@
   }
   .app-card-dialog__bullets {
   font-size: 8px;
+  line-height: 10px;
 }
 .app-card-dialog__view-more-title {
   font-size: 10px;
+  line-height: 12px;
 }
 .app-card-dialog__view-more-name {
   font-size: 6px;
@@ -602,13 +629,14 @@
 
 @media (min-width: 1025px) {
   .app-card-dialog__panel {
-    padding: calc(32 * var(--app-dialog-px)) calc(48 * var(--app-dialog-px));
+    padding: calc(63 * var(--app-dialog-px)) calc(65 * var(--app-dialog-px))
+      calc(18 * var(--app-dialog-px)) calc(60 * var(--app-dialog-px));
   }
 
   .app-card-dialog__top {
     grid-template-columns: minmax(0, 1fr) calc(530 * var(--app-dialog-px)) auto;
-    gap: calc(24 * var(--app-dialog-px));
-    margin-bottom: calc(24 * var(--app-dialog-px));
+    gap: calc(32 * var(--app-dialog-px));
+    margin-bottom: calc(40 * var(--app-dialog-px));
   }
 
   .app-card-dialog__top--no-gallery {
@@ -620,7 +648,7 @@
   }
 
   .app-card-dialog__content {
-    gap: calc(24 * var(--app-dialog-px));
+    gap: calc(34 * var(--app-dialog-px));
   }
 
   .app-card-dialog__blocks {
@@ -656,11 +684,13 @@
 
   .app-card-dialog__block-label {
     font-size: calc(24 * var(--app-dialog-px));
+    line-height: calc(24 * var(--app-dialog-px));
     margin-bottom: calc(4 * var(--app-dialog-px));
   }
 
   .app-card-dialog__block-text {
     font-size: calc(16 * var(--app-dialog-px));
+    line-height: calc(20 * var(--app-dialog-px));
   }
 
   .app-card-dialog__hero {
@@ -671,11 +701,11 @@
 
   .app-card-dialog__gallery {
     gap: calc(16 * var(--app-dialog-px));
-    padding-right: calc(24 * var(--app-dialog-px));
+    padding-right: 0;
   }
 
   .app-card-dialog__thumbs {
-    gap: calc(8 * var(--app-dialog-px));
+    gap: calc(6.01 * var(--app-dialog-px));
   }
 
   .app-card-dialog__thumb {
@@ -684,8 +714,8 @@
   }
 
   .app-card-dialog__thumb-image {
-    width: calc(154.11279296875 * var(--app-dialog-px));
-    height: calc(86.68844604492188 * var(--app-dialog-px));
+    width: calc((154.11279296875 - 4) * var(--app-dialog-px));
+    height: calc((86.68844604492188 - 4) * var(--app-dialog-px));
   }
 
   .app-card-dialog__more {
@@ -701,23 +731,32 @@
 
   .app-card-dialog__title {
     font-size: calc(24 * var(--app-dialog-px));
+    line-height: calc(24 * var(--app-dialog-px));
     margin-bottom: calc(8 * var(--app-dialog-px));
   }
 
   .app-card-dialog__story {
     font-size: calc(16 * var(--app-dialog-px));
+    line-height: calc(20 * var(--app-dialog-px));
     margin-bottom: calc(12 * var(--app-dialog-px));
   }
 
   .app-card-dialog__bullets {
+    font-size: calc(16 * var(--app-dialog-px));
+    line-height: calc(20 * var(--app-dialog-px));
     gap: calc(8 * var(--app-dialog-px));
     margin-bottom: calc(16 * var(--app-dialog-px));
     padding-left: calc(20 * var(--app-dialog-px));
     font-size: calc(16 * var(--app-dialog-px));
   }
 
+  .app-card-dialog__view-more {
+    margin-top: calc(40 * var(--app-dialog-px));
+  }
+
   .app-card-dialog__view-more-title {
     font-size: calc(24 * var(--app-dialog-px));
+    line-height: calc(24 * var(--app-dialog-px));
     margin-bottom: calc(12 * var(--app-dialog-px));
   }
 
