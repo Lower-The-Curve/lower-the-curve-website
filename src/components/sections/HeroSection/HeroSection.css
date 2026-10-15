@@ -100,18 +100,21 @@
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
-  /* A measure, not a fixed width. `ch` scales with the heading token, so the
-     design's three-line break ("Building Apps that / power Shopify stores /
-     worldwide") holds at 64px, 52px and 40px without a media query.
+  max-width: 744px;
+}
 
-     18.5ch sits between the two bounds that set the break: the longest line
-     that has to fit — "power Shopify stores" (~17ch) — and the shortest run
-     that must NOT fit on the first line — "Building Apps that power"
-     (~20.1ch). Measured against Poppins' own advances, so the break is the
-     same at every tier the viewport can fit these lines. A materially
-     different headline moves both bounds — this is a measure, not a
-     guarantee. */
-  max-width: 18.5ch;
+/* The headline measure at the narrower two tiers. Kept beside the desktop
+   value so the three sit together. */
+@media (max-width: 1024px) {
+  .hero__title {
+    max-width: 604px;
+  }
+}
+
+@media (max-width: 575px) {
+  .hero__title {
+    max-width: 465px;
+  }
 }
 
 /* Authored <br>s set the lines, so the measure is dropped. */
