@@ -18,6 +18,9 @@
 //
 // Note the gradient runs dark-on-the-RIGHT (x1 is the larger x), matching the
 // hero headline's blue accent rather than the buttons' dark-on-left order.
+
+import './ChevronsDownIcon.css';
+
 export default function ChevronsDownIcon({ className }) {
   return (
     <svg
@@ -31,6 +34,7 @@ export default function ChevronsDownIcon({ className }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--bottom"
         d="M22.5 35.5L12.5 45.5L2.5 35.5"
         stroke="url(#ltcChevronGradient)"
         strokeWidth="5"
@@ -38,6 +42,7 @@ export default function ChevronsDownIcon({ className }) {
         strokeLinejoin="round"
       />
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--middle"
         d="M22.5 19L12.5 29L2.5 19"
         stroke="url(#ltcChevronGradient)"
         strokeWidth="5"
@@ -45,6 +50,7 @@ export default function ChevronsDownIcon({ className }) {
         strokeLinejoin="round"
       />
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--top"
         d="M22.5 2.5L12.5 12.5L2.5 2.5"
         stroke="url(#ltcChevronGradient)"
         strokeWidth="5"

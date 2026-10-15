@@ -388,6 +388,14 @@
     padding-bottom: 80px;
   }
 
+  .hero__scroll-text {
+    font-size: var(--fs-body-base);
+  }
+
+  .hero__scroll-text--mixed {
+    line-height: 1.25;
+  }
+
   /* "… Left | Center": headline only; the scroll cue keeps its own
      alignment. `.hero` doubled up so these beat the desktop content_align
      rules regardless of source order. */
