@@ -21,6 +21,9 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //   scroll_color         -> single_line_text_field, "Blue" | "White"; the cue's
 //                           colour, label and chevrons alike
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
+//   content_position_mobile -> optional choice list, phones only (≤575px):
+//                           "Top Left" | "Top Center" | "Center Left" |
+//                           "Center Center". Empty keeps the desktop placement
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
 export const HERO_SECTION_TYPE = 'hero_section';
@@ -91,6 +94,32 @@ function isWhiteScroll(section) {
   return fieldValue(section, 'scroll_color')?.trim().toLowerCase() === 'white';
 }
 
+// Phone-only placement of the headline block, from `content_position_mobile`:
+// "Top Left" | "Top Center" | "Center Left" | "Center Center" (any casing).
+// The first word is the vertical position, the second the text alignment.
+// Only the headline moves — the scroll cue keeps its own alignment. Empty or
+// unrecognised values leave the desktop behaviour.
+const MOBILE_VERTICAL = {
+  top: 'hero--mobile-top',
+  center: 'hero--mobile-center',
+};
+const MOBILE_ALIGN = {
+  left: 'hero--mobile-align-left',
+  center: 'hero--mobile-align-center',
+};
+
+function mobilePositionClasses(section) {
+  const [vertical, horizontal] = (
+    fieldValue(section, 'content_position_mobile') ?? ''
+  )
+    .trim()
+    .toLowerCase()
+    .split(/\s+/);
+  return [MOBILE_VERTICAL[vertical], MOBILE_ALIGN[horizontal]]
+    .filter(Boolean)
+    .join(' ');
+}
+
 // The design accents part of the headline — a green run and a blue one — and
 // those runs are also the only bold text in it, against a regular-weight
 // heading. Which words they are is editorial, so it's authored in the metafield
@@ -110,7 +139,7 @@ const ACCENT_CLASSES = {
 };
 
 const ACCENT_SPAN =
-  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>/gi;
+  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
 
 const SENTENCE_BREAK = /[.!?](?:<\/span>)?\s+/;
 
@@ -154,6 +183,14 @@ function titleSentenceLines(title) {
   for (const match of title.matchAll(ACCENT_SPAN)) {
     if (match.index > cursor) pushText(title.slice(cursor, match.index));
 
+    // <br>: an authored line break, kept inside the current line so a blank
+    // line ("a.<br><br>b") survives.
+    if (match[1] === undefined) {
+      line.push(<br key={match.index} />);
+      cursor = match.index + match[0].length;
+      continue;
+    }
+
     // Tolerates extra classes on the span (`class="green-gradient wide"`).
     const accent = match[1]
       .split(/\s+/)
@@ -188,7 +225,33 @@ function accentedTitle(title) {
   ));
 }
 
-export default function HeroSection({ section, artwork }) {
+// The scroll label may bold part of itself, as in the design:
+//   Scroll down to <strong>Explore more</strong>
+// Only <strong>/<b> are understood; the rest renders as text.
+const SCROLL_STRONG = /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+
+function scrollLabel(text) {
+  const parts = [];
+  let cursor = 0;
+  for (const match of text.matchAll(SCROLL_STRONG)) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+    parts.push(
+      <strong key={match.index} className="hero__scroll-strong">
+        {match[2]}
+      </strong>
+    );
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return parts;
+}
+
+export default function HeroSection({
+  section,
+  artwork,
+  appIcons = false,
+  fadeBottom = false,
+}) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
@@ -222,14 +285,22 @@ export default function HeroSection({ section, artwork }) {
     'scroll_botttom_text',
     'scroll_bottom_text'
   );
-  
+
   const whiteScroll = isWhiteScroll(section);
 
   return (
     <section
-      className={`hero ${alignClass(section)} ${scrollAlignClass(section)}${
-        whiteScroll ? ' hero--scroll-color-white' : ''
-      }${artwork ? ' hero--asset' : ''}`}
+      className={[
+        'hero',
+        alignClass(section),
+        scrollAlignClass(section),
+        mobilePositionClasses(section),
+        whiteScroll && 'hero--scroll-color-white',
+        artwork && 'hero--asset',
+        fadeBottom && 'hero--fade-bottom',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -278,25 +349,69 @@ export default function HeroSection({ section, artwork }) {
       )}
 
       <div className="hero__content">
-        {title && (
-          <h1
-            className={`hero__title${
-              hasSentenceBreak(title) ? ' hero__title--sentences' : ''
-            }`}
-          >
-            {accentedTitle(title)}
-          </h1>
-        )}
+        <div className="hero__heading">
+          {appIcons && (
+            <div className="hero__icons-row" aria-hidden="true">
+              <Image
+                src="/assets/Shopify apps logos frame.svg"
+                alt=""
+                width={329}
+                height={54}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--left" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416.svg"
+                alt=""
+                width={213}
+                height={434}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {title && (
+            <h1
+              className={`hero__title${
+                hasSentenceBreak(title) ? ' hero__title--sentences' : ''
+              }${/<br\s*\/?>/i.test(title) ? ' hero__title--manual' : ''}`}
+            >
+              {accentedTitle(title)}
+            </h1>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--right" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416 (1).svg"
+                alt=""
+                width={213}
+                height={428}
+                unoptimized
+              />
+            </div>
+          )}
+        </div>
+
         {description && <p className="hero__description">{description}</p>}
       </div>
 
       {scrollText && (
         <div className="hero__scroll">
-          <span className="hero__scroll-text">{scrollText}</span>
-          <ChevronsDownIcon
-            className="hero__scroll-icon"
-            gradient={!whiteScroll}
-          />
+          <span
+            className={
+              /<(strong|b)\b/i.test(scrollText)
+                ? 'hero__scroll-text hero__scroll-text--mixed'
+                : 'hero__scroll-text'
+            }
+          >
+            {scrollLabel(scrollText)}
+          </span>
+          <ChevronsDownIcon className="hero__scroll-icon" />
         </div>
       )}
     </section>

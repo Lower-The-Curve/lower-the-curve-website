@@ -31,6 +31,12 @@ function imageFrom(node, ...keys) {
   return null;
 }
 
+// A file field's URL. SVG uploads can arrive as a GenericFile, not a MediaImage.
+function fileUrl(node, key) {
+  const ref = field(node, key)?.reference;
+  return ref?.image?.url ?? ref?.url ?? null;
+}
+
 function referencesFrom(node, ...keys) {
   for (const key of keys) {
     const nodes = field(node, key)?.references?.nodes;
@@ -128,6 +134,19 @@ export default function RichTextWithStatsSection({ section }) {
   const hasStats = stats.length > 0;
   const hasFigmaLayout = Boolean(image && (hasStats || showVector));
   const hasVector = hasFigmaLayout && showVector;
+  // Decorative art behind the image: `background_svg` (blue ellipse) and
+  // `green_glow`. Positioned in CSS.
+  // Only for the plain image layout (Case Studies). The stats/arch layout
+  // (Services) draws its own art and keeps its own sizing.
+  const backdropAllowed = Boolean(image) && !hasFigmaLayout;
+  const backgroundSvg = backdropAllowed
+    ? fileUrl(section, 'background_svg')
+    : null;
+  const greenGlow = backdropAllowed ? fileUrl(section, 'green_glow') : null;
+  // `image_position`: Left (default) | Right. Desktop only; phones stack.
+  const mediaRight =
+    Boolean(image) &&
+    fieldValue(section, 'image_position')?.trim().toLowerCase() === 'right';
   const buttonVariant =
     fieldValue(section, 'button_styles')?.trim().toLowerCase() === 'outline'
       ? 'secondary'
@@ -140,12 +159,43 @@ export default function RichTextWithStatsSection({ section }) {
         image ? 'rich-text-with-stats--has-media' : ''
       } ${hasStats ? 'rich-text-with-stats--with-stats' : ''} ${
         hasFigmaLayout ? 'rich-text-with-stats--figma-art' : ''
+      } ${mediaRight ? 'rich-text-with-stats--media-right' : ''} ${
+        backgroundSvg || greenGlow ? 'rich-text-with-stats--backdrop-art' : ''
       }`}
     >
       <div className="rich-text-with-stats__clip">
         <div className="rich-text-with-stats__inner">
           {image && (
             <div className="rich-text-with-stats__media">
+              {/* The ellipse twice: a blurred copy for its upper part (under
+                  Figma's blur layer) and the sharp one for its lower part. */}
+              {backgroundSvg &&
+                [
+                  'rich-text-with-stats__vector rich-text-with-stats__vector--soft',
+                  'rich-text-with-stats__vector',
+                ].map((className) => (
+                  <Image
+                    key={className}
+                    src={backgroundSvg}
+                    alt=""
+                    width={900}
+                    height={180}
+                    className={className}
+                    aria-hidden="true"
+                    unoptimized
+                  />
+                ))}
+              {greenGlow && (
+                <Image
+                  src={greenGlow}
+                  alt=""
+                  width={300}
+                  height={300}
+                  className="rich-text-with-stats__glow"
+                  aria-hidden="true"
+                  unoptimized
+                />
+              )}
               {hasFigmaLayout ? (
                 <div className="rich-text-with-stats__art-stage">
                   {hasVector && (
@@ -167,7 +217,11 @@ export default function RichTextWithStatsSection({ section }) {
                   width={image.width ?? 1000}
                   height={image.height ?? 800}
                   className="rich-text-with-stats__image"
-                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  sizes={
+                    backgroundSvg || greenGlow
+                      ? '(max-width: 1024px) 100vw, 65vw'
+                      : '(max-width: 1024px) 100vw, 42vw'
+                  }
                   unoptimized={/\.svg(\?|$)/i.test(image.url)}
                 />
               )}
@@ -215,7 +269,7 @@ export default function RichTextWithStatsSection({ section }) {
               <Button
                 href={buttonLink.url}
                 variant={buttonVariant}
-                arrow="rise"
+                arrow={backgroundSvg || greenGlow ? 'diagonal' : 'rise'}
                 className="rich-text-with-stats__button"
               >
                 {buttonLink.text}

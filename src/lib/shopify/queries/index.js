@@ -3,3 +3,4 @@
 // import from '@/lib/shopify/queries' or './queries'.
 export * from './pages';
 export * from './sections';
+export * from './appPopUp';

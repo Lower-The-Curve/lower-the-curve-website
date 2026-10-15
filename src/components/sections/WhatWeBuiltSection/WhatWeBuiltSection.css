@@ -26,7 +26,9 @@
   z-index: 1;
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space) 6rem;
+  /* Figma gap: 50px from the Approach section above, 0 to Results below (it
+     owns its own 70px top padding). */
+  padding: 50px var(--space) 0;
   display: flex;
   flex-direction: column;
   gap: 3.5rem;
@@ -159,7 +161,9 @@
   }
 
   .what-we-built__inner {
-    padding: 3rem var(--space) 4rem;
+    /* 50px to Approach above, 0 to Results below (it owns its own 50px
+       top). */
+    padding: 50px var(--space) 0;
     gap: 2.5rem;
   }
 

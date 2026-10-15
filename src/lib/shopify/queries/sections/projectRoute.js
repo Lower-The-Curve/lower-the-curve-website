@@ -57,6 +57,11 @@ export const projectRouteSectionFragment = /* GraphQL */ `
                             height
                           }
                         }
+                        ... on Metaobject {
+                          id
+                          type
+                          handle
+                        }
                       }
                     }
                   }

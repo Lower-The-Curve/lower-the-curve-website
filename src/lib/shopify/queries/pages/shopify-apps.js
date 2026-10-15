@@ -4,8 +4,14 @@ import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
 // (handle "shopify-apps") with one reference field per component slot. The
 // ORDER OF THOSE SLOTS is the order the page renders in.
 //
-// Live keys are `sections` and `component_6`. `component6` is only an alias
-// for the underscore key. Render order is this list, not the `fields` array.
+// Live keys are `sections`, `section_2` and `component_3`. `component2` is
+// only an alias for the underscore key (the admin's "Component 2"), the same
+// pattern as home. Render order is this list, not the `fields` array.
+//
+// `component_6` is deliberately NOT queried: it is a legacy slot that still
+// references the same "Copy of How we get things Done" entry as `component_3`,
+// so selecting it would render the process section twice. Clear that slot in
+// the admin when convenient; add it here once it holds a different section.
 //
 // Section field selections come from each section's fragment in ../sections.
 export const getShopifyAppsPageQuery = /* GraphQL */ `
@@ -16,7 +22,10 @@ export const getShopifyAppsPageQuery = /* GraphQL */ `
       sections: field(key: "sections") {
         ...PageComponentFields
       }
-      component6: field(key: "component_6") {
+      component2: field(key: "section_2") {
+        ...PageComponentFields
+      }
+      component3: field(key: "component_3") {
         ...PageComponentFields
       }
     }
