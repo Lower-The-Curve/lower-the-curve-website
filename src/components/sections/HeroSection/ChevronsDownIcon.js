@@ -34,6 +34,7 @@ export default function ChevronsDownIcon({ className, gradient = true }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--bottom"
         d="M22.5 35.5L12.5 45.5L2.5 35.5"
         stroke={stroke}
         strokeWidth="5"
@@ -41,6 +42,7 @@ export default function ChevronsDownIcon({ className, gradient = true }) {
         strokeLinejoin="round"
       />
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--middle"
         d="M22.5 19L12.5 29L2.5 19"
         stroke={stroke}
         strokeWidth="5"
@@ -48,6 +50,7 @@ export default function ChevronsDownIcon({ className, gradient = true }) {
         strokeLinejoin="round"
       />
       <path
+        className="chevrons-down__chevron chevrons-down__chevron--top"
         d="M22.5 2.5L12.5 12.5L2.5 2.5"
         stroke={stroke}
         strokeWidth="5"

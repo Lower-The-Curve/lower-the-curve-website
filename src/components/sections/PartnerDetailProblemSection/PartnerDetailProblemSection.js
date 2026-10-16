@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
 import ArrowIcon from '@/components/ui/Button/ArrowIcon';
+import BlueDot from '@/components/sections/SolutionsSection/BlueDot';
 import './PartnerDetailProblemSection.css';
 
 // The partner's "problem" section, right under the partner hero. It reads a
@@ -170,7 +171,11 @@ export default function PartnerDetailProblemSection({ section, partnerName }) {
 
         {issues.length > 0 && (
           <div className="partner-detail-problem__issues">
-            <span className="partner-detail-problem__blue-dot" aria-hidden="true" />
+            {/* Two layers, like the home hero's blobs: the span drifts slowly,
+                the SVG inside it wobbles faster on a mismatched cycle. */}
+            <span className="partner-detail-problem__blue-dot" aria-hidden="true">
+              <BlueDot className="partner-detail-problem__blue-dot-shape" />
+            </span>
 
             <ol className="partner-detail-problem__list">
               {issues.map((issue, index) => {

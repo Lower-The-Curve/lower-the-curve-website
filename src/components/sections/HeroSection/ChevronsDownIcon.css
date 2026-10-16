@@ -1,0 +1,50 @@
+/* Chevrons down — the `chevrons-down` BEM block. The animated scroll cue's
+   three chevrons (ChevronsDownIcon.js).
+
+   Each chevron fades in, holds, and fades out. The three run the same keyframes
+   0.3s apart, so they light up top to bottom and clear in the same order, with
+   a short empty beat before the loop starts again — matching the reference
+   recording. Change the cycle by changing --chevrons-down-cycle and the
+   per-chevron delays together. */
+.chevrons-down__chevron {
+  --chevrons-down-cycle: 2.4s;
+  opacity: 0;
+  animation: chevrons-down-pulse var(--chevrons-down-cycle) ease-in-out infinite both;
+}
+
+.chevrons-down__chevron--top {
+  animation-delay: 0s;
+}
+
+.chevrons-down__chevron--middle {
+  animation-delay: 0.3s;
+}
+
+.chevrons-down__chevron--bottom {
+  animation-delay: 0.6s;
+}
+
+@keyframes chevrons-down-pulse {
+  0% {
+    opacity: 0;
+  }
+  12.5% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  62.5% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevrons-down__chevron {
+    animation: none;
+    opacity: 1;
+  }
+}

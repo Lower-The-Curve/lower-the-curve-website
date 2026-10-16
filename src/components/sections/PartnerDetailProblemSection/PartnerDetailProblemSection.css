@@ -246,15 +246,77 @@
   height: var(--partner-detail-problem-dot);
   top: calc(150px - var(--partner-detail-problem-dot) / 2);
   left: calc(-16px - var(--partner-detail-problem-dot) / 2);
-  border-radius: 50%;
-  background: linear-gradient(
-    to left,
-    var(--color-brand-dark),
-    var(--color-brand)
-  );
-  opacity: 0.9;
-  /* Figma layer blur 4.5 at every size (CSS blur is about half of Figma's). */
-  filter: blur(2.25px);
+  animation: partner-detail-problem-dot-drift 18s ease-in-out -5s infinite both;
+}
+
+/* The dot itself is BlueDot (SolutionsSection) — the same blurred brand
+   gradient circle as the Figma dot, drawn as SVG. Its viewBox is 68 with a
+   55.48-wide circle, so the SVG is 122.57% of the dot box and pulled out by
+   half the difference to keep the circle centred on it. */
+.partner-detail-problem__blue-dot-shape {
+  position: absolute;
+  top: -11.285%;
+  left: -11.285%;
+  display: block;
+  width: 122.57%;
+  height: 122.57%;
+  animation: partner-detail-problem-dot-wobble 5.3s ease-in-out -1.8s infinite both;
+}
+
+/* Motion modelled on the home hero's animated blobs: a slow drift along a
+   loop (outer) plus a small, faster wobble on a mismatched cycle (inner), so
+   the path never visibly repeats. Distances are multiples of the dot size, so
+   the motion shrinks with the dot on smaller screens. The drift is mostly
+   vertical and stays close to the dot's original x, tucked against the
+   cards' edge as in the design. */
+@keyframes partner-detail-problem-dot-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * 0.06),
+      calc(var(--partner-detail-problem-dot) * -0.55)
+    );
+  }
+  50% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * -0.08),
+      calc(var(--partner-detail-problem-dot) * 0.1)
+    );
+  }
+  75% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * 0.04),
+      calc(var(--partner-detail-problem-dot) * 0.6)
+    );
+  }
+}
+
+@keyframes partner-detail-problem-dot-wobble {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * 0.06),
+      calc(var(--partner-detail-problem-dot) * -0.12)
+    );
+  }
+  60% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * -0.1),
+      calc(var(--partner-detail-problem-dot) * 0.06)
+    );
+  }
+  80% {
+    transform: translate(
+      calc(var(--partner-detail-problem-dot) * -0.04),
+      calc(var(--partner-detail-problem-dot) * 0.14)
+    );
+  }
 }
 
 /* Mobile values are the Figma 390 frame's: title -> paragraph 16px,
@@ -350,5 +412,10 @@
   .partner-detail-problem__row,
   .partner-detail-problem__arrow {
     transition: none;
+  }
+
+  .partner-detail-problem__blue-dot,
+  .partner-detail-problem__blue-dot-shape {
+    animation: none;
   }
 }

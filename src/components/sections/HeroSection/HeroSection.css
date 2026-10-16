@@ -424,21 +424,29 @@
 
   /* `content_position_mobile` — "Top …": the headline sits under the header,
      as in the Figma mobile frame, and the free space falls between it and the
-     scroll cue instead of above it. The gap scales with the screen height. */
+     scroll cue instead of above it. */
   .hero--mobile-top .hero__content {
     align-self: start;
-    padding-top: 12svh;
+    padding-top: 90px;
   }
 
-  /* "Top Left" sits a little lower than "Top Center". */
+  /* "Top Left" sits lower than "Top Center". */
   .hero--mobile-top.hero--mobile-align-left .hero__content {
-    padding-top: 90px;
+    padding-top: 140px;
   }
 
   /* "Center …": still centred, but nudged a bit above the true middle.
      Bottom padding shifts the centred block up by half its value. */
   .hero--mobile-center .hero__content {
-    padding-bottom: 10svh;
+    padding-bottom: 80px;
+  }
+
+  .hero__scroll-text {
+    font-size: var(--fs-body-base);
+  }
+
+  .hero__scroll-text--mixed {
+    line-height: 1.25;
   }
 
   /* "… Left | Center": headline only; the scroll cue keeps its own
