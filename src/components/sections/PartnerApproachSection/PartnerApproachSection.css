@@ -37,6 +37,14 @@
   pointer-events: none;
 }
 
+.partner-approach__circle {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  height: auto;
+  pointer-events: none;
+}
+
 .partner-approach__inner {
   /* The Figma row is 1220px wide (4 x 290 + 3 x 20); --max-width less the
      side padding is 1216px, so the cap is restated to fit it. */
@@ -283,6 +291,13 @@
       var(--partner-approach-card)
     );
   }
+
+  .partner-approach__circle {
+    display: block;
+    right: -45px;
+    bottom: -105px;
+    width: 160px;
+  }
 }
 
 @media (max-width: 575px) {
@@ -292,6 +307,13 @@
     top: 29px;
     left: -51px;
     width: 102px;
+  }
+
+  .partner-approach__circle {
+    display: block;
+    right: -27px;
+    bottom: -48px;
+    width: 73px;
   }
 
   .partner-approach {

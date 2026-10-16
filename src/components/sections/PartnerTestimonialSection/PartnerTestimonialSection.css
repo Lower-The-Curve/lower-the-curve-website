@@ -5,7 +5,7 @@
 .partner-testimonial__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 0 var(--space) 6rem;
+  padding: 0 var(--space) 12px;
   --partner-testimonial-card-width: 900px;
 }
 

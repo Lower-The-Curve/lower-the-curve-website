@@ -9,6 +9,9 @@ import MetricsReveal from "./MetricsReveal";
 //     - `subtitle` : single_line_text_field, stored as
 //                    `<span class="blue-gradient">Before/After</span>`; tags
 //                    are stripped here and the accent is painted by the theme.
+//     - `margin_bottom` : number_integer, optional. Space below the section in
+//                    px, i.e. the gap to the Testimonial. Empty means 0. Same
+//                    convention as HeroSection's margin_top / margin_bottom.
 //   partner_detail (`partner`) — the partner's own entry:
 //     - `partner_metric` : list.metaobject_reference -> `partner_metrics`, whose
 //                          `metrics` field is list.metaobject_reference ->
@@ -39,6 +42,13 @@ function fieldValue(node, ...keys) {
   }
 
   return null;
+}
+
+// A number_integer field as a CSS length. Empty or invalid reads as 0px, so a
+// section saved without the field set renders exactly as it did before.
+function pixels(node, key) {
+  const parsed = Number.parseInt(fieldValue(node, key) ?? "", 10);
+  return `${Number.isFinite(parsed) ? parsed : 0}px`;
 }
 
 function stripTags(text) {
@@ -133,7 +143,12 @@ export default function CaseStudyMetricsSection({ section, partner }) {
   if (!metrics.length) return null;
 
   return (
-    <section className="case-study-metrics">
+    <section
+      className="case-study-metrics"
+      style={{
+        "--case-study-metrics-margin-bottom": pixels(section, "margin_bottom"),
+      }}
+    >
       <div className="case-study-metrics__inner">
         {title && <h2 className="case-study-metrics__title">{title}</h2>}
         {subtitle && (

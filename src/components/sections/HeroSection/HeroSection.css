@@ -17,6 +17,7 @@
      section rendered without the fields set at all. */
   margin-top: var(--hero-margin-top, 0px);
   margin-bottom: var(--hero-margin-bottom, 0px);
+  --hero-side-inset: 58px;
   /* The artwork reaches up under the header, so the section only needs the rest
      of the first screen. svh keeps mobile browser chrome from adding a scroll.
 
@@ -45,7 +46,7 @@
      taking it out of flow, so it can never overlap the headline on a short
      viewport. */
   grid-template-rows: 1fr auto;
-  padding: 0 var(--space) 3rem;
+  padding: 0 var(--hero-side-inset) 3rem;
 }
 
 /* --- BACKDROP -----------------------------------------------------------
@@ -73,37 +74,49 @@
   mask-image: linear-gradient(to bottom, #000 65%, transparent);
 }
 
-/* Opt-in per page (the `fadeTop` prop — About Us). The artwork's top edge is a
-   visible line against the page; this dissolves it in from white instead. */
-.hero--fade-top .hero__backdrop {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.04) 15%,
-    rgba(0, 0, 0, 0.15) 30%,
-    rgba(0, 0, 0, 0.35) 45%,
-    rgba(0, 0, 0, 0.65) 60%,
-    rgba(0, 0, 0, 0.9) 75%,
-    #000 90%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.04) 15%,
-    rgba(0, 0, 0, 0.15) 30%,
-    rgba(0, 0, 0, 0.35) 45%,
-    rgba(0, 0, 0, 0.65) 60%,
-    rgba(0, 0, 0, 0.9) 75%,
-    #000 90%
-  );
-}
-
-/* `cover` rather than `contain`: the artwork is a soft gradient wash with no
-   detail to protect, so filling the screen matters more than showing all of it.
+/* `cover` on phones and tablets: the artwork is a soft gradient wash with no
+   detail to protect, so filling the screen matters more than showing all of it,
+   and the mobile design wants the blobs large and bleeding off the edges.
    Anchored to the top, which is where the blobs that frame the header live. */
 .hero__image {
   object-fit: cover;
   object-position: center top;
+}
+
+/* The local-SVG artwork is STUCK at its natural 1440px and hangs off the right
+   edge: `object-fit: none` draws it at 1:1 inside the full-width image box, so
+   a narrower screen crops it instead of shrinking it and a wider one reveals
+   more white to its left. Same technique as the portrait rule below; it is the
+   way to size the artwork here because next/image's `fill` pins the box itself
+   with an inline `width: 100%` that a class can't override. */
+.hero__image--asset {
+  object-fit: cover;
+  object-position: right top;
+}
+
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .hero__image--asset {
+    object-position: right 6rem;
+  }
+}
+
+.hero__backdrop--asset::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 15%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #ffffff);
+}
+
+
+@media (min-width: 1025px) {
+  .hero__image--portrait {
+    object-fit: none;
+    object-position: calc(100% - 53.21px) center;
+  }
 }
 
 /* --- CONTENT ------------------------------------------------------------ */
@@ -111,8 +124,6 @@
   grid-row: 1;
   align-self: center;
   width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -125,23 +136,42 @@
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
-  /* A measure, not a fixed width. `ch` scales with the heading token, so the
-     design's three-line break ("Building Apps that / power Shopify stores /
-     worldwide") holds at 64px, 52px and 40px without a media query.
+  max-width: 744px;
+}
 
-     18.5ch sits between the two bounds that set the break: the longest line
-     that has to fit — "power Shopify stores" (~17ch) — and the shortest run
-     that must NOT fit on the first line — "Building Apps that power"
-     (~20.1ch). Measured against Poppins' own advances, so the break is the
-     same at every tier the viewport can fit these lines. A materially
-     different headline moves both bounds — this is a measure, not a
-     guarantee. */
-  max-width: 18.5ch;
+/* The headline measure at the narrower two tiers. Kept beside the desktop
+   value so the three sit together. */
+@media (max-width: 1024px) {
+  .hero__title {
+    max-width: 604px;
+  }
+}
+
+@media (max-width: 575px) {
+  .hero__title {
+    max-width: 465px;
+  }
 }
 
 /* Authored <br>s set the lines, so the measure is dropped. */
 .hero__title--manual {
   max-width: none;
+}
+
+.hero__title--sentences {
+  max-width: none;
+}
+
+.hero__title-line {
+  display: block;
+}
+
+@media (max-width: 575px) {
+  .hero__title--sentences {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
+  }
 }
 
 /* The accented runs in the headline. The weight lives on .hero__accent rather than on
@@ -275,14 +305,13 @@
 .hero__scroll {
   grid-row: 2;
   width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  /* Colours the label only — the chevrons below carry their own brand gradient
-     rather than inheriting currentColor. */
+  /* The blue default, from `scroll_color`'s "Blue" (or an empty field). Only
+     the white modifier below changes this; the chevrons carry their own brand
+     gradient and don't inherit it. */
   color: var(--color-brand);
 }
 
@@ -311,57 +340,55 @@
   font-weight: 600;
 }
 
-/* --- CONTENT ALIGNMENT --------------------------------------------------
-   Driven by the metaobject's `content_align` field. The measure wrappers stay
-   centred on the page either way; only the text inside them moves.
+/* --- ALIGNMENT ----------------------------------------------------------
+   Two independent authored alignments. `content_align` moves the headline and
+   description; `scroll_align` moves the scroll cue on its own. The wrappers
+   fill the section's padded box either way; only their contents move.
    ---------------------------------------------------------------------- */
-.hero--align-center .hero__content,
-.hero--align-center .hero__scroll {
+.hero--align-center .hero__content {
   align-items: center;
   text-align: center;
 }
 
-.hero--align-left .hero__content,
-.hero--align-left .hero__scroll {
+.hero--align-left .hero__content {
   align-items: flex-start;
   text-align: left;
 }
 
-.hero--align-right .hero__content,
-.hero--align-right .hero__scroll {
+.hero--align-right .hero__content {
   align-items: flex-end;
   text-align: right;
 }
 
 /* Scroll cue overrides (scroll_align / scroll_color). After the rules above
    so they win at equal specificity. */
-.hero--scroll-center .hero__scroll {
+.hero--scroll-align-center .hero__scroll {
   align-items: center;
   text-align: center;
 }
 
-.hero--scroll-left .hero__scroll {
+.hero--scroll-align-left .hero__scroll {
   align-items: flex-start;
   text-align: left;
 }
 
-.hero--scroll-right .hero__scroll {
+.hero--scroll-align-right .hero__scroll {
   align-items: flex-end;
   text-align: right;
 }
 
-.hero--scroll-white .hero__scroll {
+.hero--scroll-color-white .hero__scroll {
   color: var(--color-bg);
 }
 
 /* Figma "White gradient for logos" on the chevrons: white on the left to
    #BDBDBD at 50% on the right. The icon's gradient runs right → left, so the
    first stop is the right end. */
-.hero--scroll-white .hero__scroll-icon stop:first-child {
+.hero--scroll-color-white .hero__scroll-icon stop:first-child {
   stop-color: rgb(189 189 189 / 0.5);
 }
 
-.hero--scroll-white .hero__scroll-icon stop:last-child {
+.hero--scroll-color-white .hero__scroll-icon stop:last-child {
   stop-color: var(--color-bg);
 }
 
@@ -389,6 +416,7 @@
 @media (max-width: 575px) {
   .hero {
     --hero-fold-gutter: 2rem;
+    --hero-side-inset: var(--space);
     /* Was 3rem. The box is shorter now, so the scroll cue would otherwise sit
        tight under the headline — this gives the gutter back to the content. */
     padding-bottom: 2rem;
@@ -396,23 +424,29 @@
 
   /* `content_position_mobile` — "Top …": the headline sits under the header,
      as in the Figma mobile frame, and the free space falls between it and the
-     scroll cue instead of above it. The gap scales with the screen height. */
+     scroll cue instead of above it. */
   .hero--mobile-top .hero__content {
     align-self: start;
-    padding-top: 12svh;
+    padding-top: 90px;
   }
 
-  /* "Top Left": the title sits 94px under the menu capsule, per Figma. The
-     capsule ends 12px above the header's flow box (.site-header's bottom
-     padding), so 94 - 12 = 82px. */
+  /* "Top Left" sits lower than "Top Center". */
   .hero--mobile-top.hero--mobile-align-left .hero__content {
-    padding-top: 82px;
+    padding-top: 140px;
   }
 
   /* "Center …": still centred, but nudged a bit above the true middle.
      Bottom padding shifts the centred block up by half its value. */
   .hero--mobile-center .hero__content {
-    padding-bottom: 10svh;
+    padding-bottom: 80px;
+  }
+
+  .hero__scroll-text {
+    font-size: var(--fs-body-base);
+  }
+
+  .hero__scroll-text--mixed {
+    line-height: 1.25;
   }
 
   /* "… Left | Center": headline only; the scroll cue keeps its own
@@ -473,5 +507,21 @@
 
   .hero__image--narrow {
     display: block;
+  }
+}
+
+@media (max-width: 1199px) {
+  .hero--asset .hero__image--wide {
+    display: none;
+  }
+
+  .hero--asset .hero__image--narrow {
+    display: block;
+    object-fit: contain;
+    object-position: right top;
+  }
+
+  .hero__backdrop--asset::after {
+    display: none;
   }
 }

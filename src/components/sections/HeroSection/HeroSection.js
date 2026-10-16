@@ -7,16 +7,20 @@ import ChevronsDownIcon from './ChevronsDownIcon';
 //
 // Its GraphQL fragment lives in lib/shopify/queries/sections/hero.js. Every
 // field on the definition comes through that one selection:
-//   title                -> single_line_text_field, the headline
+//   title                -> single_line_text_field, the headline; more than one
+//                           sentence renders one sentence per line
 //   description          -> multi_line_text_field, optional lede under it
 //   image                -> file_reference, the full-bleed background artwork
 //   image_mobile         -> file_reference, an optional phone-shaped counterpart
 //                           to `image`; see mobileImage below for what happens
 //                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
+//   scroll_align         -> single_line_text_field, "Left" | "Center" | "Right";
+//                           the scroll cue's alignment, separate from
+//                           content_align's; empty follows content_align
+//   scroll_color         -> single_line_text_field, "Blue" | "White"; the cue's
+//                           colour, label and chevrons alike
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
-//   scroll_align         -> optional "Left" | "Center" | "Right"; empty follows content_align
-//   scroll_color         -> optional "Blue" | "White"; empty is Blue
 //   content_position_mobile -> optional choice list, phones only (≤575px):
 //                           "Top Left" | "Top Center" | "Center Left" |
 //                           "Center Center". Empty keeps the desktop placement
@@ -71,16 +75,23 @@ function alignClass(section) {
   return ALIGN_CLASSES[authored] ?? ALIGN_CLASSES.center;
 }
 
-// Scroll cue overrides: alignment and colour, independent of the headline.
-function scrollClasses(section) {
-  const align = fieldValue(section, 'scroll_align')?.trim().toLowerCase();
-  const color = fieldValue(section, 'scroll_color')?.trim().toLowerCase();
-  return [
-    ALIGN_CLASSES[align] && `hero--scroll-${align}`,
-    color === 'white' && 'hero--scroll-white',
-  ]
-    .filter(Boolean)
-    .join(' ');
+const SCROLL_ALIGN_CLASSES = {
+  left: 'hero--scroll-align-left',
+  center: 'hero--scroll-align-center',
+  right: 'hero--scroll-align-right',
+};
+
+function scrollAlignClass(section) {
+  const authored = fieldValue(
+    section,
+    'scroll_align',
+    'content_align'
+  )?.trim().toLowerCase();
+  return SCROLL_ALIGN_CLASSES[authored] ?? SCROLL_ALIGN_CLASSES.center;
+}
+
+function isWhiteScroll(section) {
+  return fieldValue(section, 'scroll_color')?.trim().toLowerCase() === 'white';
 }
 
 // Phone-only placement of the headline block, from `content_position_mobile`:
@@ -121,6 +132,7 @@ function mobilePositionClasses(section) {
 // Only <span> carrying a class in the map below produces an element, so a stray
 // tag or a pasted <script> can't turn into markup. A title with no spans renders
 // as plain text, and an unrecognised class keeps its words but drops the accent.
+
 const ACCENT_CLASSES = {
   'green-gradient': 'hero__accent--green',
   'blue-gradient': 'hero__accent--blue',
@@ -129,16 +141,52 @@ const ACCENT_CLASSES = {
 const ACCENT_SPAN =
   /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
 
-function accentedTitle(title) {
-  const parts = [];
+const SENTENCE_BREAK = /[.!?](?:<\/span>)?\s+/;
+
+const SENTENCE_SPLIT = /([.!?])\s+/g;
+
+function hasSentenceBreak(title) {
+  return SENTENCE_BREAK.test(title);
+}
+
+function titleSentenceLines(title) {
+  const lines = [];
+  let line = [];
   let cursor = 0;
+  let atSentenceEnd = false;
+
+  const endLine = () => {
+    if (line.length) lines.push(line);
+    line = [];
+  };
+
+  const pushText = (text) => {
+    if (atSentenceEnd && /^\s/.test(text)) {
+      endLine();
+      text = text.replace(/^\s+/, '');
+      atSentenceEnd = false;
+    }
+
+    let last = 0;
+    for (const match of text.matchAll(SENTENCE_SPLIT)) {
+      line.push(text.slice(last, match.index + 1));
+      endLine();
+      last = match.index + match[0].length;
+    }
+
+    const tail = text.slice(last);
+    if (tail) line.push(tail);
+
+    atSentenceEnd = /[.!?]\s*$/.test(text);
+  };
 
   for (const match of title.matchAll(ACCENT_SPAN)) {
-    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+    if (match.index > cursor) pushText(title.slice(cursor, match.index));
 
-    // <br>: an authored line break.
+    // <br>: an authored line break, kept inside the current line so a blank
+    // line ("a.<br><br>b") survives.
     if (match[1] === undefined) {
-      parts.push(<br key={match.index} />);
+      line.push(<br key={match.index} />);
       cursor = match.index + match[0].length;
       continue;
     }
@@ -149,7 +197,7 @@ function accentedTitle(title) {
       .map((name) => ACCENT_CLASSES[name])
       .find(Boolean);
 
-    parts.push(
+    line.push(
       accent ? (
         <span key={match.index} className={`hero__accent ${accent}`}>
           {match[2]}
@@ -159,11 +207,22 @@ function accentedTitle(title) {
       )
     );
 
+    atSentenceEnd = /[.!?]\s*$/.test(match[2]);
+
     cursor = match.index + match[0].length;
   }
 
-  if (cursor < title.length) parts.push(title.slice(cursor));
-  return parts;
+  if (cursor < title.length) pushText(title.slice(cursor));
+  endLine();
+  return lines;
+}
+
+function accentedTitle(title) {
+  return titleSentenceLines(title).map((parts, i) => (
+    <span key={i} className="hero__title-line">
+      {parts}
+    </span>
+  ));
 }
 
 // The scroll label may bold part of itself, as in the design:
@@ -189,6 +248,7 @@ function scrollLabel(text) {
 
 export default function HeroSection({
   section,
+  artwork,
   appIcons = false,
   fadeBottom = false,
   fadeTop = false,
@@ -197,7 +257,18 @@ export default function HeroSection({
 
   const title = fieldValue(section, 'title');
   const description = fieldValue(section, 'description');
-  const image = imageFrom(section, 'image');
+  // The desktop artwork: the metaobject's `image` when one is authored, otherwise
+  // the local asset path the page hands in via `artwork`. Shopify can't host SVG
+  // files, so a design that ships as SVG lives in `public/assets/` and its path
+  // is passed here — it behaves exactly like an uploaded image, and an upload to
+  // the `image` field still wins, so taking over from the admin needs no code
+  // change. Example: the services hero's `Headline section (2).svg`, whose export
+  // needed one fix: Figma painted the white fade rect UNDER the blobs and clipped
+  // them flat at y=815, leaving a hard edge through the grey blob — painting the
+  // rect last reproduces the design's soft fade.
+  const authoredImage = imageFrom(section, 'image');
+  const localArtwork = authoredImage ? null : artwork;
+  const image = authoredImage ?? (localArtwork ? { url: localArtwork } : null);
   // The phone-shaped artwork. The live `hero_section` entry has no value for this
   // today, so it resolves to null and `image` covers every width — the hero is
   // never left with no artwork. Set `image_mobile` on the metaobject and it takes
@@ -209,19 +280,24 @@ export default function HeroSection({
   // If setting it has no effect, check the field is published to the Storefront
   // API rather than assuming the key is wrong.
   const mobileImage = imageFrom(section, 'image_mobile', 'mobile_image');
+  const portraitArt = Number(image?.width) < Number(image?.height);
   const scrollText = fieldValue(
     section,
     'scroll_botttom_text',
     'scroll_bottom_text'
   );
 
+  const whiteScroll = isWhiteScroll(section);
+
   return (
     <section
       className={[
         'hero',
         alignClass(section),
-        scrollClasses(section),
+        scrollAlignClass(section),
         mobilePositionClasses(section),
+        whiteScroll && 'hero--scroll-color-white',
+        artwork && 'hero--asset',
         fadeBottom && 'hero--fade-bottom',
         fadeTop && 'hero--fade-top',
       ]
@@ -236,7 +312,11 @@ export default function HeroSection({
           so the artwork starts at the very top of the page and the transparent
           header renders over it — see HeroSection.css. */}
       {image && (
-        <div className="hero__backdrop">
+        <div
+          className={`hero__backdrop${
+            localArtwork ? ' hero__backdrop--asset' : ''
+          }`}
+        >
           {/* Two elements rather than one with a swapped src: this is a Server
               Component, so there is no viewport to branch on at render time and
               the choice has to be made in CSS. When no mobile artwork is
@@ -248,7 +328,11 @@ export default function HeroSection({
             fill
             sizes="100vw"
             priority
-            className={`hero__image ${mobileImage ? 'hero__image--wide' : ''}`}
+            className={`hero__image${
+              mobileImage ? ' hero__image--wide' : ''
+            }${portraitArt ? ' hero__image--portrait' : ''}${
+              localArtwork ? ' hero__image--asset' : ''
+            }`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
 
@@ -294,11 +378,9 @@ export default function HeroSection({
 
           {title && (
             <h1
-              className={
-                /<br\s*\/?>/i.test(title)
-                  ? 'hero__title hero__title--manual'
-                  : 'hero__title'
-              }
+              className={`hero__title${
+                hasSentenceBreak(title) ? ' hero__title--sentences' : ''
+              }${/<br\s*\/?>/i.test(title) ? ' hero__title--manual' : ''}`}
             >
               {accentedTitle(title)}
             </h1>

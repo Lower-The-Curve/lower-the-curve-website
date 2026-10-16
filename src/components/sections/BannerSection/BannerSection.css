@@ -205,6 +205,7 @@
 
   .banner--story .banner__content {
     grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     gap: 2rem;
   }
 
@@ -252,5 +253,52 @@
 
   .banner__image--narrow {
     display: block;
+  }
+}
+
+/* --- LINES (see BannerLines.js) ----------------------------------------
+   Where code lines show, the Shopify image is replaced by its own gradient. */
+.banner {
+  --banner-lines-bg: linear-gradient(
+    90deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+}
+
+.banner__lines-desktop,
+.banner__lines-mobile {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Our Story desktop: sized to the banner's height so the bend sits on its bottom edge. */
+@media (min-width: 1025px) {
+  .banner--story::before {
+    background-image: var(--banner-lines-bg);
+  }
+
+  .banner__lines-desktop {
+    display: block;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .banner::before {
+    background-image: var(--banner-lines-bg);
+  }
+
+  .banner__lines-mobile {
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
   }
 }

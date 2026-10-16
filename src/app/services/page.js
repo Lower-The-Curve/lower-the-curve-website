@@ -33,6 +33,8 @@ const COMPONENT_SLOTS = [
   "component6",
 ];
 
+const HERO_ARTWORK = "/assets/Headline section (2).svg";
+
 function sectionsIn(slot) {
   if (!slot) return [];
 
@@ -52,7 +54,13 @@ export default async function ServicesPage() {
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
-            return <HeroSection key={section.id} section={section} />;
+            return (
+              <HeroSection
+                key={section.id}
+                section={section}
+                artwork={HERO_ARTWORK}
+              />
+            );
           case PROJECT_ROUTE_TYPE:
             return <ProjectRouteSection key={section.id} section={section} />;
           case RICH_TEXT_WITH_STATS_TYPE:
