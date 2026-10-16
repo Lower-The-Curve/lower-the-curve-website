@@ -42,9 +42,9 @@ Import order in `layout.js` matters: `typography.css` **before** `globals.css`.
 
 ## 1. Font family
 
-**Poppins is the only font on the site.** Weights loaded: **400, 500, 600, 700**
+**Poppins is the only font on the site.** Weights loaded: **300, 400, 500, 600, 700**
 (Poppins is not a variable font, so each weight is a separate file — do not add
-weights you aren't using).
+weights you aren't using). 300 (Light) is used only by the app dialog subtitle.
 
 - Loaded in [src/app/layout.js](src/app/layout.js) with `next/font/google`,
   exposed as `--font-poppins` on `<html>`.
@@ -112,6 +112,7 @@ than the 40px those sections were originally specified at.
 | `--fs-body-base` | **16px** | 16px | 16px | **Default** — `p` and `body`, long-form copy |
 | `--fs-body-sm` | 16px | 16px | 14px | UI text: nav labels, button labels |
 | `--fs-body-xs` | 14px | 14px | 12px | Captions, legal, meta text |
+| `--fs-body-card` | 16px | 16px | **12px** | Feature card copy. The mobile design drops it to 12px while desktop stays 16px. Tablet interpolated. |
 
 **`base` and `sm` render the same size on desktop and tablet** (16px), splitting
 only on mobile (16 vs 14). `base` was 18px on desktop until it was lowered; the
@@ -168,6 +169,22 @@ that token is 18px on mobile — nothing on the body scale pairs 24 with 14.
 Snapping to 48/32 and 24/18 was the alternative; the specified numbers were used
 instead, deliberately. **Tablet is interpolated** — only desktop and mobile were
 given. Don't reach for these outside that band.
+
+### The case-study metrics set — off the scale on purpose
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-metric` | 22px | 14px | 8px | metric card names and before/after values |
+| `--fs-metric-title` | 32px | 28px | 24px | the section heading |
+| `--fs-metric-subtitle` | 24px | 20px | 16px | the "Before/After" line |
+| `--fs-metric-scale` | 14px | 10px | 6px | the chart's 0–100% axis labels |
+
+Desktop and mobile come from the design. On mobile the chart is the desktop
+layout scaled down to a ~357px frame, so its type shrinks with it (8px and 6px —
+the same kind of tiny the team-card captions already use). **Tablet is
+interpolated.** The heading pair can't reuse `--fs-heading-md/sm`: those are flat
+32/24 at every tier and the design drops them to 24/16 on mobile. Don't reach for
+these outside `CaseStudyMetricsSection`.
 
 ### The footer pair — the one place the scale runs backwards
 
@@ -439,6 +456,7 @@ in the design system rather than in a style guide.
 | `solutions` | [src/components/sections/SolutionsSection/SolutionsSection.css](src/components/sections/SolutionsSection/SolutionsSection.css) |
 | `testimonials` | [src/components/sections/TestimonialsSection/TestimonialsSection.css](src/components/sections/TestimonialsSection/TestimonialsSection.css) |
 | `case-studies` | [src/components/sections/CaseStudiesSection/CaseStudiesSection.css](src/components/sections/CaseStudiesSection/CaseStudiesSection.css) |
+| `delivered` | [src/components/sections/DeliveredSection/DeliveredSection.css](src/components/sections/DeliveredSection/DeliveredSection.css) |
 | `home-page` | [src/app/page.css](src/app/page.css) |
 | `services-page` | [src/app/services/page.css](src/app/services/page.css) |
 
@@ -867,11 +885,12 @@ Two consequences:
 - **The site's second Client Component**, after `HeaderNav`'s mobile drawer — and
   the first *section* that is one. The carousel needs state and a scroll listener,
   which is the one case the conventions allow `'use client'` for.
-  - Because of that the **type constant and the GraphQL fragment live in
-    `testimonials.shared.js`**, not in the component: the page query imports the
-    fragment, and a server-side query module must not pull a client module into
-    its graph. `TestimonialsSection.js` is a two-line barrel that re-exports both
-    sides, so the page still imports from one path like every other section.
+  - Because of that the **type constants live in `TestimonialsSection.js`**, not
+    in the carousel: the page is a Server Component and needs the plain strings
+    to dispatch on, so they stay out of the client module. `TestimonialsSection.js`
+    also re-exports the carousel as its default, so the page still imports from
+    one path like every other section. The GraphQL fragment lives in
+    `lib/shopify/queries/sections/testimonials.js`, like every section's.
   - The carousel is a **native scroll container with CSS scroll-snap**, not a
     JS-driven slider — it works by swipe, trackpad, keyboard and screen reader
     before any of the JS runs. The arrows and the progress bar are enhancements
@@ -1488,3 +1507,46 @@ Two consequences:
   135deg** — both existing tokens, no new colour. The exact stops are estimated
   from the reference screenshot; if the design's navy is deeper than
   `--color-brand-darker` (#003a9e), that's a new token and a deliberate addition.
+
+### Type scale addition: the team card captions
+The team section's design sets the expanded card's name/role at **36/22px** on
+desktop and **14/10px** on mobile, and the collapsed cards' at **18/10px** and
+**8/6px**. Nothing on the body scale goes below 12px or sits at 36/22, so four
+off-scale tokens were added (all three tier blocks in `typography.css`),
+chosen over snapping to 14/12 because the collapsed captions are meant to be
+smaller than any body step.
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-team-name-open` | 36px | 32px | 14px | expanded card's name |
+| `--fs-team-role-open` | 22px | 20px | 10px | expanded card's role |
+| `--fs-team-name-closed` | 18px | 18px | 8px | collapsed cards' name |
+| `--fs-team-role-closed` | 10px | 14px | 6px | collapsed cards' role |
+
+- **Desktop and mobile were specified; tablet was not.** Tablet keeps the values
+  the captions already rendered (32/20 open, 18/14 closed), so it was not touched
+  when desktop moved to 36/22/18/10. That leaves tablet's closed role (14px)
+  larger than desktop's (10px) — confirm with design.
+- **6–8px is below any legibility floor** and is what the design asks for; flagged
+  here in case design reconsiders.
+- Don't reach for these outside `TeamSection`.
+
+### Type scale addition: the approach timeline cards
+The partner Approach section's step cards are set at **24/16/16px** (title /
+copy / week pill) on desktop and **16/10/8px** on mobile. Nothing on the body
+scale goes below 12px and no heading step is 16px, so three off-scale tokens
+were added (all three tier blocks in `typography.css`).
+
+| Token | Desktop | Tablet | Mobile | Use for |
+|---|---|---|---|---|
+| `--fs-approach-title` | 24px | 24px | 16px | step card title |
+| `--fs-approach-copy` | 16px | 16px | 10px | step card description |
+| `--fs-approach-pill` | 16px | 16px | 8px | week-range pill |
+
+- The step number reuses `--fs-heading-lg` (48px desktop, 32px mobile).
+- **Tablet was not specified** and keeps the desktop values: the cards stay
+  desktop-sized and the row swipes horizontally below 1025px.
+- **Mobile is a swipeable row**, per the Figma mobile frame, not the vertical
+  timeline the written brief describes.
+- 8px and 10px are below any legibility floor and are what the design asks for.
+- Don't reach for these outside `PartnerApproachSection`.

@@ -1,0 +1,659 @@
+/* Delivered section — the `delivered` BEM block. Centred heading and lede over a
+   two-column layout of store-preview cards. Desktop columns are independent, so
+   an expanded card only pushes cards in its own column (same gap as the closed
+   stack). On desktop the card title, copy and shared pill
+   are revealed only on hover / focus-within; on tablet and mobile (<= 1024px) they
+   are always visible.
+
+   Sizes come from the type scale in src/app/typography.css and colours from the
+   tokens in src/app/globals.css.
+*/
+
+.delivered {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.delivered__inner {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  /* Figma gap: 70px from the Testimonial section above; 70px below to the
+     footer's Book a Call frame — this section owns that gap fully since the
+     footer isn't page-specific. */
+  padding: 70px var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* --- INTRO -------------------------------------------------------------- */
+
+.delivered__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.delivered__title {
+  font-size: var(--fs-heading-md);
+  font-weight: 400;
+  line-height: 40px;
+  text-align: center;
+  margin: 0;
+}
+
+.delivered__accent {
+  font-weight: 700;
+}
+
+.delivered__accent--blue {
+  color: var(--color-brand);
+}
+
+.delivered__accent--green {
+  color: var(--color-accent-green);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .delivered__accent--blue,
+  .delivered__accent--green {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .delivered__accent--blue {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+  }
+
+  .delivered__accent--green {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-accent-green-dark),
+      var(--color-accent-green)
+    );
+  }
+}
+
+.delivered__lede {
+  color: var(--color-ink);
+  margin: 0;
+  max-width: 44rem;
+}
+
+.delivered__glow {
+  position: absolute;
+  z-index: -1;
+  top: 15rem;
+  right: 10rem;
+  width: 15rem;
+  height: auto;
+  pointer-events: none;
+}
+
+.delivered__blue-glow {
+  display: none;
+}
+
+/* --- GRID --------------------------------------------------------------- */
+
+.delivered__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 3rem;
+  align-items: start;
+}
+
+.delivered__column {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  min-width: 0;
+}
+
+.delivered__item {
+  min-width: 0;
+}
+
+/* --- CARD --------------------------------------------------------------- */
+
+.delivered__card {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  border: 5px solid transparent;
+  border-radius: 30px;
+
+  background-image:
+    linear-gradient(var(--color-bg), var(--color-bg)),
+    linear-gradient(90deg, #ffffff 0%, rgba(189, 189, 189, 0.5) 100%);
+
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+
+  overflow: hidden;
+
+  box-shadow: 0 6px 28px color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+.delivered__card--linked:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+/* --- PREVIEW ------------------------------------------------------------ */
+
+.delivered__preview {
+  position: relative;
+  aspect-ratio: 29 / 14;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.delivered__preview::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 95%);
+  pointer-events: none;
+}
+
+.delivered__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.delivered__tags {
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 1.25rem;
+  bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  max-width: calc(100% - 2.5rem);
+}
+
+.delivered__tag {
+  flex: 0 0 auto;
+  border-radius: 80px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-body-xs);
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* --- PANEL -------------------------------------------------------------- */
+
+.delivered__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.delivered__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* --- DESKTOP HOVER ------------------------------------------------------ */
+
+@media (min-width: 1025px) {
+  /* Half-tucked behind the second card's right edge, as in the open variant. */
+  .delivered {
+    overflow-x: clip;
+  }
+
+  .delivered__glow {
+    right: calc(max(0px, (100% - var(--max-width)) / 2) + var(--space) - 150px);
+  }
+
+  .delivered__panel {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.28s ease,
+      opacity 0.28s ease,
+      visibility 0s linear 0.28s;
+  }
+
+  .delivered__panel-inner {
+    padding-block: 0;
+    transition: padding-block 0.28s ease;
+  }
+
+  .delivered__card:hover .delivered__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .delivered__card:hover .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+}
+
+.delivered__card-title {
+  font-size: var(--fs-heading-sm);
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.delivered__card-copy {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--fs-body-lg);
+  font-weight: 400;
+  line-height: 22px;
+  white-space: pre-line;
+}
+
+/* The pill is a <span> because the card itself is the link. */
+
+.delivered__cta {
+  margin-top: 1rem;
+  background: transparent;
+  background-image: none;
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+.delivered__cta:hover {
+  background: var(--color-brand);
+  background-image: none;
+  color: var(--color-bg);
+  border-color: var(--color-brand);
+}
+
+
+.delivered__cta:hover .btn__arrow--rise {
+  transform: rotate(-45deg) translateX(3px);
+}
+
+.delivered__cta--solid {
+  --btn-from: var(--color-brand);
+  --btn-to: var(--color-brand-dark);
+  background-image: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  color: var(--color-bg);
+  border-color: transparent;
+}
+
+.delivered__cta--solid:hover {
+  --btn-from: var(--color-brand-dark);
+  --btn-to: var(--color-brand-darker);
+  background-image: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  color: var(--color-bg);
+  border-color: transparent;
+}
+
+/* --- OPEN (card_details = Always visible) ------------------------------ */
+.delivered--open {
+  overflow-x: clip;
+}
+
+.delivered--open .delivered__glow {
+  top: 332px;
+  /* Track the second card's right edge (centred max-width column), so the
+     glow stays half-tucked behind it at any desktop width. */
+  right: calc(max(0px, (100% - var(--max-width)) / 2) + var(--space) - 135px);
+  width: 291px;
+}
+
+.delivered--open .delivered__grid {
+  align-items: stretch;
+}
+
+.delivered--open .delivered__column {
+  display: contents;
+}
+
+.delivered--open .delivered__item {
+  display: flex;
+}
+
+.delivered--open .delivered__panel {
+  flex: 1 1 auto;
+}
+
+.delivered--open .delivered__cta {
+  margin-top: auto;
+}
+
+.delivered__cta {
+  border-width: 3px;
+  padding: 7px 20.3px 7px 21px;
+  gap: 9.3px;
+  font-size: var(--fs-body-base);
+  line-height: 24px;
+  background-origin: border-box;
+}
+
+.delivered__cta .btn__arrow {
+  width: 20.4px;
+  height: 16.8px;
+}
+
+/* The outline pill's hover fill fades in as a separate layer (::before)
+   rather than by transitioning the background itself: browsers can't animate
+   one background-image into another, so the hover used to snap.
+
+   This replaces an @property version (two registered <color> custom
+   properties transitioned on hover). That one could get stuck on the hover
+   colours after navigating away from the page and back, leaving blue label
+   text on a blue fill. Fading a plain opacity can't get stuck. */
+.delivered__cta--outline {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--color-bg), var(--color-bg)),
+    linear-gradient(90deg, var(--color-brand), var(--color-brand-dark));
+  background-clip: padding-box, border-box;
+  transition:
+    color var(--btn-fade) ease,
+    transform 0.2s ease;
+}
+
+/* Pulled out by the 3px border so the fill covers the gradient ring too. */
+.delivered__cta--outline::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand),
+    var(--color-brand-dark)
+  );
+  opacity: 0;
+  transition: opacity var(--btn-fade) ease;
+  pointer-events: none;
+}
+
+/* Restates the resting background so the generic .delivered__cta:hover
+   (a flat brand fill, applied instantly) doesn't override the fade. */
+.delivered__cta--outline:hover {
+  border-color: transparent;
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--color-bg), var(--color-bg)),
+    linear-gradient(90deg, var(--color-brand), var(--color-brand-dark));
+  color: var(--color-bg);
+}
+
+.delivered__cta--outline:hover::before {
+  opacity: 1;
+}
+
+.delivered__cta--outline:hover .btn__arrow-gradient {
+  opacity: 0;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  (-webkit-text-fill-color: transparent) {
+  .delivered__cta--outline .btn__label {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-brand),
+      var(--color-brand-dark)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: -webkit-text-fill-color var(--btn-fade) ease;
+  }
+
+  .delivered__cta--outline:hover .btn__label {
+    -webkit-text-fill-color: var(--color-bg);
+  }
+}
+
+@media (min-width: 1025px) {
+  .delivered--open .delivered__grid {
+    row-gap: 3rem;
+  }
+
+  .delivered--open .delivered__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+
+  .delivered--open .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+}
+
+/* --- TABLET (<= 1024px) ----------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .delivered__grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 3rem;
+  }
+
+  .delivered__column {
+    display: contents;
+  }
+
+  .delivered__card-title,
+  .delivered__card-copy {
+    display: block;
+  }
+
+  .delivered__cta {
+    display: none;
+  }
+
+  .delivered--open .delivered__grid {
+    grid-auto-rows: 1fr;
+  }
+
+  .delivered--open .delivered__glow {
+    top: -3px;
+    right: -78px;
+    width: 142px;
+    transform: rotate(90deg);
+  }
+
+  .delivered--open .delivered__cta {
+    display: inline-flex;
+  }
+
+  .delivered--open .delivered__panel-inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+
+  .delivered__panel {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .delivered__panel-inner {
+    padding-block: 1.25rem 0.5rem;
+  }
+}
+
+/* --- MOBILE (<= 575px) -------------------------------------------------- */
+
+@media (max-width: 575px) {
+  .delivered__cta {
+    padding: 5.8px 18.6px 5.8px 19px;
+    gap: 8.4px;
+  }
+
+  .delivered__cta .btn__arrow {
+    width: 18.7px;
+    height: 15.4px;
+  }
+
+  .delivered {
+    overflow-x: clip;
+  }
+
+  .delivered--open .delivered__accent {
+    display: block;
+  }
+
+  .delivered__glow {
+    top: -1rem;
+    right: -2rem;
+    width: 5rem;
+  }
+
+  .delivered__item {
+    position: relative;
+  }
+
+  /* Figma: 88px, centred in the row gap above the last card, half off the
+     left viewport edge (left: -43px). */
+  .delivered__blue-glow {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    left: calc(-1 * var(--space) - 44px);
+    top: calc(-0.75rem - 44px);
+    width: 88px;
+    height: auto;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .delivered__inner {
+    /* 50px to Testimonial above (its own bottom is zeroed); 50px below to
+       the footer, which this section owns fully since the footer isn't
+       page-specific. */
+    padding: 50px var(--space);
+    gap: 2rem;
+  }
+
+  .delivered__grid {
+    row-gap: 1.5rem;
+  }
+
+  .delivered__card {
+    width: 100%;
+    border-width: 3px;
+    border-radius: 23px;
+  }
+
+  .delivered__preview {
+    aspect-ratio: 580 / 301;
+  }
+
+  .delivered__preview::after {
+    height: 100%;
+    background: linear-gradient(180deg, transparent 38%, var(--color-bg) 78%);
+  }
+
+  .delivered__tags {
+    left: 13px;
+    right: 13px;
+    bottom: 26px;
+    max-width: none;
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .delivered__tag {
+    border-radius: 57.12px;
+    padding: 4px 14px;
+    font-size: var(--fs-body-xs);
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  .delivered__panel {
+    position: relative;
+    margin-top: -15px;
+  }
+
+  .delivered__panel-inner,
+  .delivered--open .delivered__panel-inner {
+    gap: 16px;
+    padding: 0 13px 20px;
+  }
+
+  .delivered__card-title {
+    font-size: var(--fs-body-base);
+    line-height: 20px;
+  }
+
+  .delivered__card-copy {
+    font-size: var(--fs-body-xs);
+    line-height: 16px;
+  }
+}
+
+/* Ambient drift on the glows — individual `translate` / `scale` so it composes
+   with the `transform` the layouts set (the mobile rotate). Different durations
+   keep the two out of step. */
+@keyframes delivered-glow-drift {
+  25% {
+    translate: -3rem 2rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: -1rem 4.5rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.1;
+  }
+}
+
+.delivered__glow {
+  animation: delivered-glow-drift 16s ease-in-out infinite;
+}
+
+.delivered__blue-glow {
+  animation: delivered-glow-drift 20s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delivered__glow,
+  .delivered__blue-glow {
+    animation: none;
+  }
+}

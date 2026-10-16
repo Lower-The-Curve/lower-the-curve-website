@@ -1,52 +1,33 @@
 import Image from 'next/image';
 import './HeroSection.css';
 import ChevronsDownIcon from './ChevronsDownIcon';
+import ScrollCue from './ScrollCue';
 
 // The metaobject type this component renders. Used to dispatch sections to the
 // right component at render time.
-export const HERO_SECTION_TYPE = 'hero_section';
-
-// Colocated GraphQL fragment: this component declares exactly what it needs
-// from a `hero_section` metaobject. The page queries spread this fragment in, so
-// adding/removing fields here is all that's required — the query stays generic.
 //
-// Metaobjects share the generic `Metaobject` type in the Storefront API, so the
-// fragment selects the `fields` list and the component reads fields by key.
-//
-// Every field on the definition comes through this one selection:
-//   title                -> single_line_text_field, the headline
+// Its GraphQL fragment lives in lib/shopify/queries/sections/hero.js. Every
+// field on the definition comes through that one selection:
+//   title                -> single_line_text_field, the headline; more than one
+//                           sentence renders one sentence per line
 //   description          -> multi_line_text_field, optional lede under it
 //   image                -> file_reference, the full-bleed background artwork
 //   image_mobile         -> file_reference, an optional phone-shaped counterpart
 //                           to `image`; see mobileImage below for what happens
 //                           when it is absent
 //   content_align        -> single_line_text_field, "Left" | "Center" | "Right"
+//   scroll_align         -> single_line_text_field, "Left" | "Center" | "Right";
+//                           the scroll cue's alignment, separate from
+//                           content_align's; empty follows content_align
+//   scroll_color         -> single_line_text_field, "Blue" | "White"; the cue's
+//                           colour, label and chevrons alike
 //   scroll_botttom_text  -> single_line_text_field, the scroll cue's label
+//   content_position_mobile -> optional choice list, phones only (≤575px):
+//                           "Top Left" | "Top Center" | "Center Left" |
+//                           "Center Center". Empty keeps the desktop placement
 //   margin_top           -> number_integer, extra space above the section (px)
 //   margin_bottom        -> number_integer, extra space below the section (px)
-export const heroSectionFragment = /* GraphQL */ `
-  fragment HeroSectionFields on Metaobject {
-    id
-    type
-    handle
-    fields {
-      key
-      type
-      value
-      reference {
-        __typename
-        ... on MediaImage {
-          image {
-            url
-            altText
-            width
-            height
-          }
-        }
-      }
-    }
-  }
-`;
+export const HERO_SECTION_TYPE = 'hero_section';
 
 // Read a single field by key from a metaobject node.
 function field(section, key) {
@@ -95,6 +76,51 @@ function alignClass(section) {
   return ALIGN_CLASSES[authored] ?? ALIGN_CLASSES.center;
 }
 
+const SCROLL_ALIGN_CLASSES = {
+  left: 'hero--scroll-align-left',
+  center: 'hero--scroll-align-center',
+  right: 'hero--scroll-align-right',
+};
+
+function scrollAlignClass(section) {
+  const authored = fieldValue(
+    section,
+    'scroll_align',
+    'content_align'
+  )?.trim().toLowerCase();
+  return SCROLL_ALIGN_CLASSES[authored] ?? SCROLL_ALIGN_CLASSES.center;
+}
+
+function isWhiteScroll(section) {
+  return fieldValue(section, 'scroll_color')?.trim().toLowerCase() === 'white';
+}
+
+// Phone-only placement of the headline block, from `content_position_mobile`:
+// "Top Left" | "Top Center" | "Center Left" | "Center Center" (any casing).
+// The first word is the vertical position, the second the text alignment.
+// Only the headline moves — the scroll cue keeps its own alignment. Empty or
+// unrecognised values leave the desktop behaviour.
+const MOBILE_VERTICAL = {
+  top: 'hero--mobile-top',
+  center: 'hero--mobile-center',
+};
+const MOBILE_ALIGN = {
+  left: 'hero--mobile-align-left',
+  center: 'hero--mobile-align-center',
+};
+
+function mobilePositionClasses(section) {
+  const [vertical, horizontal] = (
+    fieldValue(section, 'content_position_mobile') ?? ''
+  )
+    .trim()
+    .toLowerCase()
+    .split(/\s+/);
+  return [MOBILE_VERTICAL[vertical], MOBILE_ALIGN[horizontal]]
+    .filter(Boolean)
+    .join(' ');
+}
+
 // The design accents part of the headline — a green run and a blue one — and
 // those runs are also the only bold text in it, against a regular-weight
 // heading. Which words they are is editorial, so it's authored in the metafield
@@ -107,20 +133,64 @@ function alignClass(section) {
 // Only <span> carrying a class in the map below produces an element, so a stray
 // tag or a pasted <script> can't turn into markup. A title with no spans renders
 // as plain text, and an unrecognised class keeps its words but drops the accent.
+
 const ACCENT_CLASSES = {
   'green-gradient': 'hero__accent--green',
   'blue-gradient': 'hero__accent--blue',
 };
 
 const ACCENT_SPAN =
-  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>/gi;
+  /<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
 
-function accentedTitle(title) {
-  const parts = [];
+const SENTENCE_BREAK = /[.!?](?:<\/span>)?\s+/;
+
+const SENTENCE_SPLIT = /([.!?])\s+/g;
+
+function hasSentenceBreak(title) {
+  return SENTENCE_BREAK.test(title);
+}
+
+function titleSentenceLines(title) {
+  const lines = [];
+  let line = [];
   let cursor = 0;
+  let atSentenceEnd = false;
+
+  const endLine = () => {
+    if (line.length) lines.push(line);
+    line = [];
+  };
+
+  const pushText = (text) => {
+    if (atSentenceEnd && /^\s/.test(text)) {
+      endLine();
+      text = text.replace(/^\s+/, '');
+      atSentenceEnd = false;
+    }
+
+    let last = 0;
+    for (const match of text.matchAll(SENTENCE_SPLIT)) {
+      line.push(text.slice(last, match.index + 1));
+      endLine();
+      last = match.index + match[0].length;
+    }
+
+    const tail = text.slice(last);
+    if (tail) line.push(tail);
+
+    atSentenceEnd = /[.!?]\s*$/.test(text);
+  };
 
   for (const match of title.matchAll(ACCENT_SPAN)) {
-    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
+    if (match.index > cursor) pushText(title.slice(cursor, match.index));
+
+    // <br>: an authored line break, kept inside the current line so a blank
+    // line ("a.<br><br>b") survives.
+    if (match[1] === undefined) {
+      line.push(<br key={match.index} />);
+      cursor = match.index + match[0].length;
+      continue;
+    }
 
     // Tolerates extra classes on the span (`class="green-gradient wide"`).
     const accent = match[1]
@@ -128,7 +198,7 @@ function accentedTitle(title) {
       .map((name) => ACCENT_CLASSES[name])
       .find(Boolean);
 
-    parts.push(
+    line.push(
       accent ? (
         <span key={match.index} className={`hero__accent ${accent}`}>
           {match[2]}
@@ -138,19 +208,68 @@ function accentedTitle(title) {
       )
     );
 
+    atSentenceEnd = /[.!?]\s*$/.test(match[2]);
+
     cursor = match.index + match[0].length;
   }
 
-  if (cursor < title.length) parts.push(title.slice(cursor));
+  if (cursor < title.length) pushText(title.slice(cursor));
+  endLine();
+  return lines;
+}
+
+function accentedTitle(title) {
+  return titleSentenceLines(title).map((parts, i) => (
+    <span key={i} className="hero__title-line">
+      {parts}
+    </span>
+  ));
+}
+
+// The scroll label may bold part of itself, as in the design:
+//   Scroll down to <strong>Explore more</strong>
+// Only <strong>/<b> are understood; the rest renders as text.
+const SCROLL_STRONG = /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+
+function scrollLabel(text) {
+  const parts = [];
+  let cursor = 0;
+  for (const match of text.matchAll(SCROLL_STRONG)) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+    parts.push(
+      <strong key={match.index} className="hero__scroll-strong">
+        {match[2]}
+      </strong>
+    );
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
   return parts;
 }
 
-export default function HeroSection({ section }) {
+export default function HeroSection({
+  section,
+  artwork,
+  appIcons = false,
+  fadeBottom = false,
+  fadeTop = false,
+}) {
   if (!section) return null;
 
   const title = fieldValue(section, 'title');
   const description = fieldValue(section, 'description');
-  const image = imageFrom(section, 'image');
+  // The desktop artwork: the metaobject's `image` when one is authored, otherwise
+  // the local asset path the page hands in via `artwork`. Shopify can't host SVG
+  // files, so a design that ships as SVG lives in `public/assets/` and its path
+  // is passed here — it behaves exactly like an uploaded image, and an upload to
+  // the `image` field still wins, so taking over from the admin needs no code
+  // change. Example: the services hero's `Headline section (2).svg`, whose export
+  // needed one fix: Figma painted the white fade rect UNDER the blobs and clipped
+  // them flat at y=815, leaving a hard edge through the grey blob — painting the
+  // rect last reproduces the design's soft fade.
+  const authoredImage = imageFrom(section, 'image');
+  const localArtwork = authoredImage ? null : artwork;
+  const image = authoredImage ?? (localArtwork ? { url: localArtwork } : null);
   // The phone-shaped artwork. The live `hero_section` entry has no value for this
   // today, so it resolves to null and `image` covers every width — the hero is
   // never left with no artwork. Set `image_mobile` on the metaobject and it takes
@@ -162,15 +281,29 @@ export default function HeroSection({ section }) {
   // If setting it has no effect, check the field is published to the Storefront
   // API rather than assuming the key is wrong.
   const mobileImage = imageFrom(section, 'image_mobile', 'mobile_image');
+  const portraitArt = Number(image?.width) < Number(image?.height);
   const scrollText = fieldValue(
     section,
     'scroll_botttom_text',
     'scroll_bottom_text'
   );
 
+  const whiteScroll = isWhiteScroll(section);
+
   return (
     <section
-      className={`hero ${alignClass(section)}`}
+      className={[
+        'hero',
+        alignClass(section),
+        scrollAlignClass(section),
+        mobilePositionClasses(section),
+        whiteScroll && 'hero--scroll-color-white',
+        artwork && 'hero--asset',
+        fadeBottom && 'hero--fade-bottom',
+        fadeTop && 'hero--fade-top',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         '--hero-margin-top': pixels(section, 'margin_top'),
         '--hero-margin-bottom': pixels(section, 'margin_bottom'),
@@ -180,7 +313,11 @@ export default function HeroSection({ section }) {
           so the artwork starts at the very top of the page and the transparent
           header renders over it — see HeroSection.css. */}
       {image && (
-        <div className="hero__backdrop">
+        <div
+          className={`hero__backdrop${
+            localArtwork ? ' hero__backdrop--asset' : ''
+          }`}
+        >
           {/* Two elements rather than one with a swapped src: this is a Server
               Component, so there is no viewport to branch on at render time and
               the choice has to be made in CSS. When no mobile artwork is
@@ -192,7 +329,11 @@ export default function HeroSection({ section }) {
             fill
             sizes="100vw"
             priority
-            className={`hero__image ${mobileImage ? 'hero__image--wide' : ''}`}
+            className={`hero__image${
+              mobileImage ? ' hero__image--wide' : ''
+            }${portraitArt ? ' hero__image--portrait' : ''}${
+              localArtwork ? ' hero__image--asset' : ''
+            }`}
             unoptimized={/\.svg(\?|$)/i.test(image.url)}
           />
 
@@ -211,15 +352,70 @@ export default function HeroSection({ section }) {
       )}
 
       <div className="hero__content">
-        {title && <h1 className="hero__title">{accentedTitle(title)}</h1>}
+        <div className="hero__heading">
+          {appIcons && (
+            <div className="hero__icons-row" aria-hidden="true">
+              <Image
+                src="/assets/Shopify apps logos frame.svg"
+                alt=""
+                width={329}
+                height={54}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--left" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416.svg"
+                alt=""
+                width={213}
+                height={434}
+                unoptimized
+              />
+            </div>
+          )}
+
+          {title && (
+            <h1
+              className={`hero__title${
+                hasSentenceBreak(title) ? ' hero__title--sentences' : ''
+              }${/<br\s*\/?>/i.test(title) ? ' hero__title--manual' : ''}`}
+            >
+              {accentedTitle(title)}
+            </h1>
+          )}
+
+          {appIcons && (
+            <div className="hero__icons hero__icons--right" aria-hidden="true">
+              <Image
+                src="/assets/Group 1597880416 (1).svg"
+                alt=""
+                width={213}
+                height={428}
+                unoptimized
+              />
+            </div>
+          )}
+        </div>
+
         {description && <p className="hero__description">{description}</p>}
       </div>
 
       {scrollText && (
-        <div className="hero__scroll">
-          <span className="hero__scroll-text">{scrollText}</span>
+        <ScrollCue className="hero__scroll">
+          <span
+            className={
+              /<(strong|b)\b/i.test(scrollText)
+                ? 'hero__scroll-text hero__scroll-text--mixed'
+                : 'hero__scroll-text'
+            }
+          >
+            {scrollLabel(scrollText)}
+          </span>
           <ChevronsDownIcon className="hero__scroll-icon" />
-        </div>
+        </ScrollCue>
       )}
     </section>
   );

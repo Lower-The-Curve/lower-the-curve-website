@@ -7,17 +7,31 @@
 import {
   getHomePageQuery,
   getServicesPageQuery,
+  getShopifyAppsPageQuery,
+  getAppPopUpsQuery,
+  getCaseStudiesPageQuery,
+  getAboutUsPageQuery,
+  getPartnerDetailPageQuery,
+  getWhatWeBuiltQuery,
+  getPartnerTestimonialQuery,
+  getPartnerApproachIntroQuery,
+  getCaseStudyMetricsQuery,
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
+// Also tolerate a full URL ("https://lower-the-curve.myshopify.com/") — strip
+// the scheme, any path, and the trailing slash before building the endpoint.
 const rawDomain = process.env.SHOPIFY_STORE_DOMAIN;
-const domain = rawDomain
-  ? rawDomain.includes('.')
-    ? rawDomain
-    : `${rawDomain}.myshopify.com`
+const storeHost = rawDomain
+  ? rawDomain.trim().replace(/^https?:\/\//i, '').split('/')[0]
+  : null;
+const domain = storeHost
+  ? storeHost.includes('.')
+    ? storeHost
+    : `${storeHost}.myshopify.com`
   : null;
 const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 const apiVersion = process.env.SHOPIFY_STOREFRONT_API_VERSION || '2025-01';
@@ -61,7 +75,17 @@ export async function shopifyFetch({
     cache,
   });
 
-  const body = await result.json();
+  const raw = await result.text();
+  let body;
+
+  try {
+    body = raw ? JSON.parse(raw) : {};
+  } catch {
+    const preview = raw.replace(/\s+/g, ' ').trim().slice(0, 200);
+    throw new Error(
+      `Shopify Storefront API returned non-JSON (HTTP ${result.status}): ${preview || '(empty body)'}`
+    );
+  }
 
   if (body.errors) {
     throw new Error(
@@ -340,4 +364,215 @@ export async function getServicesPage() {
   });
 
   return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "shopify-apps" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "shopify-apps" doesn't exist.
+ */
+export async function getShopifyAppsPage() {
+  const { body } = await shopifyFetch({
+    query: getShopifyAppsPageQuery,
+    variables: { handle: { type: 'content', handle: 'shopify-apps' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Shopify Apps popups
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch every `app_pop_up` entry, one per Shopify Apps card's dialog.
+ *
+ * These are a by-type fetch on purpose — the page's `content` entry doesn't
+ * reference them; each card's `button1` field does. See the comment in
+ * queries/appPopUp.js for why reading them through the page query was rejected
+ * (nested variant measured 1449; standalone 73, verified live).
+ *
+ * @param {number} [first=10]  entries to fetch. Matches the measured 73 cost;
+ *   raise it when more than ten apps are authored.
+ * @returns {Promise<Array<object>>} Raw metaobject nodes — the components read
+ *   them by field key. Empty array if the definition has no entries.
+ */
+export async function getAppPopUps(first = 10) {
+  const { body } = await shopifyFetch({
+    query: getAppPopUpsQuery,
+    variables: { type: 'app_pop_up', first },
+  });
+
+  return body?.data?.metaobjects?.nodes ?? [];
+}
+
+/**
+ * Fetch the "Case Studies" content metaobject and its resolved section
+ * references.
+ *
+ * The live handle is `content-hcmnjrrd` — Shopify generated it from the entry's
+ * page name. Renaming the handle in the admin is a one-line change here.
+ *
+ * NOTE: there is a second "Case Studies" content entry in the store with
+ * handle `content-o096zcnb`. It only references the Blackroll banner, so the
+ * page uses `content-hcmnjrrd`, which holds both the Blackroll and Our Story
+ * banners. Delete the stale entry in the admin, or point this handle at
+ * whichever entry is canonical.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with that handle doesn't exist.
+ */
+export async function getCaseStudiesPage() {
+  const { body } = await shopifyFetch({
+    query: getCaseStudiesPageQuery,
+    variables: { handle: { type: 'content', handle: 'content-hcmnjrrd' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the "about-us" content metaobject and its resolved section references.
+ *
+ * @returns {Promise<object|null>} The `metaobject` node, or null if the
+ *   "content" metaobject with handle "about-us" doesn't exist.
+ */
+export async function getAboutUsPage() {
+  const { body } = await shopifyFetch({
+    query: getAboutUsPageQuery,
+    variables: { handle: { type: 'content', handle: 'about-us' } },
+  });
+
+  return body?.data?.metaobject ?? null;
+}
+
+/**
+ * Fetch the `partner_detail` entry for a partner.
+ *
+ * The URL key is the handle of the entry's `name` reference (a `partner`
+ * entry) — e.g. `/partners/blackroll` — NOT the `partner_detail` entry's own
+ * auto-generated handle, which Shopify derives from the copy and would change
+ * with it. The Storefront API has no field-value filter on `metaobjects`, so
+ * the query returns the entries and the match happens here.
+ *
+ * @param {string} partnerHandle  e.g. "blackroll"
+ * @param {number} [first=50]     entries to fetch before matching.
+ * @returns {Promise<object|null>} The `partner_detail` node, or null if no
+ *   entry references a partner with that handle.
+ */
+export async function getPartnerDetailPage(partnerHandle, first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnerDetailPageQuery,
+    variables: { first },
+  });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameHandle = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.reference?.handle;
+
+  const node = nodes.find((node) => nameHandle(node) === partnerHandle);
+
+  if (!node) return null;
+
+  return {
+    ...node,
+    deliveredCards: body?.data?.deliveredCards?.nodes ?? [],
+  };
+}
+
+/**
+ * Fetch the `what_we_built` entry belonging to a partner.
+ *
+ * There is no reference field linking the two: the `partner` entry has no
+ * `what_we_built` field and neither does `partner_detail`. The only link in the
+ * live data is the parent's own `name` field ("Blackroll"), which matches the
+ * referenced `partner` entry's `name`. So the match is made here, case- and
+ * whitespace-insensitively, and a partner with no matching entry simply renders
+ * no section.
+ *
+ * The Storefront API has no field-value filter on `metaobjects`, so the query
+ * returns the entries and the match happens in code — same pattern as
+ * getPartnerDetailPage() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(), whose `name` reference carries the partner's name.
+ * @returns {Promise<object|null>} The `what_we_built` node, or null.
+ */
+export async function getWhatWeBuilt(partnerDetail) {
+  const partnerName = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.fields?.find((field) => field.key === 'name')?.value;
+
+  if (!partnerName) return null;
+
+  const { body } = await shopifyFetch({ query: getWhatWeBuiltQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  const nameOf = (node) =>
+    node?.fields?.find((field) => field.key === 'name')?.value;
+
+  const wanted = partnerName.trim().toLowerCase();
+
+  return (
+    nodes.find((node) => nameOf(node)?.trim().toLowerCase() === wanted) ?? null
+  );
+}
+
+/**
+ * Fetch the shared `approach` entry: the Approach section's heading and intro,
+ * identical for every partner. The per-partner steps live on the partner's
+ * `case_study_approach` entry instead.
+ *
+ * @returns {Promise<object|null>} The `approach` node, or null.
+ */
+export async function getPartnerApproachIntro() {
+  const { body } = await shopifyFetch({ query: getPartnerApproachIntroQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
+}
+
+/**
+ * Fetch the `case_study_metrics` entry — the title and subtitle of the
+ * "How key metrics moved" section.
+ *
+ * It is one shared entry: nothing links it to a partner (the partner's own
+ * `partner_detail` entry carries the metric rows, read in the component), so
+ * there is nothing to match on and the first entry is used. The Storefront API
+ * has no field-value filter on `metaobjects`, so the query returns the entries
+ * and the pick happens here — same pattern as getWhatWeBuilt() above.
+ *
+ * @param {object|null} partnerDetail  The `partner_detail` node from
+ *   getPartnerDetailPage(); a missing partner means no section.
+ * @returns {Promise<object|null>} The `case_study_metrics` node, or null.
+ */
+export async function getCaseStudyMetrics(partnerDetail) {
+  if (!partnerDetail) return null;
+
+  const { body } = await shopifyFetch({ query: getCaseStudyMetricsQuery });
+
+  return body?.data?.metaobjects?.nodes?.[0] ?? null;
+}
+
+export async function getPartnerTestimonial(partnerDetail) {
+  const partnerHandle = partnerDetail?.fields
+    ?.find((field) => field.key === 'name')
+    ?.reference?.handle?.trim()
+    .toLowerCase();
+
+  if (!partnerHandle) return null;
+
+  const { body } = await shopifyFetch({ query: getPartnerTestimonialQuery });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  return (
+    nodes.find((node) => {
+      const handle = node?.handle?.toLowerCase() ?? '';
+
+      return handle === partnerHandle || handle.startsWith(`${partnerHandle}-`);
+    }) ?? null
+  );
 }

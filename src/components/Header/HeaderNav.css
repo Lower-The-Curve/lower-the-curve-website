@@ -243,3 +243,8 @@
     pointer-events: auto;
   }
 }
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .site-nav,
+  .site-nav__menu { gap: 2rem; }
+}

@@ -131,6 +131,37 @@
   margin-top: 0.5rem;
 }
 
+/* Hover: the Figma 270deg brand gradient (darker right, lighter left), white label, arrow swings from ↗ to →. The compound
+   selectors out-rank .btn--inverse:hover and .btn:hover .btn__arrow--diagonal
+   whatever the stylesheet order. */
+/* The gradient exists at rest too, as white-to-white, so the hover is a colour
+   change on --btn-from/--btn-to (registered in Button.css) that can transition —
+   a flat fill can't fade into a gradient. */
+.get-in-touch__button.btn--inverse {
+  --btn-from: #ffffff;
+  --btn-to: #ffffff;
+  background-image: linear-gradient(
+    270deg,
+    var(--btn-from) -7.81%,
+    var(--btn-to) 98.36%
+  );
+  background-origin: border-box;
+}
+
+.get-in-touch__button.btn--inverse:hover {
+  --btn-from: var(--color-brand-dark);
+  --btn-to: var(--color-brand);
+  color: #ffffff;
+}
+
+.get-in-touch__button.btn:hover .btn__arrow.btn__arrow--diagonal {
+  transform: translateX(3px);
+}
+
+.get-in-touch__button.btn:hover .btn__arrow-gradient {
+  opacity: 0;
+}
+
 /* --- MOBILE (<= 575px) -------------------------------------------------- */
 @media (max-width: 575px) {
   .get-in-touch {
@@ -171,5 +202,105 @@
     aspect-ratio: 1440 / 523;
     left: 50%;
     transform: translateX(-50%);
+  }
+}
+
+/* Case studies page only, desktop only: a brand-blue glow clipped by the left
+   edge (Figma: 101px circle, left -42px, 0.9 opacity). The footer is rendered
+   once in the root layout, so the band cannot know the route — it keys off the
+   page's own <main> class instead.
+
+   Drawn on ::before, fully blurred. z-index 0 rather than -1 so it lands above the backdrop's grey left blob; they sit on the left edge, clear
+   of the centred content. */
+@media (min-width: 576px) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 10%;
+    left: -42px;
+    width: 101px;
+    height: 101px;
+    border-radius: 50%;
+    background: linear-gradient(
+      270deg,
+      var(--color-brand-dark),
+      var(--color-brand)
+    );
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  /* Fully blurred: only ::before is drawn, with no clip. (Figma had a crisp top
+     35% via a second, clipped copy — ::after — which is now switched off.) */
+  body:has(.case-studies-page) .get-in-touch::after {
+    display: none;
+  }
+
+  body:has(.case-studies-page) .get-in-touch::before {
+    filter: blur(6.1px);
+  }
+}
+
+/* Ambient drift on the blue ellipse inside the artwork. It is an SVG <g>, so the
+   individual `translate` / `scale` apply in the SVG's user units (1 unit ≈ 1px
+   at the 1440 design width, scaling with the stretched artwork). `fill-box`
+   makes the scale pivot on the ellipse itself instead of the SVG's top-left
+   corner. The filter travels with the group, so the blur stays attached. */
+@keyframes get-in-touch-blue-glow-drift {
+  25% {
+    translate: -90px -30px;
+    scale: 1.06;
+  }
+  50% {
+    translate: -30px -60px;
+    scale: 0.96;
+  }
+  75% {
+    translate: 80px -20px;
+    scale: 1.04;
+  }
+}
+
+.get-in-touch__blue-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: get-in-touch-blue-glow-drift 16s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .get-in-touch__blue-glow {
+    animation: none;
+  }
+}
+
+/* Case studies page: drift the small blue circle. */
+@keyframes get-in-touch-case-studies-glow-drift {
+  25% {
+    translate: 2.5rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: 4rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: 1.5rem 2.5rem;
+    scale: 1.08;
+  }
+}
+
+@media (min-width: 576px) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    animation: get-in-touch-case-studies-glow-drift 16s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:has(.case-studies-page) .get-in-touch::before,
+  body:has(.case-studies-page) .get-in-touch::after {
+    animation: none;
   }
 }

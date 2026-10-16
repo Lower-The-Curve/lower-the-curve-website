@@ -1,0 +1,9 @@
+/* The case studies page — the `case-studies-page` BEM block, on the <main>
+   element.
+
+   Same as the home and services pages: sections own their measure and spacing,
+   so this is a plain full-width flow container and a full-bleed section can
+   reach the viewport edges. */
+.case-studies-page {
+  display: block;
+}

@@ -19,49 +19,9 @@ import './SolutionsSection.css';
 //                     `description`.
 //   - `use_stats`   : boolean, and it picks between TWO LAYOUTS, not just
 //                     whether a card shows. See the note by `hasStats` below.
+//
+// Its GraphQL fragment lives in lib/shopify/queries/sections/solutions.js.
 export const SOLUTIONS_TYPE = 'solutions';
-
-// Colocated GraphQL fragment. Both reference lists (`solution`, `stats`) and the
-// icon behind each solution item resolve through this one selection, so the page
-// query stays generic — it only spreads the fragment.
-export const solutionsSectionFragment = /* GraphQL */ `
-  fragment SolutionsSectionFields on Metaobject {
-    id
-    handle
-    type
-    fields {
-      key
-      type
-      value
-      references(first: 50) {
-        nodes {
-          __typename
-          ... on Metaobject {
-            id
-            type
-            handle
-            fields {
-              key
-              type
-              value
-              reference {
-                __typename
-                ... on MediaImage {
-                  image {
-                    url
-                    altText
-                    width
-                    height
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;

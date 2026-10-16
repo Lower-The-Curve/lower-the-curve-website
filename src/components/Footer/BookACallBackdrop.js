@@ -16,7 +16,7 @@ export default function BookACallBackdrop({ className }) {
         <g filter="url(#ltcCtaGlowLeft)">
           <circle cx="8.5" cy="684.5" r="384.5" fill="url(#ltcCtaGreyLeft)" />
         </g>
-        <g filter="url(#ltcCtaGlowBottom)">
+        <g className="get-in-touch__blue-glow" filter="url(#ltcCtaGlowBottom)">
           <ellipse cx="705" cy="823" rx="567.554" ry="567" fill="url(#ltcCtaBlue)" />
         </g>
       </g>

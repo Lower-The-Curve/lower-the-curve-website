@@ -1,10 +1,9 @@
 // The soft green glow low on the left of the stacked (use_stats = false) layout.
 // Decorative and aria-hidden, drawn here for the same reason as BlueDot.
 //
-// The circle is centred at x=25.5 with r=74.5 inside a 113-wide box, so most of it
-// sits outside the viewBox to the left and only its right-hand edge shows. That is
-// the artwork, not a mistake — the shape is meant to bleed off the page edge, so
-// it is positioned flush left.
+// The circle is centred at x=25.5 with r=74.5, so it spans x -49 to 100. The
+// viewBox starts at -62 (the blur filter region's left edge) so the whole circle
+// and its blur are drawn, not just the right-hand edge.
 //
 // Ids are namespaced for the same reason as BlueDot's. The stops keep their
 // literal hexes: they are NOT the green tokens — --color-accent-green and
@@ -16,9 +15,9 @@ export default function GreenGlow({ className }) {
   return (
     <svg
       className={className}
-      width="113"
+      width="175"
       height="175"
-      viewBox="0 0 113 175"
+      viewBox="-62 0 175 175"
       fill="none"
       aria-hidden="true"
       focusable="false"

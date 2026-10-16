@@ -85,5 +85,6 @@ pattern, and step-by-step recipes for adding sections and pages live in
 Two habits that bite hardest here:
 - **Never `npm run build`** after a change — a `next dev` server is running and
   hot reload is the feedback loop. A build while dev is running clobbers `.next`.
-- **Never forget the colocated GraphQL fragment** when adding a section — a
+- **Never forget the section's GraphQL fragment** when adding a section — it
+  lives in `src/lib/shopify/queries/sections/`, never in the component, and a
   section whose fragment isn't spread into the page query returns no data.

@@ -187,14 +187,15 @@ hashing would.
   `component_3`, …
 - **Never read order off the metaobject's `fields` array.** The Storefront API
   returns it **alphabetically**, not in authored order. Alias the keys to
-  `component1`…`componentN` in the page query (see `queries/home.js`) — that
-  aliased list is the **one place render order lives**.
+  `component1`…`componentN` in the page query (see `queries/pages/home.js`) —
+  that aliased list is the **one place render order lives**.
 
 ### The fetch path — four files, always in this order
 
-1. **`src/lib/shopify/queries/<page>.js`** — the page query. Imports section
-   fragments and spreads them; hardcodes no field selections. Re-exported from
-   `queries/index.js` (barrel).
+1. **`src/lib/shopify/queries/pages/<page>.js`** — the page query. Imports
+   section fragments from `queries/sections/` and spreads them; hardcodes no
+   field selections. Re-exported from `queries/pages/index.js`, which
+   `queries/index.js` re-exports.
 2. **`src/lib/shopify/index.js`** — `shopifyFetch` client plus one `getXPage()`
    helper per page, called with the right `{ type, handle }`. Returns the
    metaobject node or `null`.
@@ -212,29 +213,45 @@ endpoint, check the real field shape). Never invent field keys.
 
 ## 8. Adding a section — the fragment is mandatory
 
-Every section component exports **three** things:
+Every section is **two** modules:
 
-1. `xSectionFragment` — a **colocated GraphQL fragment**:
+1. **The fragment** — `src/lib/shopify/queries/sections/<name>.js` exports
+   `xSectionFragment`, re-exported from `queries/sections/index.js` (barrel):
    `fragment XFields on Metaobject { id type handle fields { key type value reference { ... } } }`
-2. `X_SECTION_TYPE` — the metaobject type string used for dispatch.
-3. default component `({ section }) => …` reading fields via `field()`.
+2. **The component** — `src/components/sections/<Name>/<Name>.js` exports
+   `X_SECTION_TYPE` (the metaobject type string used for dispatch) and the
+   default component `({ section }) => …` reading fields via `field()`.
+
+`queries/sections/` also holds `header.js` and `footer.js`. They're site
+chrome, not page sections: each fetches itself (`getHeader()`, `getFooter()`),
+so each carries its own query beside its fragment.
+
+**Section fragments never live in the component — query modules never import
+components.** `lib/shopify` is reached from the root layout (Header and Footer
+fetch through it), so a component imported by a query lands in every page's
+module graph, CSS and all; and a `'use client'` component can't hand a fragment
+to the server at all.
 
 Then — **do not skip a step**:
 
-1. Create the component (`src/components/sections/<Name>/<Name>.js` + `.css`).
-2. In `queries/<page>.js`: import the fragment, spread `...XFields` onto the
-   section `reference` **AND** `references.nodes`, and append
-   `${xSectionFragment}` to the query string. On `home.js` add it to the shared
-   `PageComponentFields` fragment so the type can go in **any** slot.
-3. Add `case X_SECTION_TYPE` to the page's `switch`.
+1. Create the fragment file and re-export it from `queries/sections/index.js`.
+2. Create the component (`src/components/sections/<Name>/<Name>.js` + `.css`).
+3. In `queries/pages/<page>.js`: import the fragment from `../sections`,
+   spread `...XFields` onto the section `reference` **AND** `references.nodes`,
+   and append `${xSectionFragment}` to the query string. On `home.js` add it to
+   the shared `PageComponentFields` fragment so the type can go in **any** slot.
+4. Add `case X_SECTION_TYPE` to the page's `switch`.
 
 **A section with no fragment spread into the query returns no data.** This is
-the single most common failure in this repo — double-check it before reporting done.
+the single most common failure in this repo — double-check it before reporting
+done. Spread it **even when another section's fragment selects the same
+shape**: every fragment is `on Metaobject`, so a section can silently ride on
+another's selection — and go blank the day that fragment changes.
 
 ### Adding a page
 
-1. `queries/<page>.js` with `getXPageQuery`, composing section fragments.
-2. Re-export from `queries/index.js`.
+1. `queries/pages/<page>.js` with `getXPageQuery`, composing section fragments.
+2. Re-export from `queries/pages/index.js`.
 3. `getXPage()` in `lib/shopify/index.js` with the right `{ type, handle }`.
 4. `src/app/<page>/page.js` + `page.css`, block `<page>-page` on the `<main>`.
 
@@ -263,8 +280,13 @@ grep -rnE '^\s*\.[a-z]+[A-Z]' src/
 # a CSS Module should never come back:
 grep -rn "module.css" src/
 
+# section fragments live in queries/sections/, and query modules never import
+# components — both should return nothing:
+grep -rn "SectionFragment" src/components/
+grep -rnE "from ['\"].*components/" src/lib/
+
 # a new section must appear in its page query:
-grep -rn "SectionFragment" src/lib/shopify/queries/
+grep -n "SectionFragment" src/lib/shopify/queries/pages/*.js
 ```
 
 Any hit is a rule break. Fix it or report it — **do not ship it silently.**

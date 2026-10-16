@@ -1,0 +1,62 @@
+.rich-text-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem;
+}
+
+.rich-text-body__paragraph {
+  margin: 0;
+  font-weight: 400;
+  /* 22px at --fs-body-base (16px). The global `p` rule is 1.5 (24px). */
+  line-height: 1.375;
+  letter-spacing: 0;
+  color: var(--color-text);
+}
+
+.rich-text-body__heading {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.rich-text-body__heading--1 {
+  font-size: var(--fs-heading-lg);
+}
+
+.rich-text-body__heading--2 {
+  font-size: var(--fs-heading-md);
+}
+
+.rich-text-body__heading--3 {
+  font-size: var(--fs-heading-sm);
+}
+
+.rich-text-body__heading--4,
+.rich-text-body__heading--5,
+.rich-text-body__heading--6 {
+  font-size: var(--fs-body-base);
+}
+
+.rich-text-body__list {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rich-text-body__list-item {
+  margin: 0;
+}
+
+.rich-text-body__link {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.rich-text-body__link:hover {
+  color: var(--color-brand-dark);
+}

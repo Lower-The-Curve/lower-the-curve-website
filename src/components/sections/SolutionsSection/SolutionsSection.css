@@ -152,7 +152,7 @@
   position: relative;
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 4rem var(--space);
+  padding: var(--section-pad-y, 4rem) var(--space);
   display: grid;
   align-items: start;
 }
@@ -170,8 +170,8 @@
    scrollbar — which would push it off the text edge by ~15px on Windows.
 
    .solutions__green-glow hangs off the section, because it is meant to bleed off the page
-   edge, not to line up with the text. Its circle is centred outside its own
-   viewBox, so only the right-hand edge shows — see GreenGlow.js.
+   edge, not to line up with the text. Its viewBox now holds the whole circle,
+   so it sits flush left as a full disc — see GreenGlow.js.
    ---------------------------------------------------------------------- */
 .solutions__blue-dot,
 .solutions__green-glow {
@@ -489,7 +489,7 @@
 /* The vertical rule between the icon and the copy. Runs the height of the copy
    block, which is what the reference shows. */
 .solutions__body {
-  border-left: 1px solid #e3e3e3;
+  border-left: 3px solid #e3e3e3;
   padding-left: 1.75rem;
   display: flex;
   flex-direction: column;
@@ -516,6 +516,29 @@
 
 .solutions__item-button {
   margin-top: 0.5rem;
+}
+
+/* "Learn More": a 16px label at every tier (the sm button's --fs-body-xs is
+   14px) and a 3px brand-gradient outline. The compound selector beats .btn--sm
+   regardless of stylesheet order. The gradient border is a transparent border
+   over a white padding-box fill and a gradient border-box. */
+.solutions__item-button.btn--secondary {
+  font-size: var(--fs-body-base);
+  border-width: 3px;
+  border-color: transparent;
+  --btn-from: #ffffff;
+  --btn-to: #ffffff;
+  background-image: linear-gradient(var(--btn-from), var(--btn-to)),
+    linear-gradient(135deg, var(--color-brand-dark), var(--color-brand));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Hover fades the white fill away to reveal the same gradient underneath. */
+.solutions__item-button.btn--secondary:hover {
+  border-color: transparent;
+  --btn-from: transparent;
+  --btn-to: transparent;
 }
 
 /* --- TABLET (<= 1024px) -------------------------------------------------
@@ -551,7 +574,7 @@
   /* Both modifiers are (0,2,0), so this has to match that to win. */
   .solutions--with-stats .solutions__inner,
   .solutions--no-stats .solutions__inner {
-    padding: 4rem var(--space);
+    padding: var(--section-pad-y, 4rem) var(--space);
     grid-template-columns: minmax(0, 1fr);
     gap: 3.5rem;
   }
@@ -606,7 +629,7 @@
   }
 
   .solutions__inner {
-    padding: 3rem var(--space);
+    padding: var(--section-pad-y, 3rem) var(--space);
   }
 
   .solutions__stats-block {
@@ -637,6 +660,46 @@
   }
 
   .solutions__body {
+    border-left-width: 2.5px;
     padding-left: 1.25rem;
+  }
+
+  /* The narrow reference has no card tint: plain white. */
+  .solutions__item,
+  .solutions--no-stats .solutions__item {
+    background: #ffffff;
+  }
+}
+
+/* Ambient drift on the glows — individual `translate` / `scale` so it composes
+   with any `transform` already positioning them. Different durations keep the
+   two out of step. */
+@keyframes solutions-glow-drift {
+  25% {
+    translate: 3rem -2rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: 1rem 2.5rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: -1.5rem 1rem;
+    scale: 1.1;
+  }
+}
+
+.solutions__blue-dot {
+  animation: solutions-glow-drift 15s ease-in-out infinite;
+}
+
+.solutions__green-glow {
+  animation: solutions-glow-drift 19s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solutions__blue-dot,
+  .solutions__green-glow {
+    animation: none;
   }
 }

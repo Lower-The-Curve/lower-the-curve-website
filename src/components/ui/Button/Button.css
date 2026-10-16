@@ -1,5 +1,21 @@
 /* Pill button. Sizes come from the type scale in src/app/typography.css — never
    hardcode a font-size here. */
+
+/* Registered so the primary gradient's two stops can transition: browsers can't
+   interpolate between two `background-image` values, but they can between
+   registered <color> custom properties. */
+@property --btn-from {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --btn-to {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -13,8 +29,13 @@
   white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+  /* One fade for every colour change on every button — fill, ring, label. Lift
+     and brightness stay quick. Sections that restyle a hover reuse this token. */
+  --btn-fade: 0.6s;
+  transition: background-color var(--btn-fade) ease,
+    border-color var(--btn-fade) ease, color var(--btn-fade) ease,
+    box-shadow var(--btn-fade) ease, transform 0.2s ease, filter 0.2s ease,
+    --btn-from var(--btn-fade) ease, --btn-to var(--btn-fade) ease;
 }
 
 .btn:focus-visible {
@@ -45,21 +66,16 @@
 
 /* --- VARIANTS ----------------------------------------------------------- */
 .btn--primary {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-brand-dark),
-    var(--color-brand)
-  );
+  --btn-from: var(--color-brand-dark);
+  --btn-to: var(--color-brand);
+  background-image: linear-gradient(135deg, var(--btn-from), var(--btn-to));
   color: #ffffff;
   border-color: transparent;
 }
 
 .btn--primary:hover {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-brand-darker),
-    var(--color-brand-dark)
-  );
+  --btn-from: var(--color-brand-darker);
+  --btn-to: var(--color-brand-dark);
 }
 
 /* Flat fill, no gradient. Both colours are overridable per instance through the
@@ -108,13 +124,14 @@
 }
 
 /* The secondary arrow is stroked with the brand GRADIENT, which would vanish on
-   the blue fill above. A CSS `stroke` beats the SVG's stroke="url(#...)"
-   presentation attribute, so this repaints it white — for the hovered button only.
+   the blue fill above. Fading the gradient copy out leaves the currentColor copy
+   under it (see ArrowIcon.js), which fades to white with the label — a stroke
+   swap from url(#...) to a colour would snap.
    NOT done by recolouring the gradient's stops: every arrow on the page ships the
    same `ltcArrowGradient` id, so url(#...) resolves to the FIRST definition in the
    document and one button's hover would repaint every arrow on the page. */
-.btn--secondary:hover .btn__arrow path {
-  stroke: #ffffff;
+.btn--secondary:hover .btn__arrow-gradient {
+  opacity: 0;
 }
 
 /* --- LABEL -------------------------------------------------------------- */
@@ -130,12 +147,12 @@
    ---------------------------------------------------------------------- */
 .btn__arrow {
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform var(--btn-fade) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* So the secondary arrow's repaint eases in with the fill rather than snapping. */
 .btn__arrow path {
-  transition: stroke 0.2s ease;
+  transition: stroke var(--btn-fade) ease, opacity var(--btn-fade) ease;
 }
 
 /* ↗ same SVG, rotated. Negative angle because the SVG's Y axis points down. */

@@ -27,7 +27,7 @@
 // character next and `r` is a word character, so `<br>` falls through to the
 // third alternative rather than being read as an unclosed <b>.
 const MARKUP =
-  /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>|<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\s*\/?>/gi;
+  /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1\s*>|<span\b[^>]*\bclass=["']([^"']*)["'][^>]*>([\s\S]*?)<\/span>|<br\b([^>]*)>/gi;
 
 /**
  * @param {string} title    The authored value, e.g. `Grow your <span class="blue-gradient">startup</span>`
@@ -75,10 +75,19 @@ export default function accentedTitle(title, classes) {
         )
       );
     } else {
-      // <br>: an authored line break. It is the only alternative with no capture
-      // groups, which is what `match[3] !== undefined` above distinguishes — an
-      // empty class attribute is "" and must still take the span branch.
-      parts.push(<br key={match.index} />);
+      // <br>: an authored line break. It is the only alternative with no
+      // span/strong captures, which is what `match[3] !== undefined` above
+      // distinguishes — an empty class attribute is "" and must still take the
+      // span branch. A class on the br is kept so a section can show one break
+      // on desktop and another on a phone.
+      const className = (match[5] || '').match(/\bclass=["']([^"']*)["']/i)?.[1];
+      parts.push(
+        className ? (
+          <br key={match.index} className={className} />
+        ) : (
+          <br key={match.index} />
+        )
+      );
     }
 
     cursor = match.index + match[0].length;
