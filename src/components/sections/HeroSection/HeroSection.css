@@ -313,6 +313,7 @@
      the white modifier below changes this; the chevrons carry their own brand
      gradient and don't inherit it. */
   color: var(--color-brand);
+  cursor: pointer;
 }
 
 .hero__scroll-text {

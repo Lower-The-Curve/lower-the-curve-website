@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import './HeroSection.css';
 import ChevronsDownIcon from './ChevronsDownIcon';
+import ScrollCue from './ScrollCue';
 
 // The metaobject type this component renders. Used to dispatch sections to the
 // right component at render time.
@@ -403,7 +404,7 @@ export default function HeroSection({
       </div>
 
       {scrollText && (
-        <div className="hero__scroll">
+        <ScrollCue>
           <span
             className={
               /<(strong|b)\b/i.test(scrollText)
@@ -414,7 +415,7 @@ export default function HeroSection({
             {scrollLabel(scrollText)}
           </span>
           <ChevronsDownIcon className="hero__scroll-icon" />
-        </div>
+        </ScrollCue>
       )}
     </section>
   );
