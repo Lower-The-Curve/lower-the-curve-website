@@ -419,3 +419,30 @@
     animation: none;
   }
 }
+
+/* Ambient drift on the sphere — individual `translate` / `scale` so it composes
+   with the sphere's rotate. */
+@keyframes partner-detail-problem-glow-drift {
+  25% {
+    translate: -3rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: -1rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.08;
+  }
+}
+
+.partner-detail-problem__sphere {
+  animation: partner-detail-problem-glow-drift 16s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-detail-problem__sphere {
+    animation: none;
+  }
+}

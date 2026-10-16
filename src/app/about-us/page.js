@@ -49,7 +49,7 @@ export default async function AboutUsPage() {
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
-            return <HeroSection key={section.id} section={section} />;
+            return <HeroSection key={section.id} section={section} fadeTop />;
           case BANNER_TYPE:
             return <BannerSection key={section.id} section={section} />;
           case FEATURE_CARDS_TYPE:

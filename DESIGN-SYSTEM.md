@@ -42,9 +42,9 @@ Import order in `layout.js` matters: `typography.css` **before** `globals.css`.
 
 ## 1. Font family
 
-**Poppins is the only font on the site.** Weights loaded: **400, 500, 600, 700**
+**Poppins is the only font on the site.** Weights loaded: **300, 400, 500, 600, 700**
 (Poppins is not a variable font, so each weight is a separate file — do not add
-weights you aren't using).
+weights you aren't using). 300 (Light) is used only by the app dialog subtitle.
 
 - Loaded in [src/app/layout.js](src/app/layout.js) with `next/font/google`,
   exposed as `--font-poppins` on `<html>`.

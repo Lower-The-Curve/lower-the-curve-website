@@ -19,7 +19,7 @@
 .rich-text-with-stats__inner {
   max-width: var(--max-width);
   margin-inline: auto;
-  padding: 64px var(--space);
+  padding: var(--section-pad-y, 64px) var(--space);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 48px;
@@ -70,10 +70,7 @@
   }
 
   .rich-text-with-stats--figma-art .rich-text-with-stats__art-stage {
-    transform: translate(
-      var(--figma-mac-offset-x),
-      var(--figma-mac-offset-y)
-    );
+    transform: translate(var(--figma-mac-offset-x), var(--figma-mac-offset-y));
   }
 
   .rich-text-with-stats--figma-art .rich-text-with-stats__content {
@@ -248,11 +245,47 @@
 }
 
 .rich-text-with-stats__button.btn--primary:hover {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-brand-dark),
-    var(--color-brand-darker)
-  );
+  background-color: transparent;
+  background-image: none;
+  /* Inset shadow, not a border: the button has no border and a real one would
+     change its size. */
+  box-shadow: inset 0 0 0 2px var(--color-brand);
+  color: var(--color-brand);
+}
+
+/* Slower, eased arrow so the swing from ↗ to → and the colour change read as one
+   smooth move rather than a snap. */
+.rich-text-with-stats__button .btn__arrow {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rich-text-with-stats__button .btn__arrow path {
+  transition: stroke 0.45s ease;
+}
+
+/* 16px label on a phone — the md button's --fs-body-sm drops to 14px there. The
+   compound selector beats .btn--md regardless of stylesheet order. */
+@media (max-width: 575px) {
+  .rich-text-with-stats__button.btn--primary,
+  .rich-text-with-stats__button.btn--secondary {
+    font-size: var(--fs-body-base);
+  }
+}
+
+/* ↗ at rest on every entry (the shared `rise` arrow starts straight); the hover
+   rule below swings it to →. */
+.rich-text-with-stats__button.btn--primary .btn__arrow {
+  transform: rotate(-45deg);
+}
+
+/* Straight right arrow on hover (the shared button would rotate it up), blue to
+   match the outline. */
+.rich-text-with-stats__button.btn--primary:hover .btn__arrow {
+  transform: translateX(3px);
+}
+
+.rich-text-with-stats__button.btn--primary:hover .btn__arrow path {
+  stroke: var(--color-brand);
 }
 
 /* CMS “outline” (btn--secondary): blank pill at rest; gradient fill on hover.
@@ -295,7 +328,7 @@
 }
 
 .rich-text-with-stats__stats-wrap::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -433,7 +466,6 @@
   mask-image: linear-gradient(to bottom, transparent 30%, #000 60%);
 }
 
-
 @media (max-width: 1024px) {
   .rich-text-with-stats--backdrop-art {
     --art-w: 96.9vw;
@@ -455,7 +487,6 @@
     filter: blur(1.3vw);
   }
 
-  
   .rich-text-with-stats__vector {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%);
     mask-image: linear-gradient(to bottom, transparent, #000 10%);
@@ -497,12 +528,14 @@
     --art-w: min(
       153.6%,
       calc(
-        (100% + (100vw - min(100vw, var(--max-width))) / 2 + var(--space) -
-            16px) / 0.781
+        (
+            100% + (100vw - min(100vw, var(--max-width))) / 2 + var(--space) -
+              16px
+          ) /
+          0.781
       )
     );
   }
-
 
   .rich-text-with-stats--backdrop-art .rich-text-with-stats__image {
     width: calc(var(--art-w) * 0.781);
@@ -557,7 +590,7 @@
   }
 
   .rich-text-with-stats--figma-art .rich-text-with-stats__inner {
-    padding: 64px var(--space);
+    padding: var(--section-pad-y, 64px) var(--space);
     row-gap: 32px;
   }
 
@@ -655,6 +688,9 @@
   .rich-text-with-stats__content {
     align-items: center;
     text-align: center;
+    /* Capped at 711px on desktop; centre that box in the column so it doesn't
+       hug the left while its text is centred. */
+    margin-inline: auto;
   }
 
   /* 20px at --fs-body-base (16px on tablet and phone). Desktop keeps
@@ -704,7 +740,7 @@
 
 @media (max-width: 575px) {
   .rich-text-with-stats__inner {
-    padding: 48px var(--space);
+    padding: var(--section-pad-y, 48px) var(--space);
     gap: 32px;
   }
 
@@ -751,11 +787,13 @@
     min-height: 44px;
   }
 
-  .rich-text-with-stats--figma-art .rich-text-with-stats__button.btn--secondary {
+  .rich-text-with-stats--figma-art
+    .rich-text-with-stats__button.btn--secondary {
     border-width: 3px;
   }
 
-  .rich-text-with-stats--figma-art .rich-text-with-stats__copy:not(.rich-text-with-stats__copy--phone) {
+  .rich-text-with-stats--figma-art
+    .rich-text-with-stats__copy:not(.rich-text-with-stats__copy--phone) {
     display: none;
   }
 
@@ -763,7 +801,8 @@
     display: block;
   }
 
-  .rich-text-with-stats--figma-art .rich-text-with-stats__stat:nth-child(n + 3) {
+  .rich-text-with-stats--figma-art
+    .rich-text-with-stats__stat:nth-child(n + 3) {
     display: none;
   }
 
@@ -816,4 +855,31 @@
 /* Growth entry: a little more room before the next section. */
 .rich-text-with-stats--backdrop-art {
   margin-bottom: 24px;
+}
+
+/* Ambient drift on the green glow — `translate` / `scale` so it composes with
+   the layout's own positioning. */
+@keyframes rich-text-with-stats-glow-drift {
+  25% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: 0.5rem 3rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: -2rem 1rem;
+    scale: 1.1;
+  }
+}
+
+.rich-text-with-stats__glow {
+  animation: rich-text-with-stats-glow-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rich-text-with-stats__glow {
+    animation: none;
+  }
 }

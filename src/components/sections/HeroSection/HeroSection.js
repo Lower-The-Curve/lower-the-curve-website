@@ -251,6 +251,7 @@ export default function HeroSection({
   artwork,
   appIcons = false,
   fadeBottom = false,
+  fadeTop = false,
 }) {
   if (!section) return null;
 
@@ -298,6 +299,7 @@ export default function HeroSection({
         whiteScroll && 'hero--scroll-color-white',
         artwork && 'hero--asset',
         fadeBottom && 'hero--fade-bottom',
+        fadeTop && 'hero--fade-top',
       ]
         .filter(Boolean)
         .join(' ')}

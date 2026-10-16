@@ -174,6 +174,14 @@
   padding: 0.65em 1.25em;
 }
 
+/* 16px label on a phone — the md button's --fs-body-sm drops to 14px there. The
+   compound selector beats .btn--md regardless of stylesheet order. */
+@media (max-width: 575px) {
+  .banner__button.btn--inverse {
+    font-size: var(--fs-body-base);
+  }
+}
+
 @media (max-width: 1024px) {
   .banner__inner {
     grid-template-columns: minmax(0, 1fr);

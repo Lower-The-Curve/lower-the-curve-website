@@ -1,3 +1,15 @@
+@property --app-button-from {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --app-button-to {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 @property --indicator-left {
   syntax: '<length>';
   inherits: true;
@@ -21,7 +33,7 @@
   z-index: 1;
   max-width: 88rem;
   margin-inline: auto;
-  padding: 4rem var(--space);
+  padding: var(--section-pad-y, 4rem) var(--space);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,7 +102,9 @@
   max-width: 70rem;
   font-size: 16px;
   line-height: 1.375;
-  color: var(--color-text-muted);
+  /* Design sets this lede near-black, not the muted grey. One consumer so far —
+     promote to a token on the second. */
+  color: #0d0d0d;
 }
 
 .app-cards__scroller {
@@ -244,6 +258,43 @@
 .app-cards__card-button {
   margin-top: auto;
   align-self: flex-end;
+  /* The fill is rebuilt from two registered colours because browsers cannot
+     animate between background-images — this lets the gradient fade out. */
+  --app-button-from: var(--color-brand-dark);
+  --app-button-to: var(--color-brand);
+  background-color: transparent;
+  background-image: linear-gradient(
+    135deg,
+    var(--app-button-from),
+    var(--app-button-to)
+  );
+  transition: --app-button-from 0.45s ease, --app-button-to 0.45s ease,
+    border-color 0.45s ease, color 0.45s ease, transform 0.2s ease;
+}
+
+.app-cards__card-button:hover {
+  --app-button-from: var(--color-brand-darker);
+  --app-button-to: var(--color-brand-dark);
+}
+
+.app-cards__card-button .btn__arrow {
+  transition: transform 0.45s ease;
+}
+
+/* Clicked: outline pill with a straight arrow, fading in then back out (the
+   class is added on click and removed after PRESSED_MS in AppCardsTabs.js).
+   Written here rather than as a Button variant because it is a transient state
+   of this one button. */
+.app-cards__card-button--pressed,
+.app-cards__card-button--pressed:hover {
+  --app-button-from: transparent;
+  --app-button-to: transparent;
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.app-cards__card-button--pressed .btn__arrow {
+  transform: none;
 }
 
 .app-cards__card-expand {
@@ -310,8 +361,12 @@
   }
 
   .app-cards__inner {
-    padding: 3rem var(--space);
+    padding: var(--section-pad-y, 3rem) var(--space);
     gap: 1.875rem;
+  }
+
+  .app-cards__title {
+    line-height: 38px;
   }
 
   .app-cards__description {
@@ -372,5 +427,54 @@
   .app-cards__indicator,
   .app-cards__tab {
     transition: none;
+  }
+}
+
+/* Ambient drift on the glows — individual `translate` / `scale` / `opacity` so
+   it composes with any `transform`. Same treatment as the services page: the
+   grey glow moves vertically only (its right edge is clipped art), the green
+   one wanders, scaled down because it is a small disc. */
+@keyframes app-cards-gray-glow-drift {
+  25% {
+    translate: 0 5rem;
+    opacity: 0.6;
+  }
+  50% {
+    translate: 0 10rem;
+    opacity: 1;
+  }
+  75% {
+    translate: 0 4rem;
+    opacity: 0.6;
+  }
+}
+
+@keyframes app-cards-green-glow-drift {
+  25% {
+    translate: 2rem -1.5rem;
+    scale: 1.15;
+  }
+  50% {
+    translate: 0.5rem -3rem;
+    scale: 0.92;
+  }
+  75% {
+    translate: -1.5rem -1rem;
+    scale: 1.1;
+  }
+}
+
+.app-cards__glow--gray {
+  animation: app-cards-gray-glow-drift 16s ease-in-out infinite;
+}
+
+.app-cards__glow--green {
+  animation: app-cards-green-glow-drift 20s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-cards__glow--gray,
+  .app-cards__glow--green {
+    animation: none;
   }
 }

@@ -258,3 +258,35 @@
     right: calc(var(--glow-size) * -0.55);
   }
 }
+
+/* Ambient drift on the glow (green or blue variant) — individual `translate` /
+   `scale` so it composes with the positioning above. */
+@keyframes feature-cards-glow-drift {
+  25% {
+    translate: -3rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: -1rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.08;
+  }
+}
+
+.feature-cards__glow {
+  animation: feature-cards-glow-drift 16s ease-in-out infinite;
+}
+
+.feature-cards__glow--blue {
+  animation-duration: 20s;
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-cards__glow {
+    animation: none;
+  }
+}

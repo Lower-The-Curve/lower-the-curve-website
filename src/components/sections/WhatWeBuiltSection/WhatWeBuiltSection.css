@@ -191,3 +191,29 @@
     padding-bottom: 2.5rem;
   }
 }
+
+/* Ambient drift on the glow — individual `translate` / `scale`. */
+@keyframes what-we-built-glow-drift {
+  25% {
+    translate: -3rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: -1rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: 2.5rem 1.5rem;
+    scale: 1.08;
+  }
+}
+
+.what-we-built__glow {
+  animation: what-we-built-glow-drift 17s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .what-we-built__glow {
+    animation: none;
+  }
+}

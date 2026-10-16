@@ -6,3 +6,32 @@
 .services-page {
   display: block;
 }
+
+/* Gaps between sections. Each section's own vertical padding is zeroed here
+   (they read --section-pad-y, default unchanged elsewhere), so these margins
+   ARE the visible gaps: 1→2 50, 2→3 50, 3→4 70, 4→5 70, 5→6 50. */
+.services-page {
+  --section-pad-y: 0px;
+}
+
+.services-page > :nth-child(2),
+.services-page > :nth-child(3),
+.services-page > :nth-child(6) {
+  margin-top: 50px;
+}
+
+.services-page > :nth-child(4),
+.services-page > :nth-child(5) {
+  margin-top: 70px;
+}
+
+/* Mobile: every gap is 50px except the last (5→6), which is 20px. */
+@media (max-width: 575px) {
+  .services-page > :nth-child(n + 2) {
+    margin-top: 50px;
+  }
+
+  .services-page > :nth-child(6) {
+    margin-top: 20px;
+  }
+}

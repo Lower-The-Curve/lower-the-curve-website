@@ -386,3 +386,29 @@
     line-height: 16px;
   }
 }
+
+/* Ambient drift on the glow — individual `translate` / `scale`. */
+@keyframes partner-approach-glow-drift {
+  25% {
+    translate: 3rem 2rem;
+    scale: 1.12;
+  }
+  50% {
+    translate: 1rem 4.5rem;
+    scale: 0.94;
+  }
+  75% {
+    translate: -1.5rem 1.5rem;
+    scale: 1.08;
+  }
+}
+
+.partner-approach__glow {
+  animation: partner-approach-glow-drift 19s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-approach__glow {
+    animation: none;
+  }
+}
