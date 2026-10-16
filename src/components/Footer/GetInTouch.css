@@ -134,14 +134,23 @@
 /* Hover: the Figma 270deg brand gradient (darker right, lighter left), white label, arrow swings from ↗ to →. The compound
    selectors out-rank .btn--inverse:hover and .btn:hover .btn__arrow--diagonal
    whatever the stylesheet order. */
-.get-in-touch__button.btn--inverse:hover {
-  background-color: var(--color-brand);
+/* The gradient exists at rest too, as white-to-white, so the hover is a colour
+   change on --btn-from/--btn-to (registered in Button.css) that can transition —
+   a flat fill can't fade into a gradient. */
+.get-in-touch__button.btn--inverse {
+  --btn-from: #ffffff;
+  --btn-to: #ffffff;
   background-image: linear-gradient(
     270deg,
-    var(--color-brand-dark) -7.81%,
-    var(--color-brand) 98.36%
+    var(--btn-from) -7.81%,
+    var(--btn-to) 98.36%
   );
   background-origin: border-box;
+}
+
+.get-in-touch__button.btn--inverse:hover {
+  --btn-from: var(--color-brand-dark);
+  --btn-to: var(--color-brand);
   color: #ffffff;
 }
 
@@ -149,8 +158,8 @@
   transform: translateX(3px);
 }
 
-.get-in-touch__button.btn:hover .btn__arrow path {
-  stroke: #ffffff;
+.get-in-touch__button.btn:hover .btn__arrow-gradient {
+  opacity: 0;
 }
 
 /* --- MOBILE (<= 575px) -------------------------------------------------- */

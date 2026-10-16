@@ -19,6 +19,8 @@
 // Note the gradient runs dark-on-the-RIGHT (x1 is the larger x), matching the
 // hero headline's blue accent rather than the buttons' dark-on-left order.
 
+import './ChevronsDownIcon.css';
+
 export default function ChevronsDownIcon({ className, gradient = true }) {
   const stroke = gradient ? 'url(#ltcChevronGradient)' : 'currentColor';
 
