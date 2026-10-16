@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import accentedTitle from '@/components/ui/accentedTitle';
 import ChevronsDownIcon from '@/components/sections/HeroSection/ChevronsDownIcon';
+import ScrollCue from '@/components/sections/HeroSection/ScrollCue';
 import './PartnerDetailSection.css';
 
 // The partner hero — a whole page's content, not a slot in a `content` entry.
@@ -213,10 +214,10 @@ export default function PartnerDetailSection({ section }) {
       </div>
 
       {scrollText && (
-        <div className="partner-detail__scroll">
+        <ScrollCue className="partner-detail__scroll">
           <span className="partner-detail__scroll-text">{scrollText}</span>
           <ChevronsDownIcon className="partner-detail__scroll-icon" />
-        </div>
+        </ScrollCue>
       )}
     </section>
   );

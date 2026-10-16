@@ -404,7 +404,7 @@ export default function HeroSection({
       </div>
 
       {scrollText && (
-        <ScrollCue>
+        <ScrollCue className="hero__scroll">
           <span
             className={
               /<(strong|b)\b/i.test(scrollText)

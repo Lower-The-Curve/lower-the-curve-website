@@ -2,11 +2,12 @@
 
 // The hero's "Scroll down" cue: smooth-scrolls to the section after the hero.
 // The hero is a server component, so the click handler lives here. This renders
-// the same `.hero__scroll` element the hero always had (no extra wrapper), so
-// the layout is untouched. Figma has no prototype interaction on the cue; this
-// is the standard behaviour for it.
+// the same scroll element the hero always had (no extra wrapper), with the
+// caller's block class (`hero__scroll`, `partner-detail__scroll`), so the layout
+// is untouched. Figma has no prototype interaction on the cue; this is the
+// standard behaviour for it.
 
-export default function ScrollCue({ children }) {
+export default function ScrollCue({ className, children }) {
   function scrollToNext(event) {
     const next = event.currentTarget.closest('section')?.nextElementSibling;
     if (!next) return;
@@ -16,7 +17,7 @@ export default function ScrollCue({ children }) {
 
   return (
     <div
-      className="hero__scroll"
+      className={className}
       role="button"
       tabIndex={0}
       onClick={scrollToNext}

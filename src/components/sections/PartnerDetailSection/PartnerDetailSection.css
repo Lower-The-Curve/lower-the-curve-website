@@ -122,6 +122,7 @@
   align-items: center;
   gap: 0.75rem;
   color: var(--color-brand);
+  cursor: pointer;
 }
 .partner-detail__scroll-text {
   font-size: var(--fs-body-xs);

@@ -653,20 +653,18 @@
   .solutions__item-button.btn--secondary {
     font-size: var(--fs-body-sm);
     border-width: 3px;
-    background-image: linear-gradient(#ffffff, #ffffff),
+    --btn-from: #ffffff;
+    --btn-to: #ffffff;
+    background-image: linear-gradient(var(--btn-from), var(--btn-to)),
       linear-gradient(135deg, var(--color-brand-dark), var(--color-brand));
     background-origin: border-box;
     background-clip: padding-box, border-box;
   }
 
-  /* Hover fills with the same gradient (the shared rule only sets a colour). */
+  /* Hover fades the white fill away to reveal the same gradient underneath. */
   .solutions__item-button.btn--secondary:hover {
-    background-image: linear-gradient(
-      135deg,
-      var(--color-brand-dark),
-      var(--color-brand)
-    );
-    background-clip: border-box;
+    --btn-from: transparent;
+    --btn-to: transparent;
   }
 }
 

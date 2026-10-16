@@ -237,30 +237,21 @@
    on the caps. The outline variant keeps its border. */
 .rich-text-with-stats__button.btn--primary {
   border-width: 0;
-  background-image: linear-gradient(
-    135deg,
-    var(--color-brand),
-    var(--color-brand-dark)
-  );
+  --btn-from: var(--color-brand);
+  --btn-to: var(--color-brand-dark);
+  background-image: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  /* The gradient fades through --btn-from/--btn-to (registered in Button.css)
+     because a gradient can't transition to `none`; the shared .btn transition
+     does the rest. */
 }
 
 .rich-text-with-stats__button.btn--primary:hover {
-  background-color: transparent;
-  background-image: none;
+  --btn-from: transparent;
+  --btn-to: transparent;
   /* Inset shadow, not a border: the button has no border and a real one would
      change its size. */
-  box-shadow: inset 0 0 0 2px var(--color-brand);
+  box-shadow: inset 0 0 0 3px var(--color-brand);
   color: var(--color-brand);
-}
-
-/* Slower, eased arrow so the swing from ↗ to → and the colour change read as one
-   smooth move rather than a snap. */
-.rich-text-with-stats__button .btn__arrow {
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.rich-text-with-stats__button .btn__arrow path {
-  transition: stroke 0.45s ease;
 }
 
 /* 16px label on a phone — the md button's --fs-body-sm drops to 14px there. The
@@ -291,25 +282,24 @@
 /* CMS “outline” (btn--secondary): blank pill at rest; gradient fill on hover.
    Lighter --color-brand on the left (90deg). */
 .rich-text-with-stats__button.btn--secondary {
-  background-image: none;
+  --btn-from: #ffffff;
+  --btn-to: #ffffff;
+  background-image: linear-gradient(90deg, var(--btn-from), var(--btn-to));
   background-color: #ffffff;
   color: var(--color-brand);
   border-color: var(--color-brand);
 }
 
 .rich-text-with-stats__button.btn--secondary:hover {
+  --btn-from: var(--color-brand);
+  --btn-to: var(--color-brand-dark);
   background-color: var(--color-brand);
-  background-image: linear-gradient(
-    90deg,
-    var(--color-brand),
-    var(--color-brand-dark)
-  );
   color: #ffffff;
   border-color: transparent;
 }
 
-.rich-text-with-stats__button.btn--secondary:hover .btn__arrow path {
-  stroke: #ffffff;
+.rich-text-with-stats__button.btn--secondary:hover .btn__arrow-gradient {
+  opacity: 0;
 }
 
 .rich-text-with-stats__stats-block {
