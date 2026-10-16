@@ -10,7 +10,11 @@
                         the design system's existing tiers — no new breakpoint is
                         introduced. */
 .site-header {
-  position: relative;
+  /* Sticky, not fixed: the header keeps its spot in normal flow, so the
+     --header-height maths in full-bleed sections (e.g. the hero) is unchanged.
+     HeaderBar.js adds --hidden while scrolling down and removes it on scroll up. */
+  position: sticky;
+  top: 0;
   /* High, because .site-header is a stacking context: the mobile drawer and its
      scrim are descendants, so they can never paint above this value no matter
      what z-index they carry. Page sections must stay below it. */
@@ -19,6 +23,27 @@
      gradient) shows through behind the header, as in the design. */
   background: transparent;
   padding: 0.75rem 0;
+  transition: transform 0.3s ease;
+}
+
+/* Slid up out of view while the visitor scrolls down. The transform lives only
+   on this modifier, never on the base class (and no will-change: transform):
+   any transform makes the header the containing block for its position:fixed
+   descendants, which would trap the mobile drawer and scrim inside it — see the
+   capsule::before note below. The drawer can't be open while hidden anyway, as
+   it locks page scroll. A keyboard user tabbing into it brings it back. */
+.site-header--hidden {
+  transform: translateY(-100%);
+}
+
+.site-header--hidden:focus-within {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
 }
 
 /* Sized to hold the capsule plus the gutters, so the capsule can actually reach

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getHeader, getMenu } from '@/lib/shopify';
+import HeaderBar from './HeaderBar';
 import HeaderNav from './HeaderNav';
 import './Header.css';
 
@@ -14,7 +15,8 @@ import './Header.css';
 //   button_color            -> the CTA's label colour
 //
 // Rendered once in the root layout so it appears on every page. The interactive
-// part (the mobile menu toggle) is isolated in HeaderNav.
+// parts are isolated in client components: the mobile menu toggle in HeaderNav,
+// and hide-on-scroll-down / show-on-scroll-up in HeaderBar.
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key);
@@ -85,7 +87,7 @@ export default async function Header() {
   const ctaLabel = ratio !== null && ratio < 3 ? null : authoredLabel;
 
   return (
-    <header className="site-header">
+    <HeaderBar>
       <div className="site-header__inner">
         {/* The rounded wrapper holds the logo, the nav and the CTA. */}
         <div className="site-header__capsule">
@@ -115,6 +117,6 @@ export default async function Header() {
           />
         </div>
       </div>
-    </header>
+    </HeaderBar>
   );
 }
