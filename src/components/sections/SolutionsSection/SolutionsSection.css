@@ -519,11 +519,26 @@
 }
 
 /* "Learn More": a 16px label at every tier (the sm button's --fs-body-xs is
-   14px) and a 3px outline. The compound selector beats .btn--sm regardless of
-   stylesheet order. */
+   14px) and a 3px brand-gradient outline. The compound selector beats .btn--sm
+   regardless of stylesheet order. The gradient border is a transparent border
+   over a white padding-box fill and a gradient border-box. */
 .solutions__item-button.btn--secondary {
   font-size: var(--fs-body-base);
   border-width: 3px;
+  border-color: transparent;
+  --btn-from: #ffffff;
+  --btn-to: #ffffff;
+  background-image: linear-gradient(var(--btn-from), var(--btn-to)),
+    linear-gradient(135deg, var(--color-brand-dark), var(--color-brand));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Hover fades the white fill away to reveal the same gradient underneath. */
+.solutions__item-button.btn--secondary:hover {
+  border-color: transparent;
+  --btn-from: transparent;
+  --btn-to: transparent;
 }
 
 /* --- TABLET (<= 1024px) -------------------------------------------------
@@ -653,23 +668,6 @@
   .solutions__item,
   .solutions--no-stats .solutions__item {
     background: #ffffff;
-  }
-
-  /* A brand-gradient outline. The gradient border is a transparent border over
-     a white padding-box fill and a gradient border-box. */
-  .solutions__item-button.btn--secondary {
-    --btn-from: #ffffff;
-    --btn-to: #ffffff;
-    background-image: linear-gradient(var(--btn-from), var(--btn-to)),
-      linear-gradient(135deg, var(--color-brand-dark), var(--color-brand));
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-  }
-
-  /* Hover fades the white fill away to reveal the same gradient underneath. */
-  .solutions__item-button.btn--secondary:hover {
-    --btn-from: transparent;
-    --btn-to: transparent;
   }
 }
 
