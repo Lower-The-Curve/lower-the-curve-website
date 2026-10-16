@@ -518,6 +518,14 @@
   margin-top: 0.5rem;
 }
 
+/* "Learn More": a 16px label at every tier (the sm button's --fs-body-xs is
+   14px) and a 3px outline. The compound selector beats .btn--sm regardless of
+   stylesheet order. */
+.solutions__item-button.btn--secondary {
+  font-size: var(--fs-body-base);
+  border-width: 3px;
+}
+
 /* --- TABLET (<= 1024px) -------------------------------------------------
    One column. The intro centres, matching the narrow reference; the solution
    rows stay left-aligned.
@@ -647,12 +655,9 @@
     background: #ffffff;
   }
 
-  /* 14px label (--fs-body-sm is 14px on a phone; the sm button's --fs-body-xs
-     drops to 12px) and a 3px brand-gradient outline. The gradient border is a
-     transparent border over a white padding-box fill and a gradient border-box. */
+  /* A brand-gradient outline. The gradient border is a transparent border over
+     a white padding-box fill and a gradient border-box. */
   .solutions__item-button.btn--secondary {
-    font-size: var(--fs-body-sm);
-    border-width: 3px;
     --btn-from: #ffffff;
     --btn-to: #ffffff;
     background-image: linear-gradient(var(--btn-from), var(--btn-to)),
