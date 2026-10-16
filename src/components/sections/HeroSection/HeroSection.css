@@ -22,7 +22,7 @@
      of the first screen. svh keeps mobile browser chrome from adding a scroll.
 
      THIS SUBTRACTION IS LOAD-BEARING, INCLUDING ON MOBILE. The header is
-     `position: relative`, so it sits in flow and takes --header-height above this
+     `position: sticky`, so it sits in flow and takes --header-height above this
      section; the hero's own box gets the remainder, and the two together are
      exactly one screen. The hero still READS as full-screen because .hero__backdrop is
      pulled up under the transparent header, so the artwork does span the whole
