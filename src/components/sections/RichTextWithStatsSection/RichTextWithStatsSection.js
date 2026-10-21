@@ -219,7 +219,7 @@ export default function RichTextWithStatsSection({ section }) {
                   className="rich-text-with-stats__image"
                   sizes={
                     backgroundSvg || greenGlow
-                      ? '(max-width: 1024px) 100vw, 65vw'
+                      ? '(max-width: 1024px) 76vw, (max-width: 1460px) 48vw, 704px'
                       : '(max-width: 1024px) 100vw, 42vw'
                   }
                   unoptimized={/\.svg(\?|$)/i.test(image.url)}
