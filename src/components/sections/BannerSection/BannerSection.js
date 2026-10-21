@@ -175,7 +175,7 @@ export default function BannerSection({ section }) {
                 className={`banner__image${
                   collageMobile.length > 0 ? ' banner__image--wide' : ''
                 }`}
-                sizes="(max-width: 1024px) 100vw, 40vw"
+                sizes="(max-width: 1024px) 100vw, 1100px"
                 unoptimized={/\.svg(\?|$)/i.test(image.url)}
               />
             ))}

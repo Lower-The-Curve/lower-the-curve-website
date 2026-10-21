@@ -7,6 +7,9 @@ const nextConfig = {
     inlineCss: true,
   },
   images: {
+    // AVIF first, WebP fallback: next/image picks the first one the browser
+    // accepts. 
+    formats: ['image/avif', 'image/webp'],
     // Shopify serves product/metaobject media from its CDN. Allow it for next/image.
     remotePatterns: [
       {
