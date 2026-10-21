@@ -475,49 +475,17 @@
 }
 
 /* --- ART DIRECTION (mobile artwork) -------------------------------------
-   Both backdrop images are rendered and one is hidden, because HeroSection is a
-   Server Component: there is no viewport at render time, so the swap has to
-   happen in CSS. `next/image` has no <picture>/<source> form, and this
-   two-element swap is the documented way to art-direct with it.
+   When a mobile artwork is authored, HeroSection renders ONE <img> inside a
+   <picture> whose <source media> swaps in the mobile file (ArtDirectedImage in
+   HeroSection.js). The browser downloads only the matching source, so nothing
+   is hidden here any more.
 
-   These MODIFIERS are only applied when a mobile image is actually authored —
-   with one image it carries a bare .hero__image, neither rule below matches, and
-   the hero can never end up with both images hidden.
-
-   575px is the site's mobile tier, matching SolutionsSection and GetInTouch. If
-   the landscape desktop artwork also reads badly on a tablet, move both rules to
-   1024px — it is a one-value change, but it is a design call, so it is not made
-   here.
-
-   `display: none` and not `visibility`/opacity: the point is to stop the browser
-   fetching the artwork that is not in use. Next's lazy loader would normally do
-   that, but both images carry `priority` (this is the LCP element), so they are
-   preloaded eagerly — display:none is what keeps the unused one out of the way
-   visually. Both do get fetched; that is the cost of art direction with two
-   priority images, and it is why a second asset should only be added when it
-   genuinely improves the composition.
+   The media queries live in HeroSection.js (NARROW_MEDIA / NARROW_MEDIA_ASSET)
+   and must match the breakpoints below: 575px is the site's mobile tier; the
+   local-SVG hero switches at 1199px. Change both together.
    ---------------------------------------------------------------------- */
-.hero__image--narrow {
-  display: none;
-}
-
-@media (max-width: 575px) {
-  .hero__image--wide {
-    display: none;
-  }
-
-  .hero__image--narrow {
-    display: block;
-  }
-}
-
 @media (max-width: 1199px) {
-  .hero--asset .hero__image--wide {
-    display: none;
-  }
-
-  .hero--asset .hero__image--narrow {
-    display: block;
+  .hero--asset .hero__image--art-directed {
     object-fit: contain;
     object-position: right top;
   }

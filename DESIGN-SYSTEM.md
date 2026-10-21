@@ -42,9 +42,13 @@ Import order in `layout.js` matters: `typography.css` **before** `globals.css`.
 
 ## 1. Font family
 
-**Poppins is the only font on the site.** Weights loaded: **300, 400, 500, 600, 700**
-(Poppins is not a variable font, so each weight is a separate file — do not add
-weights you aren't using). 300 (Light) is used only by the app dialog subtitle.
+**Poppins is the only font on the site.** Weights loaded: **300, 400, 600, 700**
+(Poppins is not a variable font, so each weight is a separate file, and
+`next/font` preloads every loaded weight on every page — do not add weights you
+aren't using). 300 (Light) is used only by the app dialog subtitle. 500 (Medium)
+was removed in the performance audit: nothing in the CSS used it, so it was a
+preloaded file competing with each page's LCP image on mobile. If a design needs
+Medium, add `'500'` back in `layout.js` and update this line.
 
 - Loaded in [src/app/layout.js](src/app/layout.js) with `next/font/google`,
   exposed as `--font-poppins` on `<html>`.
