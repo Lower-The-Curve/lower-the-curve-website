@@ -169,6 +169,11 @@ export default function PartnerDetailSection({ section }) {
               height={mockup.height ?? 1556}
               className="partner-detail__mockup"
               sizes="(max-width: 575px) 140vw, (max-width: 1024px) 500px, 78vw"
+              // First section of the partner page, so the mockup is the LCP
+              // image: load it eagerly (next/image is lazy by default) and
+              // ask for it first.
+              priority
+              fetchPriority="high"
               unoptimized={/\.svg(\?|$)/i.test(mockup.url)}
             />
           </div>
