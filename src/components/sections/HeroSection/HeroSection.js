@@ -395,10 +395,13 @@ export default function HeroSection({
 
       <div className="hero__content">
         <div className="hero__heading">
+          {/* App icon artwork: WebP renders (3×) of the Figma SVG exports in
+              public/assets/, which only wrapped 1200px PNG icons (0.75–1.6 MB
+              each). Re-render from those SVGs if the icons change. */}
           {appIcons && (
             <div className="hero__icons-row" aria-hidden="true">
               <Image
-                src="/assets/Shopify apps logos frame.svg"
+                src="/assets/shopify-apps-icons-row.webp"
                 alt=""
                 width={329}
                 height={54}
@@ -410,7 +413,7 @@ export default function HeroSection({
           {appIcons && (
             <div className="hero__icons hero__icons--left" aria-hidden="true">
               <Image
-                src="/assets/Group 1597880416.svg"
+                src="/assets/shopify-apps-icons-left.webp"
                 alt=""
                 width={213}
                 height={434}
@@ -432,7 +435,7 @@ export default function HeroSection({
           {appIcons && (
             <div className="hero__icons hero__icons--right" aria-hidden="true">
               <Image
-                src="/assets/Group 1597880416 (1).svg"
+                src="/assets/shopify-apps-icons-right.webp"
                 alt=""
                 width={213}
                 height={428}
