@@ -309,6 +309,7 @@ export default function AppCardDialog({
                   width={lightboxImage.width ?? 1060}
                   height={lightboxImage.height ?? 730}
                   className="app-card-dialog__lightbox-image"
+                  sizes="(max-width: 1024px) 88vw, 1120px"
                 />
                 <button
                   type="button"
@@ -338,6 +339,7 @@ export default function AppCardDialog({
                       width={image.width ?? 618}
                       height={image.height ?? 348}
                       className="app-card-dialog__thumb-image app-card-dialog__thumb-image--carousel"
+                      sizes="154px"
                     />
                   </button>
                 ))}
@@ -355,6 +357,7 @@ export default function AppCardDialog({
                       width={cardIcon.width ?? 560}
                       height={cardIcon.height ?? 560}
                       className="app-card-dialog__app-icon"
+                      sizes="80px"
                       unoptimized={/\.svg(\?|$)/i.test(cardIcon.url)}
                     />
                   )}
@@ -401,6 +404,7 @@ export default function AppCardDialog({
                     width={shownImage.width ?? 1060}
                     height={shownImage.height ?? 730}
                     className="app-card-dialog__hero"
+                    sizes="(max-width: 575px) 357px, (max-width: 1024px) 100vw, 530px"
                   />
                 )}
               </div>
@@ -433,6 +437,7 @@ export default function AppCardDialog({
                           width={image.width ?? 618}
                           height={image.height ?? 348}
                           className="app-card-dialog__thumb-image"
+                          sizes="(max-width: 1024px) 82px, 150px"
                         />
                       </button>
                     );
@@ -526,6 +531,7 @@ export default function AppCardDialog({
                             width={icon.width ?? 560}
                             height={icon.height ?? 560}
                             className="app-card-dialog__view-more-icon"
+                            sizes="70px"
                             unoptimized={/\.svg(\?|$)/i.test(icon.url)}
                           />
                         )}

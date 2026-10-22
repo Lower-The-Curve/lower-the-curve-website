@@ -287,6 +287,7 @@ export default function AppCardsTabs({ section, popups }) {
                     width={icon.width ?? 560}
                     height={icon.height ?? 560}
                     className="app-cards__icon"
+                    sizes="140px"
                     unoptimized={/\.svg(\?|$)/i.test(icon.url)}
                   />
                 )}

@@ -20,6 +20,14 @@ import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSecti
 import DeliveredSection from '@/components/sections/DeliveredSection/DeliveredSection';
 import './page.css';
 
+// No handles are listed up front: each partner page is rendered on its first
+// visit and then cached like the other pages (refreshed in the background
+// every 60 s, see lib/shopify). Without this, a [handle] route renders on
+// every request.
+export async function generateStaticParams() {
+  return [];
+}
+
 export default async function PartnerDetailPage({ params }) {
   const { handle } = await params;
 
