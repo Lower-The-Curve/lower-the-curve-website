@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 import './HeroSection.css';
 import ChevronsDownIcon from './ChevronsDownIcon';
 import ScrollCue from './ScrollCue';
@@ -247,6 +247,50 @@ function scrollLabel(text) {
   return parts;
 }
 
+// The width at or below which the mobile artwork replaces the desktop one. Must
+// match the art-direction rules in HeroSection.css: 575px is the site's mobile
+// tier; the local-SVG (`artwork`) hero switches at 1199px.
+const NARROW_MEDIA = '(max-width: 575px)';
+const NARROW_MEDIA_ASSET = '(max-width: 1199px)';
+
+const isSvg = (url) => /\.svg(\?|$)/i.test(url);
+
+// Desktop + mobile artwork as ONE <picture>, so the browser downloads only the
+// source whose media query matches. Two separate `priority` <Image>s (the old
+// approach) preloaded both on every device. getImageProps is Next's documented
+// route to <picture>; it doesn't take `priority`, so eager loading and
+// fetchPriority="high" stand in for it (the hero is the LCP element).
+function ArtDirectedImage({ image, mobileImage, media, className }) {
+  const common = {
+    fill: true,
+    sizes: '100vw',
+    loading: 'eager',
+    fetchPriority: 'high',
+  };
+  const { props: narrow } = getImageProps({
+    ...common,
+    alt: mobileImage.altText ?? '',
+    src: mobileImage.url,
+    unoptimized: isSvg(mobileImage.url),
+  });
+  const { props: wide } = getImageProps({
+    ...common,
+    alt: image.altText ?? '',
+    src: image.url,
+    unoptimized: isSvg(image.url),
+  });
+  return (
+    <picture>
+      <source
+        media={media}
+        srcSet={narrow.srcSet ?? narrow.src}
+        sizes={narrow.srcSet ? narrow.sizes : undefined}
+      />
+      <img {...wide} className={className} />
+    </picture>
+  );
+}
+
 export default function HeroSection({
   section,
   artwork,
@@ -318,34 +362,32 @@ export default function HeroSection({
             localArtwork ? ' hero__backdrop--asset' : ''
           }`}
         >
-          {/* Two elements rather than one with a swapped src: this is a Server
-              Component, so there is no viewport to branch on at render time and
-              the choice has to be made in CSS. When no mobile artwork is
-              authored the desktop one carries every width, so it gets no
-              --wide modifier and neither art-direction rule matches. */}
-          <Image
-            src={image.url}
-            alt={image.altText ?? ''}
-            fill
-            sizes="100vw"
-            priority
-            className={`hero__image${
-              mobileImage ? ' hero__image--wide' : ''
-            }${portraitArt ? ' hero__image--portrait' : ''}${
-              localArtwork ? ' hero__image--asset' : ''
-            }`}
-            unoptimized={/\.svg(\?|$)/i.test(image.url)}
-          />
-
-          {mobileImage && (
+          {/* One <picture> when a mobile artwork is authored (see
+              ArtDirectedImage); a single <Image> covers every width otherwise.
+              The swap is a media query, so this stays a Server Component. */}
+          {mobileImage ? (
+            <ArtDirectedImage
+              image={image}
+              mobileImage={mobileImage}
+              media={artwork ? NARROW_MEDIA_ASSET : NARROW_MEDIA}
+              className={`hero__image hero__image--art-directed${
+                portraitArt ? ' hero__image--portrait' : ''
+              }${localArtwork ? ' hero__image--asset' : ''}`}
+            />
+          ) : (
             <Image
-              src={mobileImage.url}
-              alt={mobileImage.altText ?? ''}
+              src={image.url}
+              alt={image.altText ?? ''}
               fill
               sizes="100vw"
               priority
-              className="hero__image hero__image--narrow"
-              unoptimized={/\.svg(\?|$)/i.test(mobileImage.url)}
+              // `priority` preloads the image but (Next 15) doesn't mark it
+              // high-priority; the hero is the LCP element, so ask for it first.
+              fetchPriority="high"
+              className={`hero__image${
+                portraitArt ? ' hero__image--portrait' : ''
+              }${localArtwork ? ' hero__image--asset' : ''}`}
+              unoptimized={isSvg(image.url)}
             />
           )}
         </div>
@@ -353,10 +395,13 @@ export default function HeroSection({
 
       <div className="hero__content">
         <div className="hero__heading">
+          {/* App icon artwork: WebP renders (3×) of the Figma SVG exports in
+              public/assets/, which only wrapped 1200px PNG icons (0.75–1.6 MB
+              each). Re-render from those SVGs if the icons change. */}
           {appIcons && (
             <div className="hero__icons-row" aria-hidden="true">
               <Image
-                src="/assets/Shopify apps logos frame.svg"
+                src="/assets/shopify-apps-icons-row.webp"
                 alt=""
                 width={329}
                 height={54}
@@ -368,7 +413,7 @@ export default function HeroSection({
           {appIcons && (
             <div className="hero__icons hero__icons--left" aria-hidden="true">
               <Image
-                src="/assets/Group 1597880416.svg"
+                src="/assets/shopify-apps-icons-left.webp"
                 alt=""
                 width={213}
                 height={434}
@@ -390,7 +435,7 @@ export default function HeroSection({
           {appIcons && (
             <div className="hero__icons hero__icons--right" aria-hidden="true">
               <Image
-                src="/assets/Group 1597880416 (1).svg"
+                src="/assets/shopify-apps-icons-right.webp"
                 alt=""
                 width={213}
                 height={428}

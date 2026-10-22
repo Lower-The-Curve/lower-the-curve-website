@@ -40,23 +40,35 @@ const endpoint = domain
   ? `https://${domain}/api/${apiVersion}/graphql.json`
   : null;
 
+// Cache tag for every Storefront response; cleared by /api/revalidate.
+export const SHOPIFY_CACHE_TAG = 'shopify';
+// How long cached Shopify data counts as fresh. After that, the next request
+// still gets the cached copy instantly while Next refetches in the background
+// (stale-while-revalidate), so visitors never wait and edits show up within
+// about a minute. 
+const SHOPIFY_REVALIDATE_SECONDS = 60;
+
 /**
  * Low-level GraphQL request against the Storefront API.
  *
  * @param {Object} params
  * @param {string} params.query   GraphQL query/mutation string.
  * @param {Object} [params.variables]  GraphQL variables.
- * @param {RequestCache} [params.cache]  fetch cache mode. Defaults to 'no-store'
- *   so the storefront always reflects the latest Shopify data (in dev AND
- *   production) without a rebuild. This makes routes dynamically rendered. For a
- *   specific call that can be cached, pass `cache: 'force-cache'` (optionally
- *   with `next: { revalidate }` upstream) to opt back into caching/ISR.
+ * @param {RequestCache} [params.cache]  Optional fetch cache override (e.g.
+ *   'no-store' for a call that must never be cached).
+ *
+ * By default every response is cached and tagged SHOPIFY_CACHE_TAG, so pages
+ * are served without waiting on Shopify. After SHOPIFY_REVALIDATE_SECONDS the
+ * next request still gets the cached copy instantly while Next refetches in
+ * the background, so Shopify edits show up within about a minute.
+ * POST /api/revalidate (a Shopify webhook, if one is ever set up) clears the
+ * tag immediately.
  * @returns {Promise<{ status: number, body: any }>}
  */
 export async function shopifyFetch({
   query,
   variables,
-  cache = 'no-store',
+  cache,
 }) {
   if (!endpoint || !accessToken) {
     throw new Error(
@@ -72,7 +84,14 @@ export async function shopifyFetch({
       'X-Shopify-Storefront-Access-Token': accessToken,
     },
     body: JSON.stringify({ query, variables }),
-    cache,
+    ...(cache
+      ? { cache }
+      : {
+          next: {
+            tags: [SHOPIFY_CACHE_TAG],
+            revalidate: SHOPIFY_REVALIDATE_SECONDS,
+          },
+        }),
   });
 
   const raw = await result.text();
