@@ -86,12 +86,61 @@ function accentedTitle(title) {
   return parts;
 }
 
+const THRESHOLD = 0.03;
+
+const IOS_DECELERATION = 0.998;
+const PROJECTION_MS = IOS_DECELERATION / (1 - IOS_DECELERATION);
+
+// Shorter than the arrows' slide: on release the card has only the rest of its
+// snap left, so the bar must move faster to keep up.
+const SWIPE_SLIDE = '0.35s';
+
+const SETTLE_MS = 150;
+
+function cardStep(track) {
+  const card = track.firstElementChild;
+  const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
+  const width = card ? card.getBoundingClientRect().width + gap : 0;
+  return width > 0 ? width : 320;
+}
+
+function geometry(track) {
+  const max = track.scrollWidth - track.clientWidth;
+  const distance = cardStep(track);
+  const steps = Math.max(1, Math.ceil(max / distance - 0.01));
+  const lastStart = (steps - 1) * distance;
+  const toPosition = (left) => {
+    const x = Math.min(Math.max(left, 0), max);
+    return x <= lastStart
+      ? x / distance
+      : steps - 1 + (x - lastStart) / (max - lastStart || 1);
+  };
+  return { max, steps, toPosition };
+}
+
 export default function TestimonialsCarousel({ section }) {
   const trackRef = useRef(null);
-  // 0 while unscrolled, 1 at the end. Drives the progress bar's width and
-  // whether each arrow is disabled.
-  const [progress, setProgress] = useState(0);
+  // The bar moves once per card via a CSS transition instead of following the
+  // scroll: iPhone Safari reports scroll to JS late, so a tracking bar wobbles.
+  const barRef = useRef(null);
+  const frameRef = useRef(0);
+  const indexRef = useRef(-1);
+  const lastLeftRef = useRef(0);
+  const stepsRef = useRef(1);
+  const draggingRef = useRef(false);
+  const samplesRef = useRef([]);
+  const dragFromRef = useRef(0);
+  const settleTimerRef = useRef(0);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
   const [scrollable, setScrollable] = useState(false);
+
+  const placeBar = (index, steps) => {
+    // Never restart a running slide — that is what makes the bar wobble.
+    if (index === indexRef.current) return;
+    indexRef.current = index;
+    barRef.current?.style.setProperty('--progress', String(index / steps));
+  };
 
   const readScroll = useCallback(() => {
     const track = trackRef.current;
@@ -99,37 +148,127 @@ export default function TestimonialsCarousel({ section }) {
     const max = track.scrollWidth - track.clientWidth;
     // A 1px slack: sub-pixel layout can leave scrollWidth a hair over
     // clientWidth on a track that is not actually scrollable.
-    setScrollable(max > 1);
-    setProgress(max > 1 ? track.scrollLeft / max : 0);
+    const canScroll = max > 1;
+    const left = Math.min(Math.max(track.scrollLeft, 0), max);
+    setScrollable(canScroll);
+    setAtStart(!canScroll || left <= 1);
+    setAtEnd(!canScroll || left >= max - 1);
+    if (!canScroll || !barRef.current) return;
+
+    const { steps, toPosition } = geometry(track);
+    stepsRef.current = steps;
+    const position = toPosition(left);
+
+    clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = setTimeout(() => {
+      if (draggingRef.current) return;
+      placeBar(Math.round(toPosition(track.scrollLeft)), steps);
+    }, SETTLE_MS);
+
+    const direction = left - lastLeftRef.current;
+    lastLeftRef.current = left;
+
+    if (draggingRef.current) {
+      const now = performance.now();
+      const samples = samplesRef.current;
+      samples.push({ left, time: now });
+      while (samples.length > 2 && now - samples[0].time > 100) samples.shift();
+      return;
+    }
+
+    const current = indexRef.current;
+    let index = current < 0 ? Math.round(position) : current;
+    // Never step against the direction of travel (keeps arrow moves stable).
+    if (direction > 0.5) {
+      index = Math.ceil(position - THRESHOLD);
+      if (current >= 0) index = Math.max(current, index);
+    } else if (direction < -0.5) {
+      index = Math.floor(position + THRESHOLD);
+      if (current >= 0) index = Math.min(current, index);
+    }
+    placeBar(Math.min(steps, Math.max(0, index)), steps);
   }, []);
+
+  const onScroll = useCallback(() => {
+    if (frameRef.current) return;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = 0;
+      readScroll();
+    });
+  }, [readScroll]);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return undefined;
 
     readScroll();
-    track.addEventListener('scroll', readScroll, { passive: true });
+    track.addEventListener('scroll', onScroll, { passive: true });
+
+    const onTouchStart = () => {
+      draggingRef.current = true;
+      dragFromRef.current = indexRef.current < 0 ? 0 : indexRef.current;
+      samplesRef.current = [{ left: track.scrollLeft, time: performance.now() }];
+    };
+    const onTouchEnd = () => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      if (!barRef.current || track.scrollWidth - track.clientWidth <= 1) return;
+
+      const left = track.scrollLeft;
+      const now = performance.now();
+      const samples = samplesRef.current;
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      samplesRef.current = [];
+      lastLeftRef.current = left;
+
+      const elapsed = first ? now - first.time : 0;
+      const velocity = elapsed > 0 ? (left - first.left) / elapsed : 0;
+      const sinceMove = last ? now - last.time : Infinity;
+      const coast = sinceMove > 150 ? 0 : velocity * PROJECTION_MS;
+
+      const { steps, toPosition } = geometry(track);
+      stepsRef.current = steps;
+      const from = dragFromRef.current;
+      const landing = Math.round(toPosition(left + coast));
+      const index = Math.min(from + 1, Math.max(from - 1, landing));
+      barRef.current.style.transitionDuration = SWIPE_SLIDE;
+      placeBar(Math.min(steps, Math.max(0, index)), steps);
+    };
+    track.addEventListener('touchstart', onTouchStart, { passive: true });
+    track.addEventListener('touchend', onTouchEnd, { passive: true });
+    track.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     // Card widths and the peek both change with the viewport, so the progress
     // bar has to be recomputed on resize, not just on scroll.
-    const observer = new ResizeObserver(readScroll);
+    const observer = new ResizeObserver(onScroll);
     observer.observe(track);
 
     return () => {
-      track.removeEventListener('scroll', readScroll);
+      track.removeEventListener('scroll', onScroll);
+      track.removeEventListener('touchstart', onTouchStart);
+      track.removeEventListener('touchend', onTouchEnd);
+      track.removeEventListener('touchcancel', onTouchEnd);
       observer.disconnect();
+      clearTimeout(settleTimerRef.current);
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = 0;
     };
-  }, [readScroll]);
+  }, [readScroll, onScroll]);
 
-  // One card plus its gap, read off the DOM rather than hardcoded, so the arrows
-  // stay in step with whatever the CSS is doing at this breakpoint.
+  useEffect(() => {
+    indexRef.current = -1;
+    if (scrollable) readScroll();
+  }, [scrollable, readScroll]);
+
   const step = (direction) => {
     const track = trackRef.current;
     if (!track) return;
-    const card = track.firstElementChild;
-    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
-    const distance = card ? card.getBoundingClientRect().width + gap : 320;
-    track.scrollBy({ left: direction * distance, behavior: 'smooth' });
+    const steps = stepsRef.current;
+    const from = indexRef.current < 0 ? 0 : indexRef.current;
+    if (barRef.current) barRef.current.style.transitionDuration = '';
+    placeBar(Math.min(steps, Math.max(0, from + direction)), steps);
+    track.scrollBy({ left: direction * cardStep(track), behavior: 'smooth' });
   };
 
   if (!section) return null;
@@ -138,9 +277,6 @@ export default function TestimonialsCarousel({ section }) {
   const description = fieldValue(section, 'description', 'paragraph');
   const items = referencesFrom(section, 'testimonial', 'testimonials', 'items');
   if (!items.length) return null;
-
-  const atStart = progress <= 0.001;
-  const atEnd = progress >= 0.999;
 
   return (
     <section className="testimonials">
@@ -184,10 +320,7 @@ export default function TestimonialsCarousel({ section }) {
             {/* Presentational: the real position is conveyed by the scroll
                 container itself, which assistive tech already reports. */}
             <div className="testimonials__progress" aria-hidden="true">
-              <span
-                className="testimonials__progress-bar"
-                style={{ '--progress': progress }}
-              />
+              <span className="testimonials__progress-bar" ref={barRef} />
             </div>
 
             <button
