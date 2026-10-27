@@ -5,6 +5,7 @@ import {
   testimonialsSectionFragment,
   caseStudiesSectionFragment,
 } from '../sections';
+import { pageSeoFragment } from './pageSeo';
 
 // Home page content. The `content` metaobject (handle "home") has one reference
 // field per component slot, and the ORDER OF THOSE SLOTS is the order the page
@@ -32,6 +33,7 @@ import {
 export const getHomePageQuery = /* GraphQL */ `
   query GetHomePage($handle: MetaobjectHandleInput!) {
     metaobject(handle: $handle) {
+      ...PageSeoFields
       id
       handle
       component1: field(key: "sections") {
@@ -83,4 +85,5 @@ export const getHomePageQuery = /* GraphQL */ `
   ${solutionsSectionFragment}
   ${testimonialsSectionFragment}
   ${caseStudiesSectionFragment}
+  ${pageSeoFragment}
 `;

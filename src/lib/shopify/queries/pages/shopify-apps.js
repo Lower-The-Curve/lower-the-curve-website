@@ -1,4 +1,5 @@
 import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
+import { pageSeoFragment } from './pageSeo';
 
 // Shopify Apps page content. Same pattern as home: a `content` metaobject
 // (handle "shopify-apps") with one reference field per component slot. The
@@ -17,6 +18,7 @@ import { heroSectionFragment, projectRouteSectionFragment } from '../sections';
 export const getShopifyAppsPageQuery = /* GraphQL */ `
   query GetShopifyAppsPage($handle: MetaobjectHandleInput!) {
     metaobject(handle: $handle) {
+      ...PageSeoFields
       id
       handle
       sections: field(key: "sections") {
@@ -50,4 +52,5 @@ export const getShopifyAppsPageQuery = /* GraphQL */ `
   }
   ${heroSectionFragment}
   ${projectRouteSectionFragment}
+  ${pageSeoFragment}
 `;

@@ -10,11 +10,13 @@ import {
   partnerTestimonialSectionFragment,
   whatWeBuiltSectionFragment,
 } from '../sections';
+import { pageSeoFragment } from './pageSeo';
 
 export const getPartnerDetailPageQuery = /* GraphQL */ `
   query GetPartnerDetailPage($first: Int!) {
     metaobjects(type: "partner_detail", first: $first) {
       nodes {
+        ...PageSeoFields
         ...PartnerDetailSectionFields
         ...CaseStudyMetricsSectionFields
 
@@ -55,6 +57,24 @@ export const getPartnerDetailPageQuery = /* GraphQL */ `
   ${partnerDetailProblemSectionFragment}
   ${deliveredSectionFragment}
   ${deliveredCardFragment}
+  ${pageSeoFragment}
+`;
+
+export const getPartnerDetailHandlesQuery = /* GraphQL */ `
+  query GetPartnerDetailHandles($first: Int!) {
+    metaobjects(type: "partner_detail", first: $first) {
+      nodes {
+        updatedAt
+        name: field(key: "name") {
+          reference {
+            ... on Metaobject {
+              handle
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 export const getWhatWeBuiltQuery = `

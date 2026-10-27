@@ -14,11 +14,14 @@ import StatsGridSection, {
 import TeamSection, {
   TEAM_SECTION_TYPE,
 } from '@/components/sections/TeamSection/TeamSection';
+import { cmsPageSeo, pageMetadata } from '@/lib/seo';
 import './page.css';
 
-export const metadata = {
-  title: 'About Us',
-};
+export async function generateMetadata() {
+  const page = await getAboutUsPage();
+
+  return pageMetadata({ path: '/about-us', ...cmsPageSeo(page) });
+}
 
 // Component slots in admin order (aliased in queries/pages/aboutUs.js).
 const COMPONENT_SLOTS = [

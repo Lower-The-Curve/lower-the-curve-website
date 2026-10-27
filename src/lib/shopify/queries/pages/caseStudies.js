@@ -4,6 +4,7 @@ import {
   deliveredSectionFragment,
   richTextWithStatsSectionFragment,
 } from '../sections';
+import { pageSeoFragment } from './pageSeo';
 
 // Case Studies page content. Same shape as the home and services pages: a
 // `content` metaobject with one reference field per component slot, and the
@@ -24,6 +25,7 @@ import {
 export const getCaseStudiesPageQuery = /* GraphQL */ `
   query GetCaseStudiesPage($handle: MetaobjectHandleInput!) {
     metaobject(handle: $handle) {
+      ...PageSeoFields
       id
       handle
       component1: field(key: "sections") {
@@ -75,4 +77,5 @@ export const getCaseStudiesPageQuery = /* GraphQL */ `
   ${bannerSectionFragment}
   ${deliveredSectionFragment}
   ${richTextWithStatsSectionFragment}
+  ${pageSeoFragment}
 `;

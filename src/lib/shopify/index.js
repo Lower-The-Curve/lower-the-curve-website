@@ -12,6 +12,7 @@ import {
   getCaseStudiesPageQuery,
   getAboutUsPageQuery,
   getPartnerDetailPageQuery,
+  getPartnerDetailHandlesQuery,
   getWhatWeBuiltQuery,
   getPartnerTestimonialQuery,
   getPartnerApproachIntroQuery,
@@ -499,6 +500,22 @@ export async function getPartnerDetailPage(partnerHandle, first = 50) {
     ...node,
     deliveredCards: body?.data?.deliveredCards?.nodes ?? [],
   };
+}
+
+export async function getPartnerDetailHandles(first = 50) {
+  const { body } = await shopifyFetch({
+    query: getPartnerDetailHandlesQuery,
+    variables: { first },
+  });
+
+  const nodes = body?.data?.metaobjects?.nodes ?? [];
+
+  return nodes
+    .map((node) => ({
+      handle: node?.name?.reference?.handle,
+      updatedAt: node?.updatedAt,
+    }))
+    .filter((entry) => entry.handle);
 }
 
 /**
