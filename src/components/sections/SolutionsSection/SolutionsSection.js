@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
+import { toRelativePath } from '@/lib/url';
 import SwooshBackdrop from './SwooshBackdrop';
 import GreenCurveBackdrop from './GreenCurveBackdrop';
 import BlueDot from './BlueDot';
@@ -234,7 +235,7 @@ export default function SolutionsSection({ section }) {
                     )}
                     {button && (
                       <Button
-                        href={button.url}
+                        href={toRelativePath(button.url)}
                         variant="secondary"
                         size="sm"
                         arrow="rise"

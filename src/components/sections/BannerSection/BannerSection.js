@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
+import { toRelativePath } from '@/lib/url';
 import BannerHighlights from './BannerHighlights';
 import BannerLines from './BannerLines';
 import './BannerSection.css';
@@ -216,7 +217,7 @@ export default function BannerSection({ section }) {
 
           {button?.text && button?.url && (
             <Button
-              href={button.url}
+              href={toRelativePath(button.url)}
               variant="inverse"
               arrow="rise"
               className="banner__button"

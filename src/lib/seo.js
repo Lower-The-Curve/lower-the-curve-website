@@ -1,5 +1,5 @@
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://lowerthecurve.com'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://lower-the-curve-website.vercel.app'
 ).replace(/\/+$/, '');
 
 export const SITE_NAME = 'Lower the Curve';

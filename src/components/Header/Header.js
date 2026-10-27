@@ -95,7 +95,7 @@ export default async function Header() {
             {logo ? (
               <Image
                 src={logo.url}
-                alt={logo.altText ?? 'Lower the Curve'}
+                alt={logo.altText || 'Lower the Curve'}
                 width={logo.width ?? 124}
                 height={logo.height ?? 50}
                 className="site-header__logo"

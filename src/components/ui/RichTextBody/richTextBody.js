@@ -97,7 +97,7 @@ function renderBlock(node, key) {
       );
     }
     case 'heading': {
-      const level = Math.min(6, Math.max(1, node.level ?? 2));
+      const level = Math.min(4, Math.max(2, node.level ?? 2));
       const Tag = `h${level}`;
       return (
         <Tag

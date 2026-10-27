@@ -87,7 +87,7 @@ export default function PartnersSection({ section }) {
             const content = logo ? (
               <Image
                 src={logo.url}
-                alt={logo.altText ?? name ?? ''}
+                alt={logo.altText || name || 'Partner logo'}
                 width={logo.width ?? 200}
                 height={logo.height ?? 100}
                 className="partners__logo"

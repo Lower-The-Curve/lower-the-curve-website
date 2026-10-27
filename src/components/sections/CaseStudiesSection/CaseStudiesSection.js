@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import accentedTitle from '@/components/ui/accentedTitle';
+import { toRelativePath } from '@/lib/url';
 import './CaseStudiesSection.css';
 
 // The case studies section is a single `case_studies` metaobject with:
@@ -141,7 +142,7 @@ export default function CaseStudiesSection({ section }) {
 
           {button && (
             <Button
-              href={button.url}
+              href={toRelativePath(button.url)}
               variant="secondary"
               arrow="rise"
               className="case-studies__button"

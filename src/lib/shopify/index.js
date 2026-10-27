@@ -20,6 +20,7 @@ import {
   getHeaderQuery,
   getFooterQuery,
 } from './queries';
+import { toRelativePath } from '../url';
 
 // Accept either a full myshopify domain ("lower-the-curve.myshopify.com") or
 // just the store slug ("lower-the-curve") and normalize to the full host.
@@ -197,25 +198,6 @@ const getMenuQuery = /* GraphQL */ `
   }
 `;
 
-// Turn a Shopify menu item URL into a path relative to this storefront.
-// e.g. "https://lower-the-curve.myshopify.com/collections/all" -> "/collections/all"
-function toRelativePath(url) {
-  if (!url) return '/';
-  try {
-    const parsed = new URL(url);
-
-    // Only web URLs have a path worth relativizing. mailto: and tel: would
-    // otherwise be shredded — `new URL('mailto:a@b.com').pathname` is
-    // "a@b.com", which as an href is a broken relative link, not an email.
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return url;
-
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    // Already a relative path (or unparseable) — return as-is.
-    return url;
-  }
-}
-
 /**
  * Fetch a navigation menu by handle and normalize its item URLs to paths.
  *
@@ -234,11 +216,11 @@ export async function getMenu(handle = 'main-menu') {
   return items.map((item) => ({
     id: item.id,
     title: item.title,
-    path: toRelativePath(item.url),
+    path: toRelativePath(item.url, [domain]),
     items: (item.items ?? []).map((sub) => ({
       id: sub.id,
       title: sub.title,
-      path: toRelativePath(sub.url),
+      path: toRelativePath(sub.url, [domain]),
     })),
   }));
 }
