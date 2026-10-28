@@ -61,6 +61,7 @@ export default function ProjectRouteTabs({ section }) {
   const steps = section ? referencesFrom(section, "steps") : [];
   const columns = Math.min(4, Math.max(2, intFrom(section, "columns", 2)));
   const showTabs = boolFrom(section, "show_tabs", true);
+  const panels = showTabs ? steps : steps.slice(0, 1);
   const requested = intFrom(section, "default_tab", 1) - 1;
   const initial = steps.length
     ? Math.min(steps.length - 1, Math.max(0, requested))
@@ -101,9 +102,6 @@ export default function ProjectRouteTabs({ section }) {
   const description = fieldValue(section, "description");
   const grayGlow = imageFrom(section, "gray_bubble", "gray_glow");
   const greenGlow = imageFrom(section, "green_bubble", "green_glow");
-  const current = steps[active] ?? steps[0];
-  const cards = current ? referencesFrom(current, "cards") : [];
-
   function onTabsKeyDown(event) {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     event.preventDefault();
@@ -176,9 +174,11 @@ export default function ProjectRouteTabs({ section }) {
                 return (
                   <button
                     key={step.id}
+                    id={`project-route-tab-${index}`}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
+                    aria-controls={`project-route-panel-${index}`}
                     tabIndex={isActive ? 0 : -1}
                     className={
                       isActive
@@ -195,60 +195,78 @@ export default function ProjectRouteTabs({ section }) {
           </div>
         )}
 
-        <ul
-          className="project-route__cards"
-          role="tabpanel"
-          style={{ "--project-route-columns": columns }}
-        >
-          {cards.map((card, index) => {
-            const cardTitle = fieldValue(card, "title");
-            const cardDescription = fieldValue(card, "description");
-            const icon = imageFrom(card, "icon", "image");
+        {panels.map((step, panelIndex) => {
+          const cards = referencesFrom(step, "cards");
 
-            return (
-              <li key={card.id} className="project-route__card">
-                {isSplit && index === 1 && grayGlow && (
-                  <Image
-                    src={grayGlow.url}
-                    alt={grayGlow.altText ?? ""}
-                    width={grayGlow.width ?? 130}
-                    height={grayGlow.height ?? 157}
-                    className="project-route__glow project-route__glow--card"
-                    unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
-                  />
-                )}
-                {!isSplit && index === 0 && greenGlow && (
-                  <Image
-                    src={greenGlow.url}
-                    alt={greenGlow.altText ?? ""}
-                    width={greenGlow.width ?? 30}
-                    height={greenGlow.height ?? 30}
-                    className="project-route__green-glow"
-                    unoptimized={/\.svg(\?|$)/i.test(greenGlow.url)}
-                  />
-                )}
-                {icon && (
-                  <Image
-                    src={icon.url}
-                    alt={icon.altText ?? ""}
-                    width={icon.width ?? 85}
-                    height={icon.height ?? 85}
-                    className="project-route__icon"
-                    unoptimized={/\.svg(\?|$)/i.test(icon.url)}
-                  />
-                )}
-                {cardTitle && (
-                  <h3 className="project-route__card-title">{cardTitle}</h3>
-                )}
-                {cardDescription && (
-                  <p className="project-route__card-description">
-                    {cardDescription}
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+          return (
+            <div
+              key={step.id}
+              id={`project-route-panel-${panelIndex}`}
+              role={showTabs ? "tabpanel" : undefined}
+              aria-labelledby={
+                showTabs ? `project-route-tab-${panelIndex}` : undefined
+              }
+              hidden={panelIndex !== active}
+              style={{ width: "100%" }}
+            >
+              <ul
+                className="project-route__cards"
+                style={{ "--project-route-columns": columns }}
+              >
+                {cards.map((card, index) => {
+                  const cardTitle = fieldValue(card, "title");
+                  const cardDescription = fieldValue(card, "description");
+                  const icon = imageFrom(card, "icon", "image");
+
+                  return (
+                    <li key={card.id} className="project-route__card">
+                      {isSplit && index === 1 && grayGlow && (
+                        <Image
+                          src={grayGlow.url}
+                          alt={grayGlow.altText ?? ""}
+                          width={grayGlow.width ?? 130}
+                          height={grayGlow.height ?? 157}
+                          className="project-route__glow project-route__glow--card"
+                          unoptimized={/\.svg(\?|$)/i.test(grayGlow.url)}
+                        />
+                      )}
+                      {!isSplit && index === 0 && greenGlow && (
+                        <Image
+                          src={greenGlow.url}
+                          alt={greenGlow.altText ?? ""}
+                          width={greenGlow.width ?? 30}
+                          height={greenGlow.height ?? 30}
+                          className="project-route__green-glow"
+                          unoptimized={/\.svg(\?|$)/i.test(greenGlow.url)}
+                        />
+                      )}
+                      {icon && (
+                        <Image
+                          src={icon.url}
+                          alt={icon.altText ?? ""}
+                          width={icon.width ?? 85}
+                          height={icon.height ?? 85}
+                          className="project-route__icon"
+                          unoptimized={/\.svg(\?|$)/i.test(icon.url)}
+                        />
+                      )}
+                      {cardTitle && (
+                        <h3 className="project-route__card-title">
+                          {cardTitle}
+                        </h3>
+                      )}
+                      {cardDescription && (
+                        <p className="project-route__card-description">
+                          {cardDescription}
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

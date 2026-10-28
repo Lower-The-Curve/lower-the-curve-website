@@ -301,7 +301,8 @@
   display: none;
   justify-self: end;
   align-self: start;
-  padding: 0;
+  margin: -18px;
+  padding: 18px;
   border: 0;
   background: none;
   color: var(--color-ink);
