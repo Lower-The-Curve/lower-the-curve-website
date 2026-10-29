@@ -15,7 +15,8 @@ import TestimonialsSection, {
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
-import { cmsPageSeo, pageMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import { cmsPageSeo, pageMetadata, webpageJsonLd } from '@/lib/seo';
 import './page.css';
 
 export async function generateMetadata() {
@@ -48,6 +49,7 @@ function sectionsIn(slot) {
 
 export default async function HomePage() {
   const home = await getHomePage();
+  const seo = cmsPageSeo(home);
 
   // Render order comes from the CMS: slot order first, then the order within a
   // slot that holds a list.
@@ -55,6 +57,14 @@ export default async function HomePage() {
 
   return (
     <main className="home-page">
+      <JsonLd
+        data={webpageJsonLd({
+          path: '/',
+          title: seo.title,
+          description: seo.description,
+          image: seo.image,
+        })}
+      />
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
