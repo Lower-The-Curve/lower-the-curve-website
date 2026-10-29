@@ -56,7 +56,7 @@ export default async function HomePage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(home?.[slot]));
 
   return (
-    <main className="home-page">
+    <>
       <JsonLd
         data={webpageJsonLd({
           path: '/',
@@ -65,7 +65,8 @@ export default async function HomePage() {
           image: seo.image,
         })}
       />
-      {sections.map((section) => {
+      <main className="home-page">
+        {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return <HeroSection key={section.id} section={section} />;
@@ -84,7 +85,8 @@ export default async function HomePage() {
           default:
             return null;
         }
-      })}
-    </main>
+        })}
+      </main>
+    </>
   );
 }
