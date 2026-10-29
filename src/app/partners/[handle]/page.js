@@ -18,7 +18,62 @@ import PartnerDetailResultsSection, {
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
 import DeliveredSection from '@/components/sections/DeliveredSection/DeliveredSection';
+import { cmsPageSeo, pageMetadata } from '@/lib/seo';
 import './page.css';
+
+function fieldValue(node, ...keys) {
+  for (const key of keys) {
+    const value = node?.fields?.find((f) => f.key === key)?.value;
+
+    if (value) return value;
+  }
+
+  return null;
+}
+
+function imageFrom(node, ...keys) {
+  for (const key of keys) {
+    const image = node?.fields?.find((f) => f.key === key)?.reference?.image;
+
+    if (image) return image;
+  }
+
+  return null;
+}
+
+export async function generateMetadata({ params }) {
+  const { handle } = await params;
+  const section = await getPartnerDetailPage(handle);
+
+  if (!section) {
+    return {
+      title: 'Case Study Not Found',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const partner = section.fields?.find((f) => f.key === 'name')?.reference;
+  const name = fieldValue(partner, 'name', 'title') ?? partner?.handle ?? handle;
+  const subheading = fieldValue(section, 'subheading', 'subtitle');
+  const body = fieldValue(section, 'body', 'description');
+  const mockup = imageFrom(section, 'mockup', 'image');
+  const seo = cmsPageSeo(section);
+
+  return pageMetadata({
+    path: `/partners/${handle}`,
+    title: seo.title || `${name} Case Study`,
+    description:
+      seo.description || [subheading, body].filter(Boolean).join(' '),
+    image: seo.image || mockup?.url,
+    imageWidth: seo.image ? seo.imageWidth : mockup?.width,
+    imageHeight: seo.image ? seo.imageHeight : mockup?.height,
+    imageAlt: seo.image
+      ? seo.imageAlt
+      : mockup?.altText || `${name} case study`,
+    type: 'article',
+    modifiedTime: section.updatedAt,
+  });
+}
 
 // No handles are listed up front: each partner page is rendered on its first
 // visit and then cached like the other pages (refreshed in the background

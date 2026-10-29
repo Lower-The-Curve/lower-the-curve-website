@@ -96,6 +96,7 @@ export default function AppCardsTabs({ section, popups }) {
   const steps = section ? referencesFrom(section, "steps") : [];
   const columns = Math.min(4, Math.max(2, intFrom(section, "columns", 2)));
   const showTabs = boolFrom(section, "show_tabs", true);
+  const panels = showTabs ? steps : steps.slice(0, 1);
   const requested = intFrom(section, "default_tab", 1) - 1;
   const initial = steps.length
     ? Math.min(steps.length - 1, Math.max(0, requested))
@@ -146,9 +147,6 @@ export default function AppCardsTabs({ section, popups }) {
   const description = fieldValue(section, "description");
   const grayGlow = imageFrom(section, "gray_bubble", "gray_glow");
   const greenGlow = imageFrom(section, "green_bubble", "green_glow");
-  const current = steps[active] ?? steps[0];
-  const cards = current ? referencesFrom(current, "cards") : [];
-
   const popupsById = {};
   for (const popup of popups ?? []) popupsById[popup.id] = popup;
 
@@ -247,9 +245,11 @@ export default function AppCardsTabs({ section, popups }) {
                 return (
                   <button
                     key={step.id}
+                    id={`app-cards-tab-${index}`}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
+                    aria-controls={`app-cards-panel-${index}`}
                     tabIndex={isActive ? 0 : -1}
                     className={
                       isActive
@@ -266,84 +266,104 @@ export default function AppCardsTabs({ section, popups }) {
           </div>
         )}
 
-        <ul
-          className="app-cards__grid"
-          role="tabpanel"
-          style={{ "--app-cards-columns": columns }}
-        >
-          {cards.map((card) => {
-            const cardTitle = fieldValue(card, "title");
-            const cardDescription = fieldValue(card, "description");
-            const icon = imageFrom(card, "icon", "image");
-            const popup = popupFor(card);
-            const showButton = boolFrom(card, "show_button", true);
+        {panels.map((step, panelIndex) => {
+          const cards = referencesFrom(step, "cards");
 
-            return (
-              <li key={card.id} className="app-cards__card">
-                {icon && (
-                  <Image
-                    src={icon.url}
-                    alt={icon.altText ?? ""}
-                    width={icon.width ?? 560}
-                    height={icon.height ?? 560}
-                    className="app-cards__icon"
-                    sizes="140px"
-                    unoptimized={/\.svg(\?|$)/i.test(icon.url)}
-                  />
-                )}
-                <div className="app-cards__card-body">
-                  {cardTitle && (
-                    <h3 className="app-cards__card-title">{cardTitle}</h3>
-                  )}
-                  {cardDescription && (
-                    <p className="app-cards__card-description">
-                      {cardDescription}
-                    </p>
-                  )}
-                  {showButton && (
-                    <Button
-                      className={
-                        pressedCardId === card.id
-                          ? "app-cards__card-button app-cards__card-button--pressed"
-                          : "app-cards__card-button"
-                      }
-                      variant="primary"
-                      arrow="diagonal"
-                      size="md"
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        setPressedCardId(card.id);
-                        // A transition, so the pressed state commits and paints
-                        // first instead of waiting on the dialog's render.
-                        if (popup)
-                          startTransition(() => setActiveCardId(card.id));
-                      }}
-                    >
-                      Learn More
-                    </Button>
-                  )}
-                </div>
-                {showButton && (
-                  <button
-                    type="button"
-                    className="app-cards__card-expand"
-                    aria-label={
-                      cardTitle
-                        ? `Learn more about ${cardTitle}`
-                        : "Learn more"
-                    }
-                    aria-haspopup="dialog"
-                    onClick={() => {
-                      if (popup) setActiveCardId(card.id);
-                    }}
-                  >
-                    <ExpandIcon />
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+          return (
+            <div
+              key={step.id}
+              id={`app-cards-panel-${panelIndex}`}
+              role={showTabs ? "tabpanel" : undefined}
+              aria-labelledby={
+                showTabs ? `app-cards-tab-${panelIndex}` : undefined
+              }
+              hidden={panelIndex !== active}
+              style={{ width: "100%" }}
+            >
+              <ul
+                className="app-cards__grid"
+                style={{ "--app-cards-columns": columns }}
+              >
+                {cards.map((card) => {
+                  const cardTitle = fieldValue(card, "title");
+                  const cardDescription = fieldValue(card, "description");
+                  const icon = imageFrom(card, "icon", "image");
+                  const popup = popupFor(card);
+                  const showButton = boolFrom(card, "show_button", true);
+
+                  return (
+                    <li key={card.id} className="app-cards__card">
+                      {icon && (
+                        <Image
+                          src={icon.url}
+                          alt={icon.altText ?? ""}
+                          width={icon.width ?? 560}
+                          height={icon.height ?? 560}
+                          className="app-cards__icon"
+                          sizes="140px"
+                          unoptimized={/\.svg(\?|$)/i.test(icon.url)}
+                        />
+                      )}
+                      <div className="app-cards__card-body">
+                        {cardTitle && (
+                          <h3 className="app-cards__card-title">
+                            {cardTitle}
+                          </h3>
+                        )}
+                        {cardDescription && (
+                          <p className="app-cards__card-description">
+                            {cardDescription}
+                          </p>
+                        )}
+                        {showButton && (
+                          <Button
+                            className={
+                              pressedCardId === card.id
+                                ? "app-cards__card-button app-cards__card-button--pressed"
+                                : "app-cards__card-button"
+                            }
+                            variant="primary"
+                            arrow="diagonal"
+                            size="md"
+                            aria-haspopup="dialog"
+                            onClick={() => {
+                              setPressedCardId(card.id);
+                              // A transition, so the pressed state commits and paints
+                              // first instead of waiting on the dialog's render.
+                              if (popup)
+                                startTransition(() =>
+                                  setActiveCardId(card.id)
+                                );
+                            }}
+                          >
+                            Learn More
+                          </Button>
+                        )}
+                      </div>
+                      {showButton && (
+                        <button
+                          type="button"
+                          className="app-cards__card-expand"
+                          aria-label={
+                            cardTitle
+                              ? `Learn more about ${cardTitle}`
+                              : "Learn more"
+                          }
+                          aria-haspopup="dialog"
+                          onClick={() => {
+                            if (popup) setActiveCardId(card.id);
+                          }}
+                        >
+                          <ExpandIcon />
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </div>
 
       <AppCardDialog

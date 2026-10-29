@@ -86,7 +86,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: calc(100% + 24px);
+  margin: -12px;
+  padding: 12px;
   transition: opacity 0.2s ease;
 }
 

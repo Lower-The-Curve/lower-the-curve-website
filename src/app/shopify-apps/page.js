@@ -7,11 +7,14 @@ import AppCardsSection, {
   isAppCardsSection,
 } from "@/components/sections/AppCardsSection/AppCardsSection";
 import ProjectRouteSection from "@/components/sections/ProjectRouteSection/ProjectRouteSection";
+import { cmsPageSeo, pageMetadata } from "@/lib/seo";
 import "./page.css";
 
-export const metadata = {
-  title: "Shopify Apps",
-};
+export async function generateMetadata() {
+  const page = await getShopifyAppsPage();
+
+  return pageMetadata({ path: "/shopify-apps", ...cmsPageSeo(page) });
+}
 
 const COMPONENT_SLOTS = ["sections", "component2", "component3"];
 

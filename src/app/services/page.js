@@ -14,11 +14,14 @@ import SolutionsSection, {
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from "@/components/sections/CaseStudiesSection/CaseStudiesSection";
+import { cmsPageSeo, pageMetadata } from "@/lib/seo";
 import "./page.css";
 
-export const metadata = {
-  title: "Services",
-};
+export async function generateMetadata() {
+  const page = await getServicesPage();
+
+  return pageMetadata({ path: "/services", ...cmsPageSeo(page) });
+}
 
 // The services `content` entry's component slots, in the order the admin shows
 // them (Component 1 … Component 6). The query aliases the live field keys onto

@@ -19,6 +19,7 @@ import './Footer.css';
 // it's links and an image.
 
 const COLUMNS = [1, 2, 3];
+const PATH_FIXES = new Map([['Case Studies', '/case-studies']]);
 
 function field(node, key) {
   return node?.fields?.find((f) => f.key === key) ?? null;
@@ -40,14 +41,22 @@ function isEmailItem(item) {
   return /^mailto:/i.test(item.path) || EMAIL.test(item.title.trim());
 }
 
+function pathFor(item) {
+  const fixed = PATH_FIXES.get(item.title);
+
+  return item.path === '/' && fixed ? fixed : item.path;
+}
+
 // An email label whose link isn't already a mailto: would otherwise point at
 // whatever page the menu item was built from — which for an address is never
 // what's meant. Fall back to mailing the label itself.
 function hrefFor(item) {
-  if (isEmailItem(item) && !/^mailto:/i.test(item.path)) {
+  const path = pathFor(item);
+
+  if (isEmailItem(item) && !/^mailto:/i.test(path)) {
     return `mailto:${item.title.trim()}`;
   }
-  return item.path;
+  return path;
 }
 
 // next/link handles in-app routes; anything with a scheme (mailto:, tel:, an
@@ -123,7 +132,7 @@ export default async function Footer() {
           <Link href="/" className="site-footer__brand" aria-label="Lower the Curve — home">
             <Image
               src={logo.url}
-              alt={logo.altText ?? 'Lower the Curve'}
+              alt={logo.altText || 'Lower the Curve'}
               width={logo.width ?? 190}
               height={logo.height ?? 79}
               className="site-footer__logo"

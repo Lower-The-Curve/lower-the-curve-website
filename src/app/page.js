@@ -15,7 +15,14 @@ import TestimonialsSection, {
 import CaseStudiesSection, {
   CASE_STUDIES_TYPE,
 } from '@/components/sections/CaseStudiesSection/CaseStudiesSection';
+import { cmsPageSeo, pageMetadata } from '@/lib/seo';
 import './page.css';
+
+export async function generateMetadata() {
+  const home = await getHomePage();
+
+  return pageMetadata({ path: '/', ...cmsPageSeo(home) });
+}
 
 // The home `content` entry's component slots, in the order the admin shows them
 // (Component 1 … Component 5). The query aliases the live field keys onto these

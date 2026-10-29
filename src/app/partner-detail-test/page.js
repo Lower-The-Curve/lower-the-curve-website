@@ -14,6 +14,7 @@ import './page.css';
 
 export const metadata = {
   title: 'Partner Detail Test',
+  robots: { index: false, follow: false },
 };
 
 export default async function PartnerDetailTestPage({ searchParams }) {

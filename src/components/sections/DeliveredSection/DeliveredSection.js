@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import accentedTitle from "@/components/ui/accentedTitle";
 import ArrowIcon from "@/components/ui/Button/ArrowIcon";
+import { toRelativePath } from "@/lib/url";
 import "./DeliveredSection.css";
 
 // The delivered section is a single `delivered` metaobject with:
@@ -68,6 +69,14 @@ function pathOf(url) {
   }
 }
 
+const BROKEN_CARD_PATHS = new Set(["/bonlabo", "/thinkertoys"]);
+
+function resolveCardUrl(url) {
+  if (!url || BROKEN_CARD_PATHS.has(pathOf(url))) return null;
+
+  return toRelativePath(url);
+}
+
 function shuffled(list) {
   const copy = [...list];
 
@@ -81,6 +90,26 @@ function shuffled(list) {
 
 const AUTO_MODES = new Set(["latest", "random"]);
 const AUTO_CARD_COUNT = 2;
+
+function cleanTitle(value) {
+  return String(value ?? "")
+    .replace(/^copy of\s+/i, "")
+    .trim();
+}
+
+function dedupeCards(cards) {
+  const seen = new Set();
+
+  return cards.filter((card) => {
+    const key = cleanTitle(fieldValue(card, "title")).toLowerCase();
+
+    if (!key) return true;
+    if (seen.has(key)) return false;
+
+    seen.add(key);
+    return true;
+  });
+}
 
 function pickCards(cards, partner, mode, count) {
   const ownCardId = field(partner, "delivered_card")?.reference?.id ?? null;
@@ -189,9 +218,9 @@ function CardShell({ href, hasCta, children }) {
 }
 
 function DeliveredCardItem({ card, linkLabel, solidCta, order, blueGlow }) {
-  const cardTitle = fieldValue(card, "title");
+  const cardTitle = cleanTitle(fieldValue(card, "title")) || null;
   const cardDescription = fieldValue(card, "description");
-  const url = fieldValue(card, "url", "link");
+  const url = resolveCardUrl(fieldValue(card, "url", "link"));
   const image = imageFrom(card, "image");
   const tags = tagsFrom(card);
 
@@ -213,7 +242,7 @@ function DeliveredCardItem({ card, linkLabel, solidCta, order, blueGlow }) {
           {image && (
             <Image
               src={image.url}
-              alt={image.altText ?? cardTitle ?? ""}
+              alt={image.altText || cardTitle || ""}
               width={image.width ?? 1160}
               height={image.height ?? 560}
               className="delivered__image"
@@ -288,7 +317,7 @@ export default function DeliveredSection({ section, allCards, partner }) {
   const title = fieldValue(section, "title");
   const description = fieldValue(section, "description");
   const linkLabel = fieldValue(section, "link_label", "button_text");
-  const cards = selectCards(section, allCards, partner);
+  const cards = dedupeCards(selectCards(section, allCards, partner));
   const alwaysOpen =
     fieldValue(section, "card_details")?.trim().toLowerCase() ===
     "always visible";

@@ -164,7 +164,7 @@ export default function PartnerDetailSection({ section }) {
           <div className="partner-detail__media">
             <Image
               src={mockup.url}
-              alt={mockup.altText ?? ''}
+              alt={mockup.altText || `${heading || 'Partner'} Shopify store mockup`}
               width={mockup.width ?? 2196}
               height={mockup.height ?? 1556}
               className="partner-detail__mockup"

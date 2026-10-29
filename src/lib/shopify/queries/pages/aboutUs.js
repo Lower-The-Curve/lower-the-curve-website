@@ -5,11 +5,13 @@ import {
   statsGridSectionFragment,
   teamSectionFragment,
 } from '../sections';
+import { pageSeoFragment } from './pageSeo';
 
 
 export const getAboutUsPageQuery = `
   query GetAboutUsPage($handle: MetaobjectHandleInput!) {
     metaobject(handle: $handle) {
+      ...PageSeoFields
       id
       handle
       component1: field(key: "sections") {
@@ -62,4 +64,5 @@ export const getAboutUsPageQuery = `
   ${featureCardsSectionFragment}
   ${statsGridSectionFragment}
   ${teamSectionFragment}
+  ${pageSeoFragment}
 `;

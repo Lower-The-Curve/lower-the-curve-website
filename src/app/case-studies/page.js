@@ -11,11 +11,14 @@ import DeliveredSection, {
 import RichTextWithStatsSection, {
   RICH_TEXT_WITH_STATS_TYPE,
 } from '@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection';
+import { cmsPageSeo, pageMetadata } from '@/lib/seo';
 import './page.css';
 
-export const metadata = {
-  title: 'Case Studies',
-};
+export async function generateMetadata() {
+  const page = await getCaseStudiesPage();
+
+  return pageMetadata({ path: '/case-studies', ...cmsPageSeo(page) });
+}
 
 // The Case Studies `content` entry's component slots, in the order the admin
 // shows them (Component 1 … Component 6). The query aliases the live field keys
