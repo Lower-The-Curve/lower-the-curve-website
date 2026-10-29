@@ -55,7 +55,7 @@ export default async function AboutUsPage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
-    <main className="about-us-page">
+    <>
       <JsonLd
         data={[
           webpageJsonLd({
@@ -71,7 +71,8 @@ export default async function AboutUsPage() {
           ]),
         ]}
       />
-      {sections.map((section) => {
+      <main className="about-us-page">
+        {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return <HeroSection key={section.id} section={section} fadeTop />;
@@ -86,7 +87,8 @@ export default async function AboutUsPage() {
           default:
             return null;
         }
-      })}
-    </main>
+        })}
+      </main>
+    </>
   );
 }

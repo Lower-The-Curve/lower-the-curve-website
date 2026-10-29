@@ -60,7 +60,7 @@ export default async function ServicesPage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
-    <main className="services-page">
+    <>
       <JsonLd
         data={[
           webpageJsonLd({
@@ -75,7 +75,8 @@ export default async function ServicesPage() {
           ]),
         ]}
       />
-      {sections.map((section) => {
+      <main className="services-page">
+        {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return (
@@ -98,7 +99,8 @@ export default async function ServicesPage() {
           default:
             return null;
         }
-      })}
-    </main>
+        })}
+      </main>
+    </>
   );
 }

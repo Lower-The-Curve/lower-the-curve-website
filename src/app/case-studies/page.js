@@ -59,7 +59,7 @@ export default async function CaseStudiesPage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
-    <main className="case-studies-page">
+    <>
       <JsonLd
         data={[
           webpageJsonLd({
@@ -75,7 +75,8 @@ export default async function CaseStudiesPage() {
           ]),
         ]}
       />
-      {sections.map((section) => {
+      <main className="case-studies-page">
+        {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return (
@@ -92,7 +93,8 @@ export default async function CaseStudiesPage() {
           default:
             return null;
         }
-      })}
-    </main>
+        })}
+      </main>
+    </>
   );
 }

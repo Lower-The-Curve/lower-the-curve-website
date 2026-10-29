@@ -124,7 +124,7 @@ export default async function PartnerDetailPage({ params }) {
   const metrics = await getCaseStudyMetrics(section);
 
   return (
-    <main className="partner-detail-page">
+    <>
       <JsonLd
         data={[
           webpageJsonLd({
@@ -147,7 +147,8 @@ export default async function PartnerDetailPage({ params }) {
           ]),
         ]}
       />
-      <PartnerDetailSection section={section} />
+      <main className="partner-detail-page">
+        <PartnerDetailSection section={section} />
       <PartnerDetailProblemSection
         section={section.problem?.reference}
         partnerName={partnerNameOf(section)}
@@ -168,6 +169,7 @@ export default async function PartnerDetailPage({ params }) {
         allCards={section.deliveredCards}
         partner={section}
       />
-    </main>
+      </main>
+    </>
   );
 }

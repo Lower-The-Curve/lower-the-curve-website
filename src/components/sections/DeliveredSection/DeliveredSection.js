@@ -69,14 +69,6 @@ function pathOf(url) {
   }
 }
 
-const BROKEN_CARD_PATHS = new Set(["/bonlabo", "/thinkertoys"]);
-
-function resolveCardUrl(url) {
-  if (!url || BROKEN_CARD_PATHS.has(pathOf(url))) return null;
-
-  return toRelativePath(url);
-}
-
 function shuffled(list) {
   const copy = [...list];
 
@@ -90,26 +82,6 @@ function shuffled(list) {
 
 const AUTO_MODES = new Set(["latest", "random"]);
 const AUTO_CARD_COUNT = 2;
-
-function cleanTitle(value) {
-  return String(value ?? "")
-    .replace(/^copy of\s+/i, "")
-    .trim();
-}
-
-function dedupeCards(cards) {
-  const seen = new Set();
-
-  return cards.filter((card) => {
-    const key = cleanTitle(fieldValue(card, "title")).toLowerCase();
-
-    if (!key) return true;
-    if (seen.has(key)) return false;
-
-    seen.add(key);
-    return true;
-  });
-}
 
 function pickCards(cards, partner, mode, count) {
   const ownCardId = field(partner, "delivered_card")?.reference?.id ?? null;
@@ -218,9 +190,10 @@ function CardShell({ href, hasCta, children }) {
 }
 
 function DeliveredCardItem({ card, linkLabel, solidCta, order, blueGlow }) {
-  const cardTitle = cleanTitle(fieldValue(card, "title")) || null;
+  const cardTitle = fieldValue(card, "title");
   const cardDescription = fieldValue(card, "description");
-  const url = resolveCardUrl(fieldValue(card, "url", "link"));
+  const rawUrl = fieldValue(card, "url", "link");
+  const url = rawUrl ? toRelativePath(rawUrl) : null;
   const image = imageFrom(card, "image");
   const tags = tagsFrom(card);
 
@@ -317,7 +290,7 @@ export default function DeliveredSection({ section, allCards, partner }) {
   const title = fieldValue(section, "title");
   const description = fieldValue(section, "description");
   const linkLabel = fieldValue(section, "link_label", "button_text");
-  const cards = dedupeCards(selectCards(section, allCards, partner));
+  const cards = selectCards(section, allCards, partner);
   const alwaysOpen =
     fieldValue(section, "card_details")?.trim().toLowerCase() ===
     "always visible";

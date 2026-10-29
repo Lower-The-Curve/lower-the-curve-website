@@ -43,7 +43,7 @@ export default async function ShopifyAppsPage() {
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
-    <main className="shopify-apps-page">
+    <>
       <JsonLd
         data={[
           webpageJsonLd({
@@ -58,7 +58,8 @@ export default async function ShopifyAppsPage() {
           ]),
         ]}
       />
-      {sections.map((section) => {
+      <main className="shopify-apps-page">
+        {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:
             return <HeroSection key={section.id} section={section} appIcons />;
@@ -79,7 +80,8 @@ export default async function ShopifyAppsPage() {
           default:
             return null;
         }
-      })}
-    </main>
+        })}
+      </main>
+    </>
   );
 }

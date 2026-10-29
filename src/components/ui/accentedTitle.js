@@ -40,7 +40,6 @@ const MARKUP =
  * @returns {Array<string|JSX.Element>} Ready to render as children.
  */
 export default function accentedTitle(title, classes) {
-  const text = String(title ?? '').replace(/^copy of\s+/i, '');
   const accents = {
     'blue-gradient': classes.blue,
     'green-gradient': classes.green,
@@ -49,8 +48,8 @@ export default function accentedTitle(title, classes) {
   const parts = [];
   let cursor = 0;
 
-  for (const match of text.matchAll(MARKUP)) {
-    if (match.index > cursor) parts.push(text.slice(cursor, match.index));
+  for (const match of title.matchAll(MARKUP)) {
+    if (match.index > cursor) parts.push(title.slice(cursor, match.index));
 
     if (match[1]) {
       // <strong> / <b>: bold, but in the body colour.
@@ -94,6 +93,6 @@ export default function accentedTitle(title, classes) {
     cursor = match.index + match[0].length;
   }
 
-  if (cursor < text.length) parts.push(text.slice(cursor));
+  if (cursor < title.length) parts.push(title.slice(cursor));
   return parts;
 }
