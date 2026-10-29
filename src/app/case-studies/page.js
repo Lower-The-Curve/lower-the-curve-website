@@ -11,7 +11,13 @@ import DeliveredSection, {
 import RichTextWithStatsSection, {
   RICH_TEXT_WITH_STATS_TYPE,
 } from '@/components/sections/RichTextWithStatsSection/RichTextWithStatsSection';
-import { cmsPageSeo, pageMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import {
+  breadcrumbJsonLd,
+  cmsPageSeo,
+  pageMetadata,
+  webpageJsonLd,
+} from '@/lib/seo';
 import './page.css';
 
 export async function generateMetadata() {
@@ -46,6 +52,7 @@ function sectionsIn(slot) {
 
 export default async function CaseStudiesPage() {
   const page = await getCaseStudiesPage();
+  const seo = cmsPageSeo(page);
 
   // Render order comes from the CMS: slot order first, then the order within a
   // slot that holds a list.
@@ -53,6 +60,21 @@ export default async function CaseStudiesPage() {
 
   return (
     <main className="case-studies-page">
+      <JsonLd
+        data={[
+          webpageJsonLd({
+            path: '/case-studies',
+            title: seo.title,
+            description: seo.description,
+            image: seo.image,
+            type: 'CollectionPage',
+          }),
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Case Studies', path: '/case-studies' },
+          ]),
+        ]}
+      />
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:

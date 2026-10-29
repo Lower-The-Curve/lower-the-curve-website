@@ -7,7 +7,13 @@ import AppCardsSection, {
   isAppCardsSection,
 } from "@/components/sections/AppCardsSection/AppCardsSection";
 import ProjectRouteSection from "@/components/sections/ProjectRouteSection/ProjectRouteSection";
-import { cmsPageSeo, pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/seo/JsonLd";
+import {
+  breadcrumbJsonLd,
+  cmsPageSeo,
+  pageMetadata,
+  webpageJsonLd,
+} from "@/lib/seo";
 import "./page.css";
 
 export async function generateMetadata() {
@@ -32,11 +38,26 @@ export default async function ShopifyAppsPage() {
     getShopifyAppsPage(),
     getAppPopUps(),
   ]);
+  const seo = cmsPageSeo(page);
 
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
     <main className="shopify-apps-page">
+      <JsonLd
+        data={[
+          webpageJsonLd({
+            path: "/shopify-apps",
+            title: seo.title,
+            description: seo.description,
+            image: seo.image,
+          }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Shopify Apps", path: "/shopify-apps" },
+          ]),
+        ]}
+      />
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:

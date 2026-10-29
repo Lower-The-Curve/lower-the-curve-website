@@ -14,7 +14,13 @@ import StatsGridSection, {
 import TeamSection, {
   TEAM_SECTION_TYPE,
 } from '@/components/sections/TeamSection/TeamSection';
-import { cmsPageSeo, pageMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import {
+  breadcrumbJsonLd,
+  cmsPageSeo,
+  pageMetadata,
+  webpageJsonLd,
+} from '@/lib/seo';
 import './page.css';
 
 export async function generateMetadata() {
@@ -44,11 +50,27 @@ function sectionsIn(slot) {
 
 export default async function AboutUsPage() {
   const page = await getAboutUsPage();
+  const seo = cmsPageSeo(page);
 
   const sections = COMPONENT_SLOTS.flatMap((slot) => sectionsIn(page?.[slot]));
 
   return (
     <main className="about-us-page">
+      <JsonLd
+        data={[
+          webpageJsonLd({
+            path: '/about-us',
+            title: seo.title,
+            description: seo.description,
+            image: seo.image,
+            type: 'AboutPage',
+          }),
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'About Us', path: '/about-us' },
+          ]),
+        ]}
+      />
       {sections.map((section) => {
         switch (section.type) {
           case HERO_SECTION_TYPE:

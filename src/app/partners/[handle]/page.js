@@ -18,7 +18,14 @@ import PartnerDetailResultsSection, {
 } from '@/components/sections/PartnerDetailResultsSection/PartnerDetailResultsSection';
 import CaseStudyMetricsSection from '@/components/sections/CaseStudyMetricsSection/CaseStudyMetricsSection';
 import DeliveredSection from '@/components/sections/DeliveredSection/DeliveredSection';
-import { cmsPageSeo, pageMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  cmsPageSeo,
+  pageMetadata,
+  webpageJsonLd,
+} from '@/lib/seo';
 import './page.css';
 
 function fieldValue(node, ...keys) {
@@ -41,6 +48,30 @@ function imageFrom(node, ...keys) {
   return null;
 }
 
+function partnerSeo(section, handle) {
+  const partner = section.fields?.find((f) => f.key === 'name')?.reference;
+  const name = fieldValue(partner, 'name', 'title') ?? partner?.handle ?? handle;
+  const subheading = fieldValue(section, 'subheading', 'subtitle');
+  const body = fieldValue(section, 'body', 'description');
+  const mockup = imageFrom(section, 'mockup', 'image');
+  const seo = cmsPageSeo(section);
+  const path = `/partners/${handle}`;
+
+  return {
+    name,
+    path,
+    title: seo.title || `${name} Case Study`,
+    description:
+      seo.description || [subheading, body].filter(Boolean).join(' '),
+    image: seo.image || mockup?.url,
+    imageWidth: seo.image ? seo.imageWidth : mockup?.width,
+    imageHeight: seo.image ? seo.imageHeight : mockup?.height,
+    imageAlt: seo.image
+      ? seo.imageAlt
+      : mockup?.altText || `${name} case study`,
+  };
+}
+
 export async function generateMetadata({ params }) {
   const { handle } = await params;
   const section = await getPartnerDetailPage(handle);
@@ -52,24 +83,16 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const partner = section.fields?.find((f) => f.key === 'name')?.reference;
-  const name = fieldValue(partner, 'name', 'title') ?? partner?.handle ?? handle;
-  const subheading = fieldValue(section, 'subheading', 'subtitle');
-  const body = fieldValue(section, 'body', 'description');
-  const mockup = imageFrom(section, 'mockup', 'image');
-  const seo = cmsPageSeo(section);
+  const seo = partnerSeo(section, handle);
 
   return pageMetadata({
-    path: `/partners/${handle}`,
-    title: seo.title || `${name} Case Study`,
-    description:
-      seo.description || [subheading, body].filter(Boolean).join(' '),
-    image: seo.image || mockup?.url,
-    imageWidth: seo.image ? seo.imageWidth : mockup?.width,
-    imageHeight: seo.image ? seo.imageHeight : mockup?.height,
-    imageAlt: seo.image
-      ? seo.imageAlt
-      : mockup?.altText || `${name} case study`,
+    path: seo.path,
+    title: seo.title,
+    description: seo.description,
+    image: seo.image,
+    imageWidth: seo.imageWidth,
+    imageHeight: seo.imageHeight,
+    imageAlt: seo.imageAlt,
     type: 'article',
     modifiedTime: section.updatedAt,
   });
@@ -90,6 +113,8 @@ export default async function PartnerDetailPage({ params }) {
 
   if (!section) notFound();
 
+  const seo = partnerSeo(section, handle);
+
   // `case_study_approach` is a list field; a partner has one approach entry.
   const approach = section.fields?.find((f) => f.key === 'case_study_approach')
     ?.references?.nodes?.[0];
@@ -100,6 +125,28 @@ export default async function PartnerDetailPage({ params }) {
 
   return (
     <main className="partner-detail-page">
+      <JsonLd
+        data={[
+          webpageJsonLd({
+            path: seo.path,
+            title: seo.title,
+            description: seo.description,
+            image: seo.image,
+          }),
+          articleJsonLd({
+            path: seo.path,
+            title: seo.title,
+            description: seo.description,
+            image: seo.image,
+            dateModified: section.updatedAt,
+          }),
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Case Studies', path: '/case-studies' },
+            { name: seo.name, path: seo.path },
+          ]),
+        ]}
+      />
       <PartnerDetailSection section={section} />
       <PartnerDetailProblemSection
         section={section.problem?.reference}
