@@ -1,4 +1,4 @@
-import Button from '@/components/ui/Button/Button';
+import ContactPopupTrigger from '@/components/ContactPopup/ContactPopupTrigger';
 import BookACallBackdrop from './BookACallBackdrop';
 import './GetInTouch.css';
 
@@ -84,14 +84,16 @@ export default function GetInTouch({ title, description, button }) {
         {description && <p className="get-in-touch__description">{description}</p>}
 
         {button && (
-          <Button
+          <ContactPopupTrigger
             href={button.url}
             variant="inverse"
             arrow="diagonal"
             className="get-in-touch__button"
+            aria-haspopup="dialog"
+            aria-controls="contact-popup"
           >
             {button.text}
-          </Button>
+          </ContactPopupTrigger>
         )}
       </div>
     </section>

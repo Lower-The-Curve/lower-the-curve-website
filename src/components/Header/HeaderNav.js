@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Button from '@/components/ui/Button/Button';
+import ContactPopupTrigger from '@/components/ContactPopup/ContactPopupTrigger';
 import './HeaderNav.css';
 
 // The nav list plus the CTA. Client Component because the menu collapses at
@@ -111,16 +111,18 @@ export default function HeaderNav({ items, cta, ctaBackground, ctaLabel }) {
         </ul>
 
         {cta && (
-          <Button
+          <ContactPopupTrigger
             href={cta.url}
             variant="solid"
             arrow="none"
             style={ctaStyle}
             className="site-nav__cta"
+            aria-haspopup="dialog"
+            aria-controls="contact-popup"
             onClick={close}
           >
             {cta.text}
-          </Button>
+          </ContactPopupTrigger>
         )}
       </nav>
 
