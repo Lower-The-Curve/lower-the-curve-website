@@ -177,6 +177,22 @@
   margin-top: 0.25rem;
 }
 
+.contact-popup__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contact-popup__submit:disabled:hover {
+  transform: none;
+}
+
+.contact-popup__status {
+  margin: 1.5rem 0 0;
+  font-size: var(--fs-body-xs);
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
 .contact-popup__contact {
   display: flex;
   flex-direction: column;

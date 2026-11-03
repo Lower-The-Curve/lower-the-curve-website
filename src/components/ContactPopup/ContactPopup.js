@@ -8,6 +8,16 @@ import { CONTACT_POPUP_EVENT } from './contactPopupEvents';
 import { ChatIcon, CloseIcon } from './ContactPopupIcons';
 import './ContactPopup.css';
 
+// Public endpoint — Formspree form IDs are safe to ship in client code.
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xwllwgkv';
+
+const SUBMIT_STATUS = {
+  idle: 'idle',
+  submitting: 'submitting',
+  success: 'success',
+  error: 'error',
+};
+
 const ACCENT_CLASSES = {
   accent: 'contact-popup__accent',
   blue: 'contact-popup__accent--blue',
@@ -37,6 +47,7 @@ export default function ContactPopup({ content }) {
   const panelRef = useRef(null);
   const firstFieldRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(SUBMIT_STATUS.idle);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -47,6 +58,7 @@ export default function ContactPopup({ content }) {
 
       dialog.showModal();
       setOpen(true);
+      setSubmitStatus(SUBMIT_STATUS.idle);
       if (panelRef.current) panelRef.current.scrollTop = 0;
       window.requestAnimationFrame(() => firstFieldRef.current?.focus());
     };
@@ -83,10 +95,30 @@ export default function ContactPopup({ content }) {
     if (event.target === dialogRef.current) close();
   }
 
-  // UI-only for now: the fields validate, but there is no backend to send to.
-  // The API call and success/error states land in a later pass.
-  function handleSubmit(event) {
+  // Post to Formspree with fetch instead of a native form POST so the visitor
+  // stays in the popup: Formspree returns JSON when we ask for it, which lets us
+  // swap in an inline success/error message without leaving the page.
+  async function handleSubmit(event) {
     event.preventDefault();
+    if (submitStatus === SUBMIT_STATUS.submitting) return;
+
+    const form = event.currentTarget;
+    setSubmitStatus(SUBMIT_STATUS.submitting);
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form),
+      });
+
+      if (!response.ok) throw new Error('Formspree rejected the submission');
+
+      form.reset();
+      setSubmitStatus(SUBMIT_STATUS.success);
+    } catch {
+      setSubmitStatus(SUBMIT_STATUS.error);
+    }
   }
 
   const titleId = 'contact-popup-title';
@@ -234,10 +266,24 @@ export default function ContactPopup({ content }) {
               arrow="diagonal"
               className="contact-popup__submit"
               style={{ fontSize: 'var(--fs-body-base)' }}
+              disabled={submitStatus === SUBMIT_STATUS.submitting}
+              aria-busy={submitStatus === SUBMIT_STATUS.submitting}
             >
               {content.labels.submit}
             </Button>
           </form>
+
+          {submitStatus === SUBMIT_STATUS.success && (
+            <p className="contact-popup__status" role="status">
+              Thanks for reaching out. We will be in touch soon.
+            </p>
+          )}
+
+          {submitStatus === SUBMIT_STATUS.error && (
+            <p className="contact-popup__status" role="alert">
+              Something went wrong sending your message. Please try again.
+            </p>
+          )}
 
           {content.contactItems?.length > 0 && (
             <div className="contact-popup__contact">
