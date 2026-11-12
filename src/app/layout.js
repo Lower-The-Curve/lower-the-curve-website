@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { Poppins } from 'next/font/google';
 import './typography.css';
 import './globals.css';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
+import ContactPopupLoader from '@/components/ContactPopup/ContactPopupLoader';
 import FaviconAnimation from '@/components/FaviconAnimation/FaviconAnimation';
 import JsonLd from '@/components/seo/JsonLd';
 import {
@@ -17,7 +19,7 @@ import {
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400', '600', '700'],
+  weight: ['200', '300', '400', '600', '700'],
   display: 'swap',
   variable: '--font-poppins',
 });
@@ -73,6 +75,12 @@ export default function RootLayout({ children }) {
         <Header />
         {children}
         <Footer />
+        {/* Site chrome like the header/footer: it streams in after the page
+            shell, so a Shopify hiccup or an unpublished metaobject can't block
+            the page or break the CTAs' normal link fallback. */}
+        <Suspense fallback={null}>
+          <ContactPopupLoader />
+        </Suspense>
       </body>
     </html>
   );
